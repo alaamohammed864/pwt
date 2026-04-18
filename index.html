@@ -412,9 +412,9 @@ footer a:hover{color:var(--green-bright);}
 
 <!-- HEADER -->
 <header>
-  <div class="build-badge">BUILD PASSING · 30 FILES · HTML5</div>
+  <div class="build-badge">BUILD PASSING · 27 FILES · HTML5</div>
   <h1>🌳 شجرة مستودع نظام تصاريح العمل</h1>
-  <p class="sub">مرّر الماوس فوق الثمار لرؤية الملفات — انقر لفتحها على GitHub</p>
+  <p class="sub">مرّر الماوس فوق الثمار لرؤية الملفات — انقر لفتحها مباشرةً</p>
   <div class="stats-bar">
     <div class="stat-chip"><span class="dot" style="background:#ff6b6b"></span>3 Hot Work Permit</div>
     <div class="stat-chip"><span class="dot" style="background:#38bdf8"></span>2 Cold Work Permit</div>
@@ -429,7 +429,7 @@ footer a:hover{color:var(--green-bright);}
 <div class="filter-bar">
   <button class="filter-btn active" onclick="setFilter('all')" data-filter="all">
     <span class="fbdot" style="background:rgba(255,255,255,0.4)"></span>
-    الكل <span class="filter-count">30</span>
+    الكل <span class="filter-count">27</span>
   </button>
   <button class="filter-btn" onclick="setFilter('hot')" data-filter="hot">
     <span class="fbdot" style="background:#ff6b6b"></span>
@@ -536,7 +536,7 @@ footer a:hover{color:var(--green-bright);}
     <span class="footer-stat">❄ <strong>2</strong> Cold Work Permits</span>
     <span class="footer-stat">🤖 <strong>12</strong> AI Prototypes</span>
     <span class="footer-stat">🔧 <strong>9</strong> Misc Prototypes</span>
-    <span class="footer-stat">📁 <strong>30</strong> Total Files</span>
+    <span class="footer-stat">📁 <strong>27</strong> Total Files</span>
     <span class="footer-stat" id="totalSizeLabel">💾 ~3.8 MB Total</span>
   </div>
   🏭 Permit-to-Work System · HSE Industrial Suite ·
@@ -546,9 +546,9 @@ footer a:hover{color:var(--green-bright);}
 
 <script>
 /* ══════════════════════════════════════════
-   CONFIG
+   CONFIG — ✅ تم التصحيح: GitHub Pages URL
 ══════════════════════════════════════════ */
-const REPO_BASE = 'https://github.com/alaamohammed864/pwt/blob/main/';
+const REPO_BASE = 'https://alaamohammed864.github.io/pwt/';
 const REPO_URL  = 'https://github.com/alaamohammed864/pwt';
 
 /* ══════════════════════════════════════════
@@ -831,6 +831,7 @@ function drawLeafCluster(x,y,r,alpha){
   }
   ctx.globalAlpha=1;
 }
+
 function drawCanopy(){
   [{x:CX,y:163,r:110},{x:CX-224,y:183,r:84},{x:CX+228,y:175,r:82},
    {x:CX-150,y:121,r:68},{x:CX+157,y:116,r:66},
@@ -1094,7 +1095,7 @@ function showTooltip(f,cx,cy){
       <span class="tip-complexity">${stars} تعقيد</span>
     </div>
     <div class="tip-actions">
-      <button class="tip-btn tip-btn-primary" onclick="openFile('${f.file.name}')">⇗ فتح GitHub</button>
+      <button class="tip-btn tip-btn-primary" onclick="openFile('${f.file.name}')">⇗ فتح الملف</button>
       <button class="tip-btn tip-btn-secondary" onclick="copyFileLink('${f.file.name}')">📋 نسخ رابط</button>
     </div>`;
   tip.classList.add('visible');
@@ -1195,7 +1196,7 @@ function buildListView(){
       <td>${f.desc}</td>
       <td>${f.sizeLabel}</td>
       <td style="font-family:var(--font-mono);font-size:13px;color:rgba(150,200,170,0.7)">${compl}</td>
-      <td><a class="open-link" href="${REPO_BASE+f.name}" target="_blank">فتح ⇗</a></td>
+      <td><a class="open-link" href="${REPO_BASE+f.name}" target="_blank" onclick="event.stopPropagation()">فتح ⇗</a></td>
     </tr>`;
   }).join('');
 }
@@ -1228,13 +1229,18 @@ function toggleDayMode(){
   showToast(dayMode?'☀ وضع النهار':'🌙 وضع الليل');
 }
 
+/* ══════════════════════════════════════════
+   ✅ openFile — يفتح الملف عبر GitHub Pages
+══════════════════════════════════════════ */
 function openFile(name){
-  window.open(REPO_BASE+name,'_blank');
+  window.open(REPO_BASE + name, '_blank');
 }
+
 function openAll(){
   if(!confirm(`سيتم فتح ${files.length} تاب جديد — متأكد؟`)) return;
   files.forEach((f,i)=>setTimeout(()=>window.open(REPO_BASE+f.name,'_blank'),i*200));
 }
+
 function openRandom(){
   const vis=fruits.filter(f=>!f.dimmed);
   if(!vis.length) return;
@@ -1243,12 +1249,15 @@ function openRandom(){
   showToast(`🎲 ${f.file.name}`);
   setTimeout(()=>openFile(f.file.name),800);
 }
+
 function copyFileLink(name){
   navigator.clipboard.writeText(REPO_BASE+name).then(()=>showToast('📋 تم نسخ الرابط'));
 }
+
 function copyClone(){
   navigator.clipboard.writeText(`git clone ${REPO_URL}.git`).then(()=>showToast('📋 تم نسخ أمر git clone'));
 }
+
 function exportCSV(){
   const hdr='Name,Group,Size,Complexity,Version,Description\n';
   const rows=files.map(f=>`"${f.name}","${f.group}","${f.sizeLabel}",${f.complexity},"${f.version}","${f.desc}"`).join('\n');
@@ -1257,6 +1266,7 @@ function exportCSV(){
   a.href=URL.createObjectURL(blob); a.download='ptw-files.csv'; a.click();
   showToast('⬇ تم تصدير CSV');
 }
+
 function showEmbed(){
   document.getElementById('embedCode').value=
     `<iframe src="${window.location.href}" width="100%" height="600" frameborder="0" style="border-radius:12px;overflow:hidden;"></iframe>`;
@@ -1307,7 +1317,6 @@ fruits.forEach((f,i)=>{
     const dur=500, start=Date.now();
     function anim(){
       const p=Math.min(1,(Date.now()-start)/dur);
-      const ease=1-Math.pow(1-p,3);
       f.cy=f.cy+(orig.cy-(f.cy))*0.2;
       if(p<1) requestAnimationFrame(anim);
     }
