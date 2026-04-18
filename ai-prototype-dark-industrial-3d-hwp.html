@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOT WORK PERMIT — Industrial PTW System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600&display=swap');
+
+:root {
+  --red: #c0392b;
+  --red-dark: #7f0000;
+  --red-glow: #ff2200;
+  --orange: #e67e22;
+  --orange-light: #f39c12;
+  --yellow: #f1c40f;
+  --green: #27ae60;
+  --green-light: #2ecc71;
+  --bg-dark: #0a0a0f;
+  --bg-panel: #111118;
+  --bg-card: #16161f;
+  --bg-field: #0d0d14;
+  --border: #2a2a3a;
+  --border-red: #6b1111;
+  --text-primary: #e8e8f0;
+  --text-secondary: #9090a8;
+  --text-dim: #5a5a70;
+  --mono: 'Share Tech Mono', monospace;
+  --sans: 'Barlow', sans-serif;
+  --cond: 'Barlow Condensed', sans-serif;
+  --display: 'Rajdhani', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── CANVAS ── */
+#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── LAYOUT ── */
+.app-shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: linear-gradient(180deg, #0f0f18 0%, #0a0a0f 100%);
+  border-right: 1px solid var(--border-red);
+  padding: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo {
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid var(--border-red);
+  text-align: center;
+}
+
+.sidebar-logo .flame-icon {
+  font-size: 32px;
+  display: block;
+  animation: flicker 1.5s infinite alternate;
+}
+
+@keyframes flicker {
+  0% { filter: drop-shadow(0 0 6px #ff4400) brightness(1); }
+  100% { filter: drop-shadow(0 0 16px #ff8800) brightness(1.2); }
+}
+
+.sidebar-logo h1 {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+.sidebar-logo .permit-id {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+
+.status-badge {
+  margin: 12px 16px;
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+}
+
+.status-badge.active { background: rgba(39,174,96,0.15); border-color: var(--green); color: var(--green); }
+.status-badge.suspended { background: rgba(230,126,34,0.15); border-color: var(--orange); color: var(--orange); }
+.status-badge.closed { background: rgba(192,57,43,0.15); border-color: var(--red); color: var(--red); }
+
+.nav-section {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(42,42,58,0.5);
+}
+
+.nav-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 6px 16px 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+  font-family: var(--cond);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+}
+
+.nav-item:hover {
+  background: rgba(192,57,43,0.08);
+  color: var(--text-primary);
+  border-left-color: var(--red);
+}
+
+.nav-item.active {
+  background: rgba(192,57,43,0.12);
+  color: var(--red);
+  border-left-color: var(--red);
+}
+
+.nav-item .icon { font-size: 14px; width: 18px; text-align: center; }
+
+.sidebar-actions {
+  margin-top: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid var(--border-red);
+}
+
+.btn {
+  padding: 8px 14px;
+  border: 1px solid;
+  border-radius: 3px;
+  font-family: var(--cond);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  background: transparent;
+}
+
+.btn-red { border-color: var(--red); color: var(--red); }
+.btn-red:hover { background: var(--red); color: #fff; box-shadow: 0 0 16px rgba(192,57,43,0.5); }
+
+.btn-green { border-color: var(--green); color: var(--green); }
+.btn-green:hover { background: var(--green); color: #fff; }
+
+.btn-orange { border-color: var(--orange); color: var(--orange); }
+.btn-orange:hover { background: var(--orange); color: #fff; }
+
+/* ── MAIN CONTENT ── */
+.main-content {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+/* ── PERMIT HEADER ── */
+.permit-header {
+  background: linear-gradient(135deg, #1a0505 0%, #0f0f18 50%, #1a0505 100%);
+  border: 1px solid var(--border-red);
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.permit-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--red), var(--orange), var(--red), transparent);
+}
+
+.permit-header::after {
+  content: 'HOT WORK';
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  font-family: var(--display);
+  font-size: 64px;
+  font-weight: 700;
+  color: rgba(192,57,43,0.06);
+  letter-spacing: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.header-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.header-left { display: flex; flex-direction: column; gap: 10px; }
+.header-center { text-align: center; }
+.header-right { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+
+.permit-title {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: 4px;
+  text-shadow: 0 0 30px rgba(192,57,43,0.5);
+  text-align: center;
+}
+
+.permit-subtitle {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.field-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-label-sm {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.field-input {
+  background: var(--bg-field);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 5px 9px;
+  border-radius: 2px;
+  transition: all 0.15s;
+  width: 100%;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: var(--red);
+  box-shadow: 0 0 8px rgba(192,57,43,0.2);
+}
+
+.field-input.large {
+  font-size: 14px;
+  padding: 7px 12px;
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+/* SCE / Risk row */
+.header-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.badge-box input[type="checkbox"] {
+  accent-color: var(--red);
+  width: 13px; height: 13px;
+  cursor: pointer;
+}
+
+.risk-select {
+  background: var(--bg-field);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 2px;
+}
+
+.risk-select.high { border-color: var(--red); color: var(--red); }
+.risk-select.medium { border-color: var(--orange); color: var(--orange); }
+.risk-select.low { border-color: var(--green); color: var(--green); }
+
+/* ── SECTION CARD ── */
+.section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.section-card:hover { border-color: rgba(192,57,43,0.3); }
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  background: linear-gradient(90deg, rgba(192,57,43,0.15) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--red);
+  letter-spacing: 1px;
+  background: rgba(192,57,43,0.15);
+  border: 1px solid rgba(192,57,43,0.3);
+  padding: 2px 7px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.section-title {
+  font-family: var(--cond);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.section-icon { font-size: 16px; }
+
+.section-collapse { font-size: 10px; color: var(--text-dim); margin-left: auto; transition: transform 0.2s; }
+.section-collapse.open { transform: rotate(180deg); }
+
+.section-body {
+  padding: 18px;
+}
+
+/* ── FORM GRID ── */
+.form-grid { display: grid; gap: 12px; }
+.form-grid-2 { grid-template-columns: 1fr 1fr; }
+.form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.form-field { display: flex; flex-direction: column; gap: 4px; }
+
+.field-label {
+  font-family: var(--cond);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.field-label.required::after {
+  content: ' *';
+  color: var(--red);
+}
+
+textarea.field-input {
+  resize: vertical;
+  min-height: 70px;
+  line-height: 1.5;
+}
+
+select.field-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235a5a70'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+/* ── HAZARD GRID ── */
+.hazard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.hazard-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.hazard-item:nth-child(even) { border-right: none; }
+.hazard-item:hover { background: rgba(192,57,43,0.06); }
+
+.hazard-item input[type="checkbox"] {
+  accent-color: var(--red);
+  width: 14px; height: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hazard-label {
+  font-family: var(--cond);
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  color: var(--text-secondary);
+  transition: color 0.15s;
+}
+
+.hazard-item:has(input:checked) { background: rgba(192,57,43,0.08); }
+.hazard-item:has(input:checked) .hazard-label { color: var(--red); font-weight: 600; }
+
+.hazard-critical { border-left: 3px solid var(--red); }
+.hazard-critical .hazard-label { color: #d44; }
+
+/* ── CHECKLIST ── */
+.checklist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--bg-field);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.check-item:hover { border-color: var(--red); }
+.check-item:has(input:checked) { border-color: var(--green); background: rgba(39,174,96,0.06); }
+
+.check-item input[type="checkbox"] {
+  accent-color: var(--green);
+  width: 13px; height: 13px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.check-label {
+  font-family: var(--cond);
+  font-size: 12px;
+  color: var(--text-secondary);
+  letter-spacing: 0.2px;
+}
+
+/* ── GAS TABLE ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+
+.data-table th {
+  background: rgba(192,57,43,0.2);
+  border: 1px solid var(--border-red);
+  padding: 8px 10px;
+  text-align: left;
+  font-family: var(--cond);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.data-table td {
+  border: 1px solid var(--border);
+  padding: 0;
+}
+
+.data-table td input,
+.data-table td select {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 8px;
+  outline: none;
+}
+
+.data-table td input:focus,
+.data-table td select:focus {
+  background: rgba(192,57,43,0.08);
+}
+
+.data-table tr:hover td { background: rgba(255,255,255,0.01); }
+
+.gas-level {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+}
+
+.gas-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+
+.gas-dot.warn { background: var(--orange); }
+.gas-dot.danger { background: var(--red); }
+
+.table-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  border: 1px solid;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+}
+
+.btn-sm.add { border-color: var(--green); color: var(--green); }
+.btn-sm.add:hover { background: var(--green); color: var(--bg-dark); }
+
+.btn-sm.remove { border-color: var(--red); color: var(--red); }
+.btn-sm.remove:hover { background: var(--red); color: #fff; }
+
+/* ── AUTHORIZATION PANEL ── */
+.auth-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.auth-card {
+  background: var(--bg-field);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 14px;
+  position: relative;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--red), var(--orange));
+}
+
+.auth-role {
+  font-family: var(--cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 10px;
+}
+
+.sig-box {
+  height: 56px;
+  border: 1px dashed var(--border);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 8px 0;
+  transition: all 0.15s;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.sig-box:hover { border-color: var(--red); color: var(--red); background: rgba(192,57,43,0.04); }
+.sig-box.signed { background: rgba(39,174,96,0.08); border-color: var(--green); color: var(--green); border-style: solid; }
+
+/* ── VALIDATION ── */
+.section-card.invalid { border-color: var(--red); }
+.section-card.valid { border-color: rgba(39,174,96,0.3); }
+
+.field-input.error { border-color: var(--red); background: rgba(192,57,43,0.06); }
+
+.validation-msg {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--red);
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+/* ── AUDIT TRAIL ── */
+.audit-entry {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(42,42,58,0.5);
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.audit-time { color: var(--text-dim); white-space: nowrap; }
+.audit-user { color: var(--orange); }
+.audit-action { color: var(--text-secondary); }
+
+/* ── VALIDATION TABLE ── */
+.validation-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.val-col { border-right: 1px solid var(--border); }
+.val-col:last-child { border-right: none; }
+
+.val-header {
+  background: rgba(255,255,255,0.04);
+  padding: 8px 14px;
+  font-family: var(--cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--orange);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.val-row {
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(42,42,58,0.3);
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.val-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ── STATUS BAR ── */
+.status-bar {
+  position: fixed;
+  bottom: 0; left: 240px; right: 0;
+  background: rgba(10,10,15,0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border-red);
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  z-index: 100;
+  font-family: var(--mono);
+  font-size: 10px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+}
+
+.dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
+.dot.red { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.dot.orange { background: var(--orange); box-shadow: 0 0 6px var(--orange); }
+
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.status-text { color: var(--text-secondary); }
+
+.status-auto {
+  margin-left: auto;
+  color: var(--text-dim);
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-red);
+  border-radius: 4px;
+  padding: 24px;
+  max-width: 480px;
+  width: 90%;
+  position: relative;
+}
+
+.modal-title {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--red);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px; right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.modal-close:hover { color: var(--red); }
+
+/* ── EMERGENCY CONTACTS ── */
+.emergency-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.emergency-card {
+  background: rgba(192,57,43,0.08);
+  border: 1px solid rgba(192,57,43,0.25);
+  border-radius: 3px;
+  padding: 10px;
+  text-align: center;
+}
+
+.emergency-label {
+  font-family: var(--cond);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.emergency-num {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--orange);
+  font-weight: 700;
+}
+
+/* ── PRINT ── */
+@media print {
+  body { background: #fff; color: #000; }
+  .sidebar, .status-bar, #bg-canvas { display: none !important; }
+  .app-shell { grid-template-columns: 1fr; }
+  .main-content { padding: 8px; }
+  .section-card { border: 1px solid #ccc; break-inside: avoid; }
+  .section-header { background: #f44444; color: #fff; }
+  .field-input { border: 1px solid #aaa; background: #fff; color: #000; }
+  .permit-title { color: #c00; }
+  .data-table th { background: #f44; color: #fff; }
+  .data-table td { border-color: #aaa; }
+  .data-table td input { color: #000; }
+}
+
+/* ── QR CODE ── */
+.qr-placeholder {
+  width: 80px; height: 80px;
+  background: #fff;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-red), transparent);
+  margin: 16px 0;
+}
+
+/* ── TAGS ── */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.tag-red { background: rgba(192,57,43,0.2); color: var(--red); border: 1px solid rgba(192,57,43,0.4); }
+.tag-green { background: rgba(39,174,96,0.2); color: var(--green); border: 1px solid rgba(39,174,96,0.4); }
+.tag-orange { background: rgba(230,126,34,0.2); color: var(--orange); border: 1px solid rgba(230,126,34,0.4); }
+
+/* ── PEOPLE COUNT ── */
+.people-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.people-box {
+  background: var(--bg-field);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 10px;
+  text-align: center;
+}
+
+.people-label {
+  font-family: var(--cond);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+}
+
+.people-input {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--orange);
+  background: transparent;
+  border: none;
+  text-align: center;
+  width: 100%;
+  outline: none;
+}
+
+/* ── SHIFT TRACKER ── */
+.shift-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.shift-card {
+  background: var(--bg-field);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 12px;
+}
+
+.shift-card-title {
+  font-family: var(--cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.safe-to-start {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(39,174,96,0.08);
+  border: 1px solid rgba(39,174,96,0.25);
+  border-radius: 3px;
+  margin-top: 8px;
+}
+
+.safe-label {
+  font-family: var(--cond);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--green);
+}
+
+/* ── SUSPENSION BOX ── */
+.suspension-box {
+  background: rgba(230,126,34,0.06);
+  border: 1px solid rgba(230,126,34,0.25);
+  border-radius: 3px;
+  padding: 14px;
+}
+
+.suspension-title {
+  font-family: var(--cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 10px;
+}
+
+/* ── COMPLETION ── */
+.completion-box {
+  background: rgba(39,174,96,0.06);
+  border: 2px solid rgba(39,174,96,0.3);
+  border-radius: 3px;
+  padding: 16px;
+  text-align: center;
+}
+
+.completion-title {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 6px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: var(--border-red); border-radius: 3px; }
+
+/* ── ACTIVE SECTION HIGHLIGHT ── */
+.section-card.section-active {
+  border-color: rgba(192,57,43,0.5);
+  box-shadow: 0 0 20px rgba(192,57,43,0.1);
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="app-shell">
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span class="flame-icon">🔥</span>
+    <h1>Hot Work PTW</h1>
+    <div class="permit-id" id="permit-id-display">PTW-HW-2024-0001</div>
+  </div>
+
+  <div id="permit-status-badge" class="status-badge active" onclick="cycleStatus()">● ACTIVE</div>
+
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Permit Info</div>
+      <div class="nav-item active" onclick="scrollTo('s-header')"><span class="icon">📋</span> Header & Info</div>
+      <div class="nav-item" onclick="scrollTo('s-workdesc')"><span class="icon">🔧</span> Work Description</div>
+      <div class="nav-item" onclick="scrollTo('s-hazards')"><span class="icon">⚠️</span> Hazard Identification</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Safety</div>
+      <div class="nav-item" onclick="scrollTo('s-conditions')"><span class="icon">🛡️</span> Safe Conditions</div>
+      <div class="nav-item" onclick="scrollTo('s-hse')"><span class="icon">🦺</span> HSE Requirements</div>
+      <div class="nav-item" onclick="scrollTo('s-gas')"><span class="icon">🧪</span> Gas Testing</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Authorization</div>
+      <div class="nav-item" onclick="scrollTo('s-auth')"><span class="icon">✍️</span> Authorization</div>
+      <div class="nav-item" onclick="scrollTo('s-validation')"><span class="icon">✅</span> Site Validation</div>
+      <div class="nav-item" onclick="scrollTo('s-suspension')"><span class="icon">⏸️</span> Suspension/Reissue</div>
+      <div class="nav-item" onclick="scrollTo('s-completion')"><span class="icon">🏁</span> Completion</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">System</div>
+      <div class="nav-item" onclick="scrollTo('s-emergency')"><span class="icon">🚨</span> Emergency Contacts</div>
+      <div class="nav-item" onclick="scrollTo('s-audit')"><span class="icon">📜</span> Audit Trail</div>
+    </div>
+  </nav>
+
+  <div class="sidebar-actions">
+    <button class="btn btn-red" onclick="validateForm()">⚡ VALIDATE</button>
+    <button class="btn btn-orange" onclick="window.print()">🖨️ PRINT A4</button>
+    <button class="btn btn-green" onclick="saveAll()">💾 SAVE</button>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main-content" style="padding-bottom: 60px;">
+
+  <!-- PERMIT HEADER -->
+  <div class="permit-header" id="s-header">
+    <div class="header-grid">
+      <div class="header-left">
+        <div class="field-inline">
+          <span class="field-label-sm">Main Permit No.</span>
+          <input class="field-input large" id="permitNo" value="PTW-HW-2024-0001" oninput="updatePermitId(this.value)" style="max-width:200px;">
+        </div>
+        <div class="field-inline">
+          <span class="field-label-sm">Work Order No.</span>
+          <input class="field-input" id="workOrderNo" placeholder="WO-XXXX" style="max-width:160px;">
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+          <div class="field-inline" style="gap:6px;">
+            <label class="badge-box">
+              <input type="checkbox" id="sce-check"> SCE
+            </label>
+          </div>
+          <div class="field-inline" style="gap:6px;">
+            <span class="field-label-sm">Risk:</span>
+            <select class="field-input risk-select" id="riskCategory" onchange="updateRiskColor(this)" style="max-width:130px;">
+              <option value="">-- Select --</option>
+              <option value="HIGH">HIGH RISK</option>
+              <option value="MEDIUM">MEDIUM RISK</option>
+              <option value="LOW">LOW RISK</option>
+            </select>
+          </div>
+          <div class="field-inline" style="gap:6px;">
+            <span class="field-label-sm">Rev.</span>
+            <input class="field-input" id="revNo" value="00" style="max-width:45px; text-align:center;">
+          </div>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div style="display:flex; justify-content:center; gap:12px; align-items:center;">
+          <div class="qr-placeholder" id="qr-container">
+            <canvas id="qr-canvas" width="80" height="80"></canvas>
+          </div>
+          <div>
+            <div class="permit-title">HOT WORK PERMIT</div>
+            <div class="permit-subtitle">Permit to Work — Oil &amp; Gas Industrial System</div>
+            <div style="display:flex; gap:6px; justify-content:center; margin-top:8px;">
+              <span class="tag tag-red">🔥 HOT WORK</span>
+              <span id="status-tag" class="tag tag-green">● ACTIVE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div>
+          <div class="field-label">Performed By</div>
+          <div style="display:flex; gap:6px; margin-top:4px;">
+            <label class="badge-box"><input type="radio" name="performer" value="company" checked> Company</label>
+            <label class="badge-box"><input type="radio" name="performer" value="contractor"> Contractor</label>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Naked Flame Allowed</label>
+          <div style="display:flex; gap:6px;">
+            <label class="badge-box"><input type="radio" name="nakedflame" value="yes"> YES</label>
+            <label class="badge-box"><input type="radio" name="nakedflame" value="no" checked> NO</label>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Attachments</label>
+          <div style="display:flex; flex-direction:column; gap:4px; margin-top:2px;">
+            <label class="check-item" style="margin:0; padding:5px 8px;">
+              <input type="checkbox" id="att-ra" style="accent-color:var(--green);"> <span class="check-label" style="font-size:11px;">Risk Assessment (HIRA)</span>
+            </label>
+            <label class="check-item" style="margin:0; padding:5px 8px;">
+              <input type="checkbox" id="att-ms" style="accent-color:var(--green);"> <span class="check-label" style="font-size:11px;">Method Statement</span>
+            </label>
+            <label class="check-item" style="margin:0; padding:5px 8px;">
+              <input type="checkbox" id="att-dwg" style="accent-color:var(--green);"> <span class="check-label" style="font-size:11px;">Drawing / P&ID</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="form-grid form-grid-4">
+      <div class="form-field">
+        <label class="field-label required">Work Site</label>
+        <input class="field-input" id="workSite" placeholder="e.g. Unit-3 / Tank Farm" required>
+      </div>
+      <div class="form-field">
+        <label class="field-label required">Date</label>
+        <input class="field-input" id="permitDate" type="date" required>
+      </div>
+      <div class="form-field">
+        <label class="field-label">Valid From</label>
+        <input class="field-input" id="validFrom" type="datetime-local">
+      </div>
+      <div class="form-field">
+        <label class="field-label">Valid Until</label>
+        <input class="field-input" id="validTo" type="datetime-local">
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: WORK DESCRIPTION -->
+  <div class="section-card" id="s-workdesc">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🔧</span>
+      <span class="section-num">SEC 01</span>
+      <span class="section-title">Description of Work to Be Performed</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="form-grid form-grid-3" style="margin-bottom:12px;">
+        <div class="form-field" style="grid-column: span 2;">
+          <label class="field-label required">Equipment Name / اسم المعدة</label>
+          <input class="field-input" id="equipName" placeholder="Enter equipment name" required>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Equipment Number</label>
+          <input class="field-input" id="equipNo" placeholder="e.g. P-101A">
+        </div>
+      </div>
+      <div class="form-grid form-grid-2" style="margin-bottom:12px;">
+        <div class="form-field">
+          <label class="field-label required">Work Location / مكان العمل</label>
+          <input class="field-input" id="workLocation" placeholder="Exact location description" required>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Vehicle Plate Number</label>
+          <input class="field-input" id="vehiclePlate" placeholder="e.g. ABC 1234">
+        </div>
+      </div>
+      <div class="form-field" style="margin-bottom:12px;">
+        <label class="field-label required">Work Description</label>
+        <textarea class="field-input" id="workDesc" placeholder="Describe the scope of hot work to be performed in detail..." required></textarea>
+      </div>
+      <div class="form-field" style="margin-bottom:12px;">
+        <label class="field-label">Tools & Equipment Required</label>
+        <textarea class="field-input" id="toolsEquip" placeholder="List all tools, welding machines, grinders, etc." style="min-height:55px;"></textarea>
+      </div>
+      <div class="form-grid form-grid-2">
+        <div>
+          <div class="field-label" style="margin-bottom:8px;">People Required</div>
+          <div class="people-grid">
+            <div class="people-box">
+              <div class="people-label">☀️ Day Shift</div>
+              <input class="people-input" id="peopleDay" type="number" min="0" value="0">
+            </div>
+            <div class="people-box">
+              <div class="people-label">🌙 Night Shift</div>
+              <input class="people-input" id="peopleNight" type="number" min="0" value="0">
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="field-label" style="margin-bottom:8px;">Status of Equipment</div>
+          <select class="field-input" id="equipStatus">
+            <option value="">-- Select Status --</option>
+            <option>In Service</option>
+            <option>Shut Down</option>
+            <option>Isolated</option>
+            <option>Depressurized</option>
+            <option>Drained</option>
+            <option>Purged</option>
+            <option>Under Maintenance</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: HAZARDS -->
+  <div class="section-card" id="s-hazards">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">⚠️</span>
+      <span class="section-num">SEC 02</span>
+      <span class="section-title">Hazards Identification (Initiator PA)</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div style="margin-bottom:10px;">
+        <span class="tag tag-red">⚠️ CRITICAL — All applicable hazards must be identified before work commences</span>
+      </div>
+      <div class="hazard-grid" id="hazard-checklist">
+        <!-- Left column -->
+        <label class="hazard-item hazard-critical"><input type="checkbox" name="hz" value="flammable"> <span class="hazard-label">🔥 Flammable / Liquid or Gas Under Pressure</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="flying-particles"> <span class="hazard-label">💨 Flying Particles / الجسيمات الطائرة</span></label>
+        <label class="hazard-item hazard-critical"><input type="checkbox" name="hz" value="toxic"> <span class="hazard-label">☠️ Toxic Materials / مواد سامة</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="electricity"> <span class="hazard-label">⚡ Electricity / كهرباء</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="corrosive"> <span class="hazard-label">🧪 Corrosive Materials / مواد تآكلية</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="radioactivity"> <span class="hazard-label">☢️ Radioactivity / النشاط الإشعاعي</span></label>
+        <label class="hazard-item hazard-critical"><input type="checkbox" name="hz" value="flammable-mat"> <span class="hazard-label">🔥 Flammable Materials / مواد قابلة للاشتعال</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="rotating"> <span class="hazard-label">⚙️ Rotating Machinery / الآلات الدوارة</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="hot-materials"> <span class="hazard-label">🌡️ Hot Materials / مواد حارة</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="noisy"> <span class="hazard-label">📢 Noisy Area (+85db) / منطقة صاخبة</span></label>
+        <label class="hazard-item hazard-critical"><input type="checkbox" name="hz" value="o2-deficiency"> <span class="hazard-label">💨 O₂ Deficiency / نقص الأكسجين</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="lifting"> <span class="hazard-label">🏗️ Process of Lifting Crane / رافعة</span></label>
+        <label class="hazard-item hazard-critical"><input type="checkbox" name="hz" value="h2s"> <span class="hazard-label">⚠️ Possible H₂S Area / منطقة كبريتيد الهيدروجين</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="adjacent"> <span class="hazard-label">🏭 Adjacent Operations / عمليات مجاورة</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="tnorm"> <span class="hazard-label">☢️ Possible T-NORM / النشاط الإشعاعي الطبيعي</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="falling"> <span class="hazard-label">⬇️ Danger of Falling / خطر السقوط</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="scaffolding"> <span class="hazard-label">🔩 Scaffolding to Install / سقالات</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="weather"> <span class="hazard-label">🌩️ Wind/Weather Status / حالة الطقس</span></label>
+        <label class="hazard-item hazard-critical"><input type="checkbox" name="hz" value="confined"> <span class="hazard-label">🚪 Confined Space Entry / الأماكن المحصورة</span></label>
+        <label class="hazard-item"><input type="checkbox" name="hz" value="co2-powder"> <span class="hazard-label">🧯 Add CO₂ Dry Chemical Powder</span></label>
+        <label class="hazard-item" style="grid-column:span 2; border-right:none;">
+          <input type="checkbox" name="hz" value="others">
+          <span class="hazard-label">📝 Others / أخرى:</span>
+          <input class="field-input" id="hazardOthers" placeholder="Specify other hazards..." style="flex:1; margin-left:8px; max-width:400px;">
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: SAFE CONDITIONS -->
+  <div class="section-card" id="s-conditions">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🛡️</span>
+      <span class="section-num">SEC 03</span>
+      <span class="section-title">Requirements for Safe Working Conditions</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="form-grid form-grid-2" style="margin-bottom:14px;">
+        <div>
+          <div class="field-label" style="margin-bottom:8px;">Equipment Isolation Checklist</div>
+          <div class="checklist-grid">
+            <label class="check-item"><input type="checkbox"> <span class="check-label">In Service</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Shut Down</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Standby Manual</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">F&G/ESD Override</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Drained / تم تصريف</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Water Flushed</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Inerted With N₂</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Pressurized</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Blanketed</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Full (Specify)</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Empty / فارغ</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Open</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Gas Free ✓</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Steamed</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Ventilated</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Continuity Bonding</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Safety Systems Bypassed</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Continuous Gas Monitoring</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Fire Fighting Isolated</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Flame Retardant Partition</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Fuel Gas Blinded</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Electrical Isolated & Tagged</span></label>
+          </div>
+        </div>
+        <div>
+          <div class="field-label" style="margin-bottom:8px;">Fire Protection Requirements</div>
+          <div class="checklist-grid">
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Equipment Is Hot</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Gas Check Before Start</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Fire Network Pressurized</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Fire Hose Lengthened</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Foam Protection</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Mobile Fire Water Monitor</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Fire Extinguisher at Site</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Fire Truck Required</span></label>
+          </div>
+
+          <div class="field-label" style="margin-top:14px; margin-bottom:8px;">Complementary Certificates</div>
+          <div class="checklist-grid">
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Confined Space Certificate</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Mechanical Isolation Cert.</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Electrical Isolation Cert.</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Radiation Certificate</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Hot Tapping</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Excavation Certificate</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">De-Isolator Certificate</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Scaffolding Certificate</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">Over Ride Certificate</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="field-label">Additional Comments / تعليقات إضافية</label>
+        <textarea class="field-input" id="safeCondComments" placeholder="Enter any additional safety requirements or special conditions..." style="min-height:60px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: HSE REQUIREMENTS -->
+  <div class="section-card" id="s-hse">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🦺</span>
+      <span class="section-num">SEC 04</span>
+      <span class="section-title">HSE Requirements for Implementation</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="form-grid form-grid-2">
+        <div>
+          <div class="field-label" style="margin-bottom:8px;">Personal Protective Equipment (PPE)</div>
+          <div class="checklist-grid">
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🪖 Safety Helmet</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🥊 Gloves</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🥽 Safety Goggles</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">😷 Dust Mask / Respirator</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">👂 Ear Muffs</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">👁️ Face Shield</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🦺 Safety Harness</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🦺 Life Lines</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🥾 Safety Shoes</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🧥 Protective Clothing</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🚒 SCBA</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🔥 Flame Arrestor</span></label>
+          </div>
+        </div>
+        <div>
+          <div class="field-label" style="margin-bottom:8px;">Site Safety Measures</div>
+          <div class="checklist-grid">
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🚒 Fire Watch Required</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🚧 Barriers Required</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">⚠️ Warning Signs</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🚗 Access/Escape Route</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">📋 Tool Box Talk</span></label>
+            <label class="check-item"><input type="checkbox"> <span class="check-label">🔒 Material Area Cleared</span></label>
+          </div>
+          <div class="form-field" style="margin-top:14px;">
+            <label class="field-label">HSE Representative</label>
+            <input class="field-input" id="hseRep" placeholder="HSE Representative name">
+          </div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <div class="form-field" style="flex:1;">
+              <label class="field-label">Sign</label>
+              <div class="sig-box" id="sig-hse" onclick="signField('sig-hse', 'HSE Rep')">TAP TO SIGN</div>
+            </div>
+            <div class="form-field" style="flex:1;">
+              <label class="field-label">Date</label>
+              <input class="field-input" type="date" id="hseDate">
+            </div>
+            <div class="form-field" style="flex:1;">
+              <label class="field-label">Time</label>
+              <input class="field-input" type="time" id="hseTime">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: GAS TESTING -->
+  <div class="section-card" id="s-gas">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🧪</span>
+      <span class="section-num">SEC 05</span>
+      <span class="section-title">Gas Testing / اختبارات الغاز</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div style="margin-bottom:10px;">
+        <span class="tag tag-orange">⚠️ Gas test must be carried out before starting activity by authorized person</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="data-table" id="gas-table">
+          <thead>
+            <tr>
+              <th>Gas Type</th>
+              <th>Reading</th>
+              <th>Alarm Limit</th>
+              <th>Status</th>
+              <th>Tested By (Name)</th>
+              <th>Signature</th>
+              <th>Date</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="gas-tbody">
+            <tr>
+              <td><select class="field-input" style="background:transparent; border:none; font-size:11px; color:var(--text-primary);"><option>O₂ — Oxygen</option><option>LEL — Flammable Gas</option><option>H₂S — Hydrogen Sulfide</option><option>CO — Carbon Monoxide</option><option>SO₂ — Sulfur Dioxide</option><option>NH₃ — Ammonia</option></select></td>
+              <td><input placeholder="%"></td>
+              <td><input placeholder="e.g. <21%"></td>
+              <td><div class="gas-level"><div class="gas-dot"></div><span style="font-size:10px;color:var(--green);">SAFE</span></div></td>
+              <td><input placeholder="Name"></td>
+              <td><input placeholder="Signature"></td>
+              <td><input type="date"></td>
+              <td><input type="time"></td>
+            </tr>
+            <tr>
+              <td><select class="field-input" style="background:transparent; border:none; font-size:11px; color:var(--text-primary);"><option>LEL — Flammable Gas</option><option>O₂ — Oxygen</option><option>H₂S — Hydrogen Sulfide</option><option>CO — Carbon Monoxide</option></select></td>
+              <td><input placeholder="%"></td>
+              <td><input placeholder="<10% LEL"></td>
+              <td><div class="gas-level"><div class="gas-dot"></div><span style="font-size:10px;color:var(--green);">SAFE</span></div></td>
+              <td><input placeholder="Name"></td>
+              <td><input placeholder="Signature"></td>
+              <td><input type="date"></td>
+              <td><input type="time"></td>
+            </tr>
+            <tr>
+              <td><select class="field-input" style="background:transparent; border:none; font-size:11px; color:var(--text-primary);"><option>H₂S — Hydrogen Sulfide</option><option>O₂ — Oxygen</option><option>LEL — Flammable Gas</option><option>CO — Carbon Monoxide</option></select></td>
+              <td><input placeholder="ppm"></td>
+              <td><input placeholder="<5 ppm"></td>
+              <td><div class="gas-level"><div class="gas-dot"></div><span style="font-size:10px;color:var(--green);">SAFE</span></div></td>
+              <td><input placeholder="Name"></td>
+              <td><input placeholder="Signature"></td>
+              <td><input type="date"></td>
+              <td><input type="time"></td>
+            </tr>
+            <tr>
+              <td><select class="field-input" style="background:transparent; border:none; font-size:11px; color:var(--text-primary);"><option>CO — Carbon Monoxide</option><option>O₂ — Oxygen</option><option>LEL — Flammable Gas</option><option>H₂S — Hydrogen Sulfide</option></select></td>
+              <td><input placeholder="ppm"></td>
+              <td><input placeholder="<25 ppm"></td>
+              <td><div class="gas-level"><div class="gas-dot"></div><span style="font-size:10px;color:var(--green);">SAFE</span></div></td>
+              <td><input placeholder="Name"></td>
+              <td><input placeholder="Signature"></td>
+              <td><input type="date"></td>
+              <td><input type="time"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-actions">
+        <button class="btn-sm add" onclick="addGasRow()">+ ADD ROW</button>
+        <button class="btn-sm remove" onclick="removeLastGasRow()">− REMOVE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: AUTHORIZATION -->
+  <div class="section-card" id="s-auth">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">✍️</span>
+      <span class="section-num">SEC 06</span>
+      <span class="section-title">Authorization — Signatures</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="auth-grid" id="auth-grid">
+        <!-- Area Authority -->
+        <div class="auth-card">
+          <div class="auth-role">🏭 Area Authority (AA)</div>
+          <div class="form-field"><label class="field-label">Name / الاسم</label><input class="field-input" id="aa-name" placeholder="Full name"></div>
+          <div class="form-field" style="margin-top:8px;"><label class="field-label">Position</label><input class="field-input" id="aa-pos" placeholder="Position / Job Title"></div>
+          <div class="form-field" style="margin-top:8px;"><label class="field-label">Company</label><input class="field-input" id="aa-company" placeholder="Company name"></div>
+          <div class="sig-box" id="sig-aa" onclick="signField('sig-aa','Area Authority')">TAP TO SIGN</div>
+          <div style="display:flex;gap:6px;">
+            <div class="form-field" style="flex:1;"><label class="field-label">Date</label><input class="field-input" type="date" id="aa-date"></div>
+            <div class="form-field" style="flex:1;"><label class="field-label">Time</label><input class="field-input" type="time" id="aa-time"></div>
+          </div>
+        </div>
+        <!-- Performing Authority -->
+        <div class="auth-card">
+          <div class="auth-role">👷 Performing Authority (PA)</div>
+          <div class="form-field"><label class="field-label">Name / الاسم</label><input class="field-input" id="pa-name" placeholder="Full name"></div>
+          <div class="form-field" style="margin-top:8px;"><label class="field-label">Position</label><input class="field-input" id="pa-pos" placeholder="Position / Job Title"></div>
+          <div class="form-field" style="margin-top:8px;"><label class="field-label">Company</label><input class="field-input" id="pa-company" placeholder="Company name"></div>
+          <div class="sig-box" id="sig-pa" onclick="signField('sig-pa','Performing Authority')">TAP TO SIGN</div>
+          <div style="display:flex;gap:6px;">
+            <div class="form-field" style="flex:1;"><label class="field-label">Date</label><input class="field-input" type="date" id="pa-date"></div>
+            <div class="form-field" style="flex:1;"><label class="field-label">Time</label><input class="field-input" type="time" id="pa-time"></div>
+          </div>
+        </div>
+        <!-- HSE Supervisor -->
+        <div class="auth-card">
+          <div class="auth-role">🛡️ HSE Supervisor</div>
+          <div class="form-field"><label class="field-label">Name / الاسم</label><input class="field-input" id="hse-name" placeholder="Full name"></div>
+          <div class="form-field" style="margin-top:8px;"><label class="field-label">Position</label><input class="field-input" id="hse-pos" placeholder="Position / Job Title"></div>
+          <div class="form-field" style="margin-top:8px;"><label class="field-label">Company</label><input class="field-input" id="hse-company" placeholder="Company name"></div>
+          <div class="sig-box" id="sig-hse-sup" onclick="signField('sig-hse-sup','HSE Supervisor')">TAP TO SIGN</div>
+          <div style="display:flex;gap:6px;">
+            <div class="form-field" style="flex:1;"><label class="field-label">Date</label><input class="field-input" type="date" id="hse-sup-date"></div>
+            <div class="form-field" style="flex:1;"><label class="field-label">Time</label><input class="field-input" type="time" id="hse-sup-time"></div>
+          </div>
+        </div>
+        <!-- Site Supervisor (PRA) -->
+        <div class="auth-card">
+          <div class="auth-role">👔 Site Supervisor (PRA)</div>
+          <div class="form-field"><label class="field-label">Name / الاسم</label><input class="field-input" id="pra-name" placeholder="Full name"></div>
+          <div class="form-field" style="margin-top:8px;"><label class="field-label">Position</label><input class="field-input" id="pra-pos" placeholder="Position / Job Title"></div>
+          <div class="form-field" style="margin-top:8px;"><label class="field-label">Company</label><input class="field-input" id="pra-company" placeholder="Company name"></div>
+          <div class="sig-box" id="sig-pra" onclick="signField('sig-pra','Site Supervisor')">TAP TO SIGN</div>
+          <div style="display:flex;gap:6px;">
+            <div class="form-field" style="flex:1;"><label class="field-label">Date</label><input class="field-input" type="date" id="pra-date"></div>
+            <div class="form-field" style="flex:1;"><label class="field-label">Time</label><input class="field-input" type="time" id="pra-time"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: SITE VALIDATION -->
+  <div class="section-card" id="s-validation">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">✅</span>
+      <span class="section-num">SEC 07</span>
+      <span class="section-title">Validation on Site — HSE Supervisor Sign for Critical Activities</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="shift-grid" style="margin-bottom:12px;">
+        <div class="shift-card">
+          <div class="shift-card-title">☀️ DAY SHIFT</div>
+          <div class="form-grid form-grid-2">
+            <div class="form-field"><label class="field-label">Open Date</label><input class="field-input" type="date" id="day-open-date"></div>
+            <div class="form-field"><label class="field-label">Time</label><input class="field-input" type="time" id="day-open-time"></div>
+            <div class="form-field"><label class="field-label">Performer (P)</label><input class="field-input" id="day-performer" placeholder="Name"></div>
+            <div class="form-field"><label class="field-label">HSE Supervisor</label><input class="field-input" id="day-hse" placeholder="Name"></div>
+          </div>
+          <div class="safe-to-start">
+            <input type="checkbox" id="day-safe" style="accent-color:var(--green); width:16px; height:16px; cursor:pointer;">
+            <label for="day-safe" class="safe-label" style="cursor:pointer;">✅ WORK SAFE TO START — DAY</label>
+          </div>
+        </div>
+        <div class="shift-card">
+          <div class="shift-card-title">🌙 NIGHT SHIFT</div>
+          <div class="form-grid form-grid-2">
+            <div class="form-field"><label class="field-label">Open Date</label><input class="field-input" type="date" id="night-open-date"></div>
+            <div class="form-field"><label class="field-label">Time</label><input class="field-input" type="time" id="night-open-time"></div>
+            <div class="form-field"><label class="field-label">Performer (P)</label><input class="field-input" id="night-performer" placeholder="Name"></div>
+            <div class="form-field"><label class="field-label">HSE Supervisor</label><input class="field-input" id="night-hse" placeholder="Name"></div>
+          </div>
+          <div class="safe-to-start">
+            <input type="checkbox" id="night-safe" style="accent-color:var(--green); width:16px; height:16px; cursor:pointer;">
+            <label for="night-safe" class="safe-label" style="cursor:pointer;">✅ WORK SAFE TO START — NIGHT</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="field-label">MSER — Mechanical / Safety / Electrical / Radiological Notes</label>
+        <textarea class="field-input" id="mser-notes" placeholder="Note any critical observations, system conflicts, or special conditions..." style="min-height:55px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 8: SUSPENSION & REISSUE -->
+  <div class="section-card" id="s-suspension">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">⏸️</span>
+      <span class="section-num">SEC 08</span>
+      <span class="section-title">Suspension & Re-Issue / التعليق وإعادة الإصدار</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="suspension-box" style="margin-bottom:12px;">
+        <div class="suspension-title">⏸️ SUSPENSION</div>
+        <div class="form-field" style="margin-bottom:10px;">
+          <label class="field-label">Reason for Suspension / سبب التعليق</label>
+          <textarea class="field-input" id="suspendReason" placeholder="Describe why this permit is being suspended..." style="min-height:60px;"></textarea>
+        </div>
+        <div class="form-grid form-grid-3">
+          <div class="form-field"><label class="field-label">Suspended By</label><input class="field-input" id="suspendBy" placeholder="Name"></div>
+          <div class="form-field"><label class="field-label">Position</label><input class="field-input" id="suspendPos" placeholder="Position"></div>
+          <div class="form-field"><label class="field-label">Date & Time</label><input class="field-input" id="suspendDT" type="datetime-local"></div>
+        </div>
+        <div class="sig-box" id="sig-suspend" onclick="signField('sig-suspend','Suspension Authority')" style="margin-top:8px;">TAP TO SIGN — SUSPENSION</div>
+      </div>
+
+      <div style="background:rgba(39,174,96,0.06); border:1px solid rgba(39,174,96,0.2); border-radius:3px; padding:14px;">
+        <div class="suspension-title" style="color:var(--green);">▶️ NORMAL OPERATION RESUMED</div>
+        <div class="form-field" style="margin-bottom:10px;">
+          <label class="field-label">Resume Notes</label>
+          <textarea class="field-input" id="resumeNotes" placeholder="Confirm all conditions are met before resuming work..." style="min-height:55px;"></textarea>
+        </div>
+        <div class="form-grid form-grid-3">
+          <div class="form-field"><label class="field-label">Resumed By</label><input class="field-input" id="resumeBy" placeholder="Name"></div>
+          <div class="form-field"><label class="field-label">Position</label><input class="field-input" id="resumePos" placeholder="Position"></div>
+          <div class="form-field"><label class="field-label">Date & Time</label><input class="field-input" id="resumeDT" type="datetime-local"></div>
+        </div>
+        <div class="sig-box" id="sig-resume" onclick="signField('sig-resume','Resume Authority')" style="margin-top:8px;">TAP TO SIGN — RESUME</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 9: WORK COMPLETION -->
+  <div class="section-card" id="s-completion">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🏁</span>
+      <span class="section-num">SEC 09</span>
+      <span class="section-title">Work Completion / Clearance / إكمال الأعمال</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="completion-box" style="margin-bottom:14px;">
+        <div class="completion-title">🏁 PERMIT CLOSURE DECLARATION</div>
+        <div style="font-family:var(--mono); font-size:10px; color:var(--text-secondary); margin-top:6px; line-height:1.6;">
+          I hereby declare that the work has been completed and the worksite has been left in a clean, safe condition.
+          All tools, equipment and personnel have been removed. All isolation and de-isolation is complete.
+        </div>
+      </div>
+      <div class="checklist-grid" style="margin-bottom:14px;">
+        <label class="check-item"><input type="checkbox"> <span class="check-label">Work Completed</span></label>
+        <label class="check-item"><input type="checkbox"> <span class="check-label">Area Cleaned Up</span></label>
+        <label class="check-item"><input type="checkbox"> <span class="check-label">Tools Removed</span></label>
+        <label class="check-item"><input type="checkbox"> <span class="check-label">Isolation Removed</span></label>
+        <label class="check-item"><input type="checkbox"> <span class="check-label">Equipment Returned to Service</span></label>
+        <label class="check-item"><input type="checkbox"> <span class="check-label">No Outstanding Issues</span></label>
+        <label class="check-item"><input type="checkbox"> <span class="check-label">Work Continue Under New PTW</span></label>
+        <label class="check-item"><input type="checkbox"> <span class="check-label">Firewatch Completed</span></label>
+      </div>
+      <div class="auth-grid">
+        <div class="auth-card">
+          <div class="auth-role">👷 Performing Authority (P)</div>
+          <div class="form-field"><label class="field-label">Name</label><input class="field-input" placeholder="Name"></div>
+          <div class="sig-box" id="sig-comp-pa" onclick="signField('sig-comp-pa','PA Completion')">TAP TO SIGN</div>
+          <div style="display:flex;gap:6px;">
+            <div class="form-field" style="flex:1;"><label class="field-label">Date</label><input class="field-input" type="date"></div>
+            <div class="form-field" style="flex:1;"><label class="field-label">Time</label><input class="field-input" type="time"></div>
+          </div>
+        </div>
+        <div class="auth-card">
+          <div class="auth-role">👔 Site Supervisor (PRA)</div>
+          <div class="form-field"><label class="field-label">Name</label><input class="field-input" placeholder="Name"></div>
+          <div class="sig-box" id="sig-comp-pra" onclick="signField('sig-comp-pra','PRA Completion')">TAP TO SIGN</div>
+          <div style="display:flex;gap:6px;">
+            <div class="form-field" style="flex:1;"><label class="field-label">Date</label><input class="field-input" type="date"></div>
+            <div class="form-field" style="flex:1;"><label class="field-label">Time</label><input class="field-input" type="time"></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px; padding:10px 14px; background:rgba(192,57,43,0.08); border:1px solid rgba(192,57,43,0.2); border-radius:3px;">
+        <div style="font-family:var(--mono); font-size:10px; color:var(--text-dim); letter-spacing:1px;">
+          DISTRIBUTION: <span style="color:var(--text-secondary);">Original — At Work Area / Copy 1 &amp; Copy 2 — Area Authority / Copy 3 — HSE Office / Copy 4 — Safety Officer / Copy 5 — Production Office</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 10: EMERGENCY CONTACTS -->
+  <div class="section-card" id="s-emergency">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🚨</span>
+      <span class="section-num">SEC 10</span>
+      <span class="section-title">Emergency Contacts / جهات الاتصال الطارئة</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="emergency-grid" style="margin-bottom:14px;">
+        <div class="emergency-card">
+          <div class="emergency-label">🚒 Fire Department</div>
+          <div class="emergency-num">993</div>
+        </div>
+        <div class="emergency-card">
+          <div class="emergency-label">🚑 Emergency Medical</div>
+          <div class="emergency-num">998</div>
+        </div>
+        <div class="emergency-card">
+          <div class="emergency-label">🏭 Control Room</div>
+          <input class="field-input" placeholder="Ext. No." style="text-align:center; margin-top:4px; font-size:14px; color:var(--orange);">
+        </div>
+        <div class="emergency-card">
+          <div class="emergency-label">🛡️ HSE Supervisor</div>
+          <input class="field-input" placeholder="Phone No." style="text-align:center; margin-top:4px; font-size:14px; color:var(--orange);">
+        </div>
+        <div class="emergency-card">
+          <div class="emergency-label">🏭 Area Authority</div>
+          <input class="field-input" placeholder="Phone No." style="text-align:center; margin-top:4px; font-size:14px; color:var(--orange);">
+        </div>
+        <div class="emergency-card">
+          <div class="emergency-label">🔒 Security</div>
+          <input class="field-input" placeholder="Phone No." style="text-align:center; margin-top:4px; font-size:14px; color:var(--orange);">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="field-label">Muster Point / نقطة التجمع</label>
+        <input class="field-input" placeholder="Assembly point location description">
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 11: AUDIT TRAIL -->
+  <div class="section-card" id="s-audit">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">📜</span>
+      <span class="section-num">SEC 11</span>
+      <span class="section-title">Audit Trail / سجل التدقيق</span>
+      <span class="section-collapse open">▼</span>
+    </div>
+    <div class="section-body">
+      <div id="audit-trail">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-indicator">
+    <div class="dot green" id="status-dot"></div>
+    <span class="status-text" id="status-text-bar">PERMIT ACTIVE</span>
+  </div>
+  <div class="status-indicator" style="margin-left:20px;">
+    <div class="dot" style="background:var(--orange); opacity:0.6;"></div>
+    <span class="status-text" id="save-status">Auto-saved: Never</span>
+  </div>
+  <div class="status-auto">
+    <span style="color:var(--text-dim);">Rev: </span><span id="rev-display">00</span>
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <span style="color:var(--text-dim);">PTW System v2.4 &nbsp;|&nbsp; ISO 45001:2018 Compliant</span>
+  </div>
+</div>
+
+<!-- SIGN MODAL -->
+<div class="modal-overlay" id="sign-modal">
+  <div class="modal">
+    <div class="modal-title">✍️ Digital Signature</div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-role" style="font-family:var(--mono); font-size:11px; color:var(--text-dim); margin-bottom:14px;"></div>
+    <div class="form-field">
+      <label class="field-label required">Full Name</label>
+      <input class="field-input" id="sig-name-input" placeholder="Enter your full name to sign">
+    </div>
+    <div class="form-field" style="margin-top:10px;">
+      <label class="field-label">Timestamp</label>
+      <input class="field-input" id="sig-timestamp" readonly style="color:var(--text-dim);">
+    </div>
+    <div style="margin-top:14px; display:flex; gap:8px;">
+      <button class="btn btn-red" style="flex:1;" onclick="confirmSign()">✍️ CONFIRM SIGNATURE</button>
+      <button class="btn" style="border-color:var(--border); color:var(--text-dim); flex:0.5;" onclick="closeModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ──────────────────────────────────────
+// PARTICLE BACKGROUND (Fire/Sparks)
+// ──────────────────────────────────────
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = H + 10;
+    this.vx = (Math.random() - 0.5) * 0.8;
+    this.vy = -(Math.random() * 1.5 + 0.3);
+    this.size = Math.random() * 2 + 0.5;
+    this.life = 1;
+    this.decay = Math.random() * 0.008 + 0.003;
+    const t = Math.random();
+    this.color = t < 0.4 ? '#ff4400' : t < 0.7 ? '#ff8800' : '#ffcc00';
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life -= this.decay;
+    this.vx += (Math.random() - 0.5) * 0.05;
+    if (this.life <= 0) this.reset();
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.life * 0.6;
+    ctx.fillStyle = this.color;
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+for (let i = 0; i < 80; i++) {
+  const p = new Particle();
+  p.y = Math.random() * H;
+  p.life = Math.random();
+  particles.push(p);
+}
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ──────────────────────────────────────
+// SECTION COLLAPSE
+// ──────────────────────────────────────
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.section-collapse');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.classList.toggle('open', !open);
+}
+
+// ──────────────────────────────────────
+// SCROLL NAV
+// ──────────────────────────────────────
+function scrollTo(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event?.target?.classList?.add('active');
+}
+
+// ──────────────────────────────────────
+// STATUS CYCLE
+// ──────────────────────────────────────
+const statuses = ['active','suspended','closed'];
+let statusIdx = 0;
+const statusLabels = { active: '● ACTIVE', suspended: '⏸ SUSPENDED', closed: '✕ CLOSED' };
+const statusDots = { active: 'green', suspended: 'orange', closed: 'red' };
+const tagClasses = { active: 'tag-green', suspended: 'tag-orange', closed: 'tag-red' };
+
+function cycleStatus() {
+  statusIdx = (statusIdx + 1) % statuses.length;
+  const s = statuses[statusIdx];
+  const badge = document.getElementById('permit-status-badge');
+  badge.className = `status-badge ${s}`;
+  badge.textContent = statusLabels[s];
+
+  const dot = document.getElementById('status-dot');
+  dot.className = `dot ${statusDots[s]}`;
+  document.getElementById('status-text-bar').textContent = `PERMIT ${s.toUpperCase()}`;
+
+  const tag = document.getElementById('status-tag');
+  tag.className = `tag ${tagClasses[s]}`;
+  tag.textContent = statusLabels[s];
+
+  addAudit(`Status changed to ${s.toUpperCase()}`, 'System');
+}
+
+// ──────────────────────────────────────
+// RISK COLOR
+// ──────────────────────────────────────
+function updateRiskColor(sel) {
+  sel.className = 'field-input risk-select';
+  if (sel.value === 'HIGH') sel.classList.add('high');
+  else if (sel.value === 'MEDIUM') sel.classList.add('medium');
+  else if (sel.value === 'LOW') sel.classList.add('low');
+}
+
+// ──────────────────────────────────────
+// PERMIT ID
+// ──────────────────────────────────────
+function updatePermitId(val) {
+  document.getElementById('permit-id-display').textContent = val;
+  generateQR(val);
+}
+
+// ──────────────────────────────────────
+// SIMPLE QR (visual placeholder)
+// ──────────────────────────────────────
+function generateQR(text) {
+  const c = document.getElementById('qr-canvas');
+  if (!c) return;
+  const ctx2 = c.getContext('2d');
+  ctx2.fillStyle = '#fff';
+  ctx2.fillRect(0, 0, 80, 80);
+  ctx2.fillStyle = '#111';
+  // Simple pseudo-QR visual
+  const cells = 10;
+  const s = 8;
+  const hash = [...text].reduce((a, c2) => a + c2.charCodeAt(0), 0);
+  for (let r = 0; r < cells; r++) {
+    for (let col = 0; col < cells; col++) {
+      const on = (hash * (r + 1) * (col + 1)) % 3 === 0;
+      if (on) ctx2.fillRect(col * s, r * s, s - 1, s - 1);
+    }
+  }
+  // Corner markers
+  const marker = (x, y) => {
+    ctx2.fillStyle = '#111';
+    ctx2.fillRect(x, y, 21, 21);
+    ctx2.fillStyle = '#fff';
+    ctx2.fillRect(x + 3, y + 3, 15, 15);
+    ctx2.fillStyle = '#111';
+    ctx2.fillRect(x + 6, y + 6, 9, 9);
+  };
+  marker(0, 0); marker(59, 0); marker(0, 59);
+}
+generateQR('PTW-HW-2024-0001');
+
+// ──────────────────────────────────────
+// GAS TABLE
+// ──────────────────────────────────────
+function addGasRow() {
+  const tbody = document.getElementById('gas-tbody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><select class="field-input" style="background:transparent; border:none; font-size:11px; color:var(--text-primary);">
+      <option>O₂ — Oxygen</option><option>LEL — Flammable Gas</option>
+      <option>H₂S — Hydrogen Sulfide</option><option>CO — Carbon Monoxide</option>
+      <option>SO₂ — Sulfur Dioxide</option><option>NH₃ — Ammonia</option>
+    </select></td>
+    <td><input placeholder="%"></td>
+    <td><input placeholder="Limit"></td>
+    <td><div class="gas-level"><div class="gas-dot"></div><span style="font-size:10px;color:var(--green);">SAFE</span></div></td>
+    <td><input placeholder="Name"></td>
+    <td><input placeholder="Signature"></td>
+    <td><input type="date"></td>
+    <td><input type="time"></td>
+  `;
+  tbody.appendChild(tr);
+  addAudit('Gas test row added', 'User');
+}
+
+function removeLastGasRow() {
+  const tbody = document.getElementById('gas-tbody');
+  if (tbody.rows.length > 1) tbody.deleteRow(tbody.rows.length - 1);
+}
+
+// ──────────────────────────────────────
+// DIGITAL SIGNATURE MODAL
+// ──────────────────────────────────────
+let currentSigId = null;
+
+function signField(id, role) {
+  currentSigId = id;
+  document.getElementById('modal-role').textContent = `Signing as: ${role}`;
+  document.getElementById('sig-timestamp').value = new Date().toLocaleString();
+  document.getElementById('sig-name-input').value = '';
+  document.getElementById('sign-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('sign-modal').classList.remove('open');
+}
+
+function confirmSign() {
+  const name = document.getElementById('sig-name-input').value.trim();
+  if (!name) { alert('Please enter your name to sign.'); return; }
+  const ts = document.getElementById('sig-timestamp').value;
+  const box = document.getElementById(currentSigId);
+  if (box) {
+    box.classList.add('signed');
+    box.innerHTML = `<div style="text-align:center;"><div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--green);letter-spacing:1px;">${name}</div><div style="font-family:var(--mono);font-size:9px;color:var(--text-dim);margin-top:3px;">${ts}</div></div>`;
+  }
+  addAudit(`Signed by: ${name}`, 'Signature');
+  closeModal();
+}
+
+// ──────────────────────────────────────
+// AUDIT TRAIL
+// ──────────────────────────────────────
+const auditLog = [];
+
+function addAudit(action, user = 'System') {
+  const ts = new Date().toLocaleTimeString();
+  auditLog.unshift({ ts, user, action });
+  renderAudit();
+  updateSaveStatus();
+}
+
+function renderAudit() {
+  const container = document.getElementById('audit-trail');
+  if (!container) return;
+  if (auditLog.length === 0) {
+    container.innerHTML = '<div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);padding:8px 0;">No audit entries yet.</div>';
+    return;
+  }
+  container.innerHTML = auditLog.slice(0, 30).map(e => `
+    <div class="audit-entry">
+      <span class="audit-time">${e.ts}</span>
+      <span class="audit-user">[${e.user}]</span>
+      <span class="audit-action">${e.action}</span>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────
+// VALIDATION
+// ──────────────────────────────────────
+function validateForm() {
+  const required = ['permitNo','workSite','permitDate','equipName','workLocation','workDesc'];
+  let valid = true;
+  required.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!el.value.trim()) {
+      el.classList.add('error');
+      valid = false;
+    } else {
+      el.classList.remove('error');
+    }
+  });
+  if (valid) {
+    alert('✅ Permit validated successfully! All required fields are complete.');
+    addAudit('Permit validated — PASSED', 'Validation');
+  } else {
+    alert('⚠️ Validation failed! Please fill in all required fields (highlighted in red).');
+    addAudit('Permit validation — FAILED (missing fields)', 'Validation');
+  }
+}
+
+// ──────────────────────────────────────
+// AUTO-SAVE (localStorage)
+// ──────────────────────────────────────
+function saveAll() {
+  const data = {};
+  document.querySelectorAll('input:not([type="radio"]):not([type="checkbox"]), textarea, select').forEach(el => {
+    if (el.id) data[el.id] = el.value;
+  });
+  // Radio buttons
+  document.querySelectorAll('input[type="radio"]:checked').forEach(el => {
+    if (el.name) data[`radio_${el.name}`] = el.value;
+  });
+  // Checkboxes
+  document.querySelectorAll('input[type="checkbox"]').forEach((el, i) => {
+    data[`cb_${i}`] = el.checked;
+  });
+  localStorage.setItem('hwpermit_data', JSON.stringify(data));
+  updateSaveStatus(true);
+  addAudit('Form data saved to storage', 'System');
+}
+
+function loadSaved() {
+  const raw = localStorage.getItem('hwpermit_data');
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    Object.entries(data).forEach(([k, v]) => {
+      if (k.startsWith('radio_')) {
+        const el = document.querySelector(`input[name="${k.replace('radio_', '')}"][value="${v}"]`);
+        if (el) el.checked = true;
+      } else if (k.startsWith('cb_')) {
+        const cbs = document.querySelectorAll('input[type="checkbox"]');
+        const idx = parseInt(k.replace('cb_', ''));
+        if (cbs[idx]) cbs[idx].checked = v;
+      } else {
+        const el = document.getElementById(k);
+        if (el) el.value = v;
+      }
+    });
+  } catch (e) {}
+}
+
+function updateSaveStatus(saved = false) {
+  const el = document.getElementById('save-status');
+  if (saved) {
+    el.textContent = `Auto-saved: ${new Date().toLocaleTimeString()}`;
+  }
+}
+
+// Auto-save every 60s
+setInterval(saveAll, 60000);
+
+// Watch rev number
+document.getElementById('revNo')?.addEventListener('input', () => {
+  document.getElementById('rev-display').textContent = document.getElementById('revNo').value;
+});
+
+// ──────────────────────────────────────
+// INIT
+// ──────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Set today's date
+  const today = new Date().toISOString().split('T')[0];
+  const dateEl = document.getElementById('permitDate');
+  if (dateEl && !dateEl.value) dateEl.value = today;
+
+  loadSaved();
+  renderAudit();
+  addAudit('Permit form initialized', 'System');
+
+  // Hazard change tracking
+  document.querySelectorAll('input[name="hz"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const label = cb.closest('label')?.querySelector('.hazard-label')?.textContent?.trim() || cb.value;
+      addAudit(`Hazard ${cb.checked ? 'identified' : 'cleared'}: ${label.replace(/[^\w\s-]/g, '').trim()}`, 'User');
+    });
+  });
+
+  // Permit no update
+  document.getElementById('permitNo')?.addEventListener('input', e => updatePermitId(e.target.value));
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HOT Work Permit | تصريح العمل الساخن</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   CSS VARIABLES & RESET
+   ============================================================ */
+:root {
+  --red:        #c0392b;
+  --red-dark:   #922b21;
+  --red-light:  #f5b7b1;
+  --red-bg:     #fdf2f0;
+  --yellow:     #f39c12;
+  --yellow-bg:  #fef9e7;
+  --green:      #1e8449;
+  --green-bg:   #e9f7ef;
+  --blue:       #1a5276;
+  --blue-bg:    #eaf4fb;
+  --gray-50:    #fafafa;
+  --gray-100:   #f3f4f6;
+  --gray-200:   #e5e7eb;
+  --gray-300:   #d1d5db;
+  --gray-400:   #9ca3af;
+  --gray-600:   #4b5563;
+  --gray-700:   #374151;
+  --gray-900:   #111827;
+  --border:     #d0d3d9;
+  --shadow:     0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.12);
+  --radius:     6px;
+  --font-body:  'IBM Plex Sans Arabic', 'IBM Plex Sans', sans-serif;
+  --font-mono:  'IBM Plex Mono', monospace;
+  --font-head:  'Barlow Condensed', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--gray-900);
+  background: #e8e8e8;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   PRINT WRAPPER
+   ============================================================ */
+.permit-wrapper {
+  max-width: 1180px;
+  margin: 24px auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+/* ============================================================
+   TOP HEADER BAR
+   ============================================================ */
+.permit-header {
+  background: var(--red);
+  color: #fff;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 10px 20px;
+  gap: 12px;
+}
+
+.permit-header .logo-box {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  opacity: .85;
+}
+
+.permit-header .title-box {
+  text-align: center;
+}
+
+.permit-header .title-box h1 {
+  font-family: var(--font-head);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.permit-header .title-box .subtitle {
+  font-size: 11px;
+  opacity: .8;
+  margin-top: 2px;
+  font-family: var(--font-body);
+  direction: rtl;
+}
+
+.permit-header .meta-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+/* ============================================================
+   META ROW (Main Permit Number, SCE, etc.)
+   ============================================================ */
+.meta-row {
+  background: var(--gray-100);
+  border-bottom: 2px solid var(--red);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  font-size: 11.5px;
+}
+
+.meta-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-right: 1px solid var(--border);
+}
+
+.meta-cell label {
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--gray-700);
+  font-size: 10.5px;
+}
+
+.meta-cell input,
+.meta-cell select {
+  border: none;
+  border-bottom: 1.5px solid var(--border);
+  background: transparent;
+  font-size: 12px;
+  padding: 1px 4px;
+  min-width: 80px;
+  color: var(--gray-900);
+  font-family: var(--font-mono);
+  outline: none;
+}
+
+.meta-cell input:focus,
+.meta-cell select:focus {
+  border-bottom-color: var(--red);
+}
+
+/* ============================================================
+   MAIN GRID LAYOUT
+   ============================================================ */
+.permit-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+.col-left {
+  border-right: 2px solid var(--border);
+}
+
+.col-right {
+  /* right column for auth / gas tests / performer / supervisor sections */
+}
+
+/* ============================================================
+   SECTION BLOCKS
+   ============================================================ */
+.section {
+  border-bottom: 1.5px solid var(--border);
+  padding: 10px 14px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.section-number {
+  background: var(--red);
+  color: #fff;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 13px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--red-dark);
+}
+
+.section-title-ar {
+  font-size: 11.5px;
+  color: var(--gray-600);
+  direction: rtl;
+  font-weight: 500;
+}
+
+/* ============================================================
+   FORM FIELD ROWS
+   ============================================================ */
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 7px;
+  align-items: flex-end;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.field-group label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+.field-group label .ar {
+  font-size: 10px;
+  font-weight: 400;
+  text-transform: none;
+  direction: rtl;
+  color: var(--gray-400);
+}
+
+.field-group input,
+.field-group select,
+.field-group textarea {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 7px;
+  font-size: 12px;
+  font-family: var(--font-body);
+  background: var(--gray-50);
+  color: var(--gray-900);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  width: 100%;
+}
+
+.field-group input:focus,
+.field-group select:focus,
+.field-group textarea:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px rgba(192,57,43,.12);
+  background: #fff;
+}
+
+.field-group textarea {
+  resize: vertical;
+  min-height: 40px;
+}
+
+/* ============================================================
+   CHECKBOX GRID (Hazards)
+   ============================================================ */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px 10px;
+  margin-bottom: 6px;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 3px 5px;
+  border-radius: 4px;
+  transition: background .12s;
+}
+
+.check-item:hover {
+  background: var(--red-bg);
+}
+
+.check-item input[type="checkbox"] {
+  accent-color: var(--red);
+  width: 13px;
+  height: 13px;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.check-item .ar {
+  direction: rtl;
+  font-size: 10px;
+  color: var(--gray-400);
+  display: block;
+}
+
+/* ============================================================
+   TABLE (Gas Tests, Certificates)
+   ============================================================ */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+
+.data-table th {
+  background: var(--red);
+  color: #fff;
+  padding: 4px 6px;
+  font-weight: 600;
+  text-align: left;
+  font-family: var(--font-head);
+  letter-spacing: .3px;
+  font-size: 11px;
+}
+
+.data-table th.ar {
+  direction: rtl;
+  font-family: var(--font-body);
+}
+
+.data-table td {
+  border: 1px solid var(--border);
+  padding: 3px 5px;
+}
+
+.data-table td input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  font-size: 11px;
+  font-family: var(--font-body);
+  outline: none;
+  color: var(--gray-900);
+}
+
+.data-table td input:focus {
+  background: var(--red-bg);
+}
+
+.data-table tbody tr:nth-child(even) td {
+  background: var(--gray-50);
+}
+
+/* ============================================================
+   SIGNATURE AREA
+   ============================================================ */
+.sig-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.sig-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 110px;
+}
+
+.sig-group label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gray-600);
+  text-transform: uppercase;
+}
+
+.sig-line {
+  border-bottom: 1.5px solid var(--border);
+  height: 28px;
+  background: var(--gray-50);
+  border-radius: 4px 4px 0 0;
+  padding: 2px 6px;
+  font-size: 11px;
+  cursor: text;
+  transition: border-color .15s;
+}
+
+.sig-line:focus-within,
+.sig-line:hover {
+  border-bottom-color: var(--red);
+  background: #fff;
+}
+
+/* ============================================================
+   AUTHORITY SIDEBAR LABEL
+   ============================================================ */
+.sidebar-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  background: var(--red);
+  color: #fff;
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 10px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .3px;
+}
+
+.badge-red   { background: var(--red-light);  color: var(--red-dark); }
+.badge-green { background: var(--green-bg);   color: var(--green); }
+.badge-yellow{ background: var(--yellow-bg);  color: var(--yellow); }
+.badge-blue  { background: var(--blue-bg);    color: var(--blue); }
+
+/* ============================================================
+   SECTION: SAFE WORKING CONDITIONS (3)
+   ============================================================ */
+.conditions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3px 8px;
+  margin-bottom: 6px;
+}
+
+/* ============================================================
+   COMPLEMENTARY CERTS TABLE
+   ============================================================ */
+.cert-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10.5px;
+}
+
+.cert-table th {
+  background: var(--blue);
+  color: #fff;
+  padding: 3px 6px;
+  font-size: 10.5px;
+}
+
+.cert-table td {
+  border: 1px solid var(--border);
+  padding: 3px 5px;
+}
+
+.cert-table td input[type="checkbox"] {
+  accent-color: var(--blue);
+}
+
+/* ============================================================
+   VALIDATION / SUSPENSION SECTIONS (right col)
+   ============================================================ */
+.auth-section {
+  background: var(--red-bg);
+  border-bottom: 1.5px solid var(--red-light);
+  padding: 10px 14px;
+}
+
+.auth-section .section-header .section-number {
+  background: var(--red-dark);
+}
+
+.auth-section p.note {
+  font-size: 10.5px;
+  color: var(--gray-600);
+  line-height: 1.5;
+  margin-bottom: 6px;
+  direction: rtl;
+  text-align: right;
+}
+
+.suspension-section {
+  background: var(--yellow-bg);
+  border-bottom: 1.5px solid #f9ca74;
+  padding: 10px 14px;
+}
+
+.completion-section {
+  background: var(--green-bg);
+  border-bottom: 1.5px solid #a9dfbf;
+  padding: 10px 14px;
+}
+
+.completion-section .section-header .section-number {
+  background: var(--green);
+}
+
+/* ============================================================
+   BOTTOM DISTRIBUTION BAR
+   ============================================================ */
+.distribution-bar {
+  background: var(--red-dark);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 7px 20px;
+  font-size: 10.5px;
+  font-family: var(--font-head);
+  letter-spacing: .5px;
+  flex-wrap: wrap;
+}
+
+.distribution-bar span {
+  opacity: .7;
+}
+
+.distribution-bar strong {
+  margin-right: 4px;
+}
+
+/* ============================================================
+   PRINT BUTTON
+   ============================================================ */
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--gray-100);
+  border-top: 1px solid var(--border);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  transition: opacity .15s, transform .1s;
+}
+
+.btn:hover { opacity: .88; transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary { background: var(--red); color: #fff; }
+.btn-outline  { background: #fff; color: var(--gray-700); border: 1.5px solid var(--border); }
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 860px) {
+  .permit-body {
+    grid-template-columns: 1fr;
+  }
+  .col-left {
+    border-right: none;
+    border-bottom: 2px solid var(--border);
+  }
+  .checkbox-grid,
+  .conditions-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .permit-header {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .permit-header .meta-box {
+    align-items: center;
+  }
+}
+
+@media (max-width: 540px) {
+  .checkbox-grid,
+  .conditions-grid {
+    grid-template-columns: 1fr;
+  }
+  .permit-header .title-box h1 {
+    font-size: 22px;
+  }
+}
+
+/* ============================================================
+   PRINT STYLES
+   ============================================================ */
+@media print {
+  body { background: #fff; }
+  .permit-wrapper {
+    box-shadow: none;
+    margin: 0;
+    border-radius: 0;
+    max-width: 100%;
+  }
+  .controls { display: none; }
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-2 { gap: 8px; }
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.text-ar { direction: rtl; text-align: right; }
+.text-xs { font-size: 10.5px; color: var(--gray-500); }
+.font-bold { font-weight: 700; }
+.text-red { color: var(--red); }
+.w-full { width: 100%; }
+
+/* highlighted required fields */
+input[required]:not(:valid) {
+  border-color: #e74c3c55;
+}
+</style>
+</head>
+<body>
+
+<div class="permit-wrapper" role="main" aria-label="Hot Work Permit Form">
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="permit-header">
+    <div class="logo-box">
+      <span style="font-family:var(--font-head);font-weight:800;font-size:20px;letter-spacing:2px;">PTW</span>
+      <span>Permit To Work System</span>
+    </div>
+    <div class="title-box">
+      <h1>🔥 HOT Work Permit</h1>
+      <div class="subtitle">تصريح العمل الساخن</div>
+    </div>
+    <div class="meta-box">
+      <span class="badge badge-red">⚠ Category: Fire / Heat Risk</span>
+      <span style="font-size:10px;opacity:.7">Work to be done by: <strong>Site / Contractor</strong></span>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       META ROW: Permit Number, SCE, Work Order, etc.
+       ============================================================ -->
+  <div class="meta-row">
+    <div class="meta-cell">
+      <label>Main Permit No. / رقم التصريح</label>
+      <input type="text" id="main-permit" placeholder="e.g. PTW-2024-001" aria-label="Main Permit Number" />
+    </div>
+    <div class="meta-cell">
+      <label>SCE</label>
+      <select aria-label="SCE">
+        <option value="">—</option>
+        <option>Y</option>
+        <option>N</option>
+      </select>
+    </div>
+    <div class="meta-cell">
+      <label>Category of Risk</label>
+      <input type="text" placeholder="High / Medium / Low" aria-label="Category of Risk" />
+    </div>
+    <div class="meta-cell">
+      <label>Work Order No. / رقم أمر العمل</label>
+      <input type="text" placeholder="WO-XXXX" aria-label="Work Order Number" />
+    </div>
+    <div class="meta-cell">
+      <label>Naked Flame</label>
+      <select aria-label="Naked Flame">
+        <option value="">—</option>
+        <option>Y</option>
+        <option>N</option>
+      </select>
+    </div>
+    <div class="meta-cell" style="margin-left:auto;">
+      <label>Date / التاريخ</label>
+      <input type="date" id="permit-date" aria-label="Permit Date" />
+    </div>
+  </div>
+
+  <!-- Work Site + Date Row -->
+  <div class="section" style="border-bottom:1.5px solid var(--border);padding:8px 14px;">
+    <div class="field-row">
+      <div class="field-group" style="max-width:200px;">
+        <label>Work Site / موقع العمل</label>
+        <input type="text" placeholder="Enter site location" aria-label="Work Site" />
+      </div>
+      <div class="field-group" style="max-width:140px;">
+        <label>Date / التاريخ</label>
+        <input type="date" aria-label="Date" />
+      </div>
+      <div class="field-group">
+        <label>Attachments / مرفقات</label>
+        <div class="flex gap-2" style="flex-wrap:wrap;">
+          <label class="check-item"><input type="checkbox" /> Risk Assessment (WMAP)</label>
+          <label class="check-item"><input type="checkbox" /> Scope/Method Statement</label>
+          <label class="check-item"><input type="checkbox" /> Procedure/SId instruction</label>
+          <label class="check-item"><input type="checkbox" /> Drawing / (MFDB/P&ID)</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MAIN TWO-COLUMN BODY
+       ============================================================ -->
+  <div class="permit-body">
+
+    <!-- ======================================
+         LEFT COLUMN
+         ====================================== -->
+    <div class="col-left">
+
+      <!-- SECTION 1: Description of Work -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">1</div>
+          <div>
+            <div class="section-title">Description of Work to be Performed</div>
+            <div class="section-title-ar">وصف العمل المقرر القيام به</div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>Equipment Name / اسم المعدة</label>
+            <input type="text" placeholder="e.g. Welding Machine, Grinder…" aria-label="Equipment Name" />
+          </div>
+          <div class="field-group">
+            <label>Work Location / مكان العمل</label>
+            <input type="text" placeholder="Unit / Area / Tag" aria-label="Work Location" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group" style="max-width:140px;">
+            <label>Vehicle Plate No.</label>
+            <input type="text" placeholder="Plate #" />
+          </div>
+          <div class="field-group" style="max-width:100px;">
+            <label>Status / الحالة</label>
+            <input type="text" placeholder="Active…" />
+          </div>
+          <div class="field-group">
+            <label>Tools & Equipment Required / الأدوات والمعدات المطلوبة</label>
+            <input type="text" placeholder="List tools…" />
+          </div>
+          <div class="field-group" style="max-width:110px;">
+            <label>Equipment No.</label>
+            <input type="text" placeholder="EQ-XXXX" />
+          </div>
+          <div class="field-group" style="max-width:130px;">
+            <label>People No. / عدد الأشخاص</label>
+            <div class="flex gap-2">
+              <input type="number" placeholder="Day" min="0" style="width:55px;" aria-label="Day shift people" />
+              <input type="number" placeholder="Night" min="0" style="width:55px;" aria-label="Night shift people" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: Hazards Identification -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">2</div>
+          <div>
+            <div class="section-title">Hazards Identification (PA)</div>
+            <div class="section-title-ar">بيان الأخطار</div>
+          </div>
+        </div>
+
+        <!-- Hazard checkboxes: 3 columns -->
+        <div class="checkbox-grid">
+          <label class="check-item" title="سائل أو غاز تحت ضغط">
+            <input type="checkbox" /><span>Liquid/Gas under pressure <span class="ar">سائل/غاز تحت ضغط</span></span>
+          </label>
+          <label class="check-item" title="الجسيمات الطائرة">
+            <input type="checkbox" /><span>Flying Particles <span class="ar">الجسيمات الطائرة</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Scaffolding to Install <span class="ar">نصب السقالات</span></span>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" /><span>Toxic Materials <span class="ar">مواد سامة</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Electricity / الكهرباء <span class="ar"></span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Wind / Weather Status <span class="ar">الريح/حالة الطقس</span></span>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" /><span>Corrosive Materials <span class="ar">مواد مسببة للتآكل</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Radioactivity <span class="ar">النشاط الإشعاعي</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Confined Space Entry <span class="ar">دخول الأماكن المحصورة</span></span>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" /><span>Flammable Materials <span class="ar">مواد قابلة للاشتعال</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Rotating Machinery <span class="ar">الماكينات الدوارة</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Others / أخرى</span>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" /><span>Hot Materials <span class="ar">مواد ساخنة</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Noisy Area ≥ 85db <span class="ar">منطقة صاخبة</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Add CO₂ Dry Chemical Powder</span>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" /><span>O₂ Deficiency <span class="ar">نقص الأكسجين</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Lifting Crane Process <span class="ar">عملية تشغيل الرافعة</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Possible H₂S Area <span class="ar">وجود كبريتيد الهيدروجين</span></span>
+          </label>
+
+          <label class="check-item">
+            <input type="checkbox" /><span>Possible TNORM <span class="ar">وجود إشعاع طبيعي</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Adjacent Operations <span class="ar">عمليات مجاورة</span></span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" /><span>Danger of Falling <span class="ar">خطر السقوط</span></span>
+          </label>
+        </div>
+
+        <div class="divider"></div>
+        <p style="font-size:10.5px;color:var(--gray-600);">
+          <strong>Performing Authority (PA):</strong> I authorise the mentioned component person as performer to have the permit &amp; observe all requirements.
+        </p>
+
+        <!-- PA Signature row -->
+        <div class="sig-row mt-1">
+          <div class="sig-group">
+            <label>Name / الاسم</label>
+            <input class="w-full" type="text" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);" placeholder="Full name…" />
+          </div>
+          <div class="sig-group">
+            <label>Position / الوظيفة</label>
+            <input class="w-full" type="text" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);" placeholder="Job title…" />
+          </div>
+          <div class="sig-group">
+            <label>Sign / التوقيع</label>
+            <div class="sig-line" tabindex="0" aria-label="Signature area"></div>
+          </div>
+          <div class="sig-group">
+            <label>Performer Name (P)</label>
+            <input class="w-full" type="text" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);" />
+          </div>
+          <div class="sig-group">
+            <label>Position / الوظيفة</label>
+            <input class="w-full" type="text" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);" />
+          </div>
+          <div class="sig-group">
+            <label>Sign / التوقيع</label>
+            <div class="sig-line" tabindex="0" aria-label="Signature area"></div>
+          </div>
+          <div class="sig-group">
+            <label>Company / الشركة</label>
+            <input class="w-full" type="text" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);" />
+          </div>
+          <div class="sig-group">
+            <label>Date / التاريخ</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);width:100%;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: Requirements for Safe Working Conditions -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">3</div>
+          <div>
+            <div class="section-title">Requirements for Safe Working Conditions</div>
+            <div class="section-title-ar">مشروط ظروف العمل الآمنة</div>
+          </div>
+        </div>
+
+        <!-- Left sub-panel: Status/Plant/Equip/Sys + conditions -->
+        <div class="flex gap-2" style="flex-wrap:wrap;align-items:flex-start;">
+          <div style="flex:1;min-width:220px;">
+            <div class="flex gap-2 mb-1" style="flex-wrap:wrap;">
+              <label class="check-item"><input type="checkbox" /> STATUS / الحالة</label>
+              <label class="check-item"><input type="checkbox" /> PLANT / المنشأة</label>
+              <label class="check-item"><input type="checkbox" /> EQUIP / معدة</label>
+              <label class="check-item"><input type="checkbox" /> SYST / نظام</label>
+              <label class="check-item"><input type="checkbox" /> In Service / الخدمة</label>
+            </div>
+            <div class="conditions-grid">
+              <label class="check-item"><input type="checkbox" /> Shut down</label>
+              <label class="check-item"><input type="checkbox" /> Standby man</label>
+              <label class="check-item"><input type="checkbox" /> F&amp;G/ESD override required</label>
+              <label class="check-item"><input type="checkbox" /> Depressurized</label>
+              <label class="check-item"><input type="checkbox" /> Equipment is not hot</label>
+              <label class="check-item"><input type="checkbox" /> Mechanical Isolation</label>
+              <label class="check-item"><input type="checkbox" /> Drained</label>
+              <label class="check-item"><input type="checkbox" /> Gas check prior starting</label>
+              <label class="check-item"><input type="checkbox" /> Electrical Isolation</label>
+              <label class="check-item"><input type="checkbox" /> Water Flushed</label>
+              <label class="check-item"><input type="checkbox" /> Fire network pressurized</label>
+              <label class="check-item"><input type="checkbox" /> Radiation Certificate</label>
+              <label class="check-item"><input type="checkbox" /> Inerted with</label>
+              <label class="check-item"><input type="checkbox" /> Fire hose lengthened</label>
+              <label class="check-item"><input type="checkbox" /> Hot Tapping</label>
+              <label class="check-item"><input type="checkbox" /> Pressurized with</label>
+              <label class="check-item"><input type="checkbox" /> Foam protection</label>
+              <label class="check-item"><input type="checkbox" /> Excavation Certificate</label>
+              <label class="check-item"><input type="checkbox" /> Blanketed with</label>
+              <label class="check-item"><input type="checkbox" /> Mobile fire water monitor</label>
+              <label class="check-item"><input type="checkbox" /> Over Ride Certificate</label>
+              <label class="check-item"><input type="checkbox" /> Full of (specify)</label>
+              <label class="check-item"><input type="checkbox" /> Portable fire extinguisher</label>
+              <label class="check-item"><input type="checkbox" /> De-Isolation Certificate</label>
+              <label class="check-item"><input type="checkbox" /> Empty</label>
+              <label class="check-item"><input type="checkbox" /> Flame retardant partition</label>
+              <label class="check-item"><input type="checkbox" /> Scaffolding Certificate</label>
+              <label class="check-item"><input type="checkbox" /> Open</label>
+              <label class="check-item"><input type="checkbox" /> Fire Truck required</label>
+              <label class="check-item"><input type="checkbox" /> Other</label>
+              <label class="check-item"><input type="checkbox" /> Gas Free</label>
+              <label class="check-item"><input type="checkbox" /> Steamed</label>
+              <label class="check-item"><input type="checkbox" /> Ventilated</label>
+              <label class="check-item"><input type="checkbox" /> Continuity bonding / Earthing</label>
+              <label class="check-item"><input type="checkbox" /> Safety systems bypassed</label>
+              <label class="check-item"><input type="checkbox" /> Continuous Gas Monitoring</label>
+              <label class="check-item"><input type="checkbox" /> Fire fighting systems isolated</label>
+              <label class="check-item"><input type="checkbox" /> Fluid gas blinded</label>
+              <label class="check-item"><input type="checkbox" /> Elec. Circuits isolated &amp; tagged</label>
+            </div>
+          </div>
+
+          <!-- Right sub-panel: Complementary Certificates -->
+          <div style="flex:1;min-width:200px;">
+            <div style="font-weight:700;font-size:11px;color:var(--blue);margin-bottom:4px;font-family:var(--font-head);letter-spacing:.5px;text-transform:uppercase;">
+              Complementary Certificates / الشهادات التكميلية
+            </div>
+            <table class="cert-table" aria-label="Complementary Certificates">
+              <thead>
+                <tr>
+                  <th>Sr. No.</th>
+                  <th>Certificate Type</th>
+                  <th>✓</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>Confined Space المحصورة</td><td><input type="checkbox" /></td></tr>
+                <tr><td>2</td><td>Mechanical Isolation الميكانيكي</td><td><input type="checkbox" /></td></tr>
+                <tr><td>3</td><td>Electrical Isolation الكهربائي</td><td><input type="checkbox" /></td></tr>
+                <tr><td>4</td><td>Radiation Certificate الإشعاع</td><td><input type="checkbox" /></td></tr>
+                <tr><td>5</td><td>Hot Tapping تنصيص ساخن</td><td><input type="checkbox" /></td></tr>
+                <tr><td>6</td><td>Excavation Certificate الحفريات</td><td><input type="checkbox" /></td></tr>
+                <tr><td>7</td><td>Over Ride Certificate التجاوز</td><td><input type="checkbox" /></td></tr>
+                <tr><td>8</td><td>De-Isolation Certificate العزل</td><td><input type="checkbox" /></td></tr>
+                <tr><td>9</td><td>Scaffolding Certificate السقالات</td><td><input type="checkbox" /></td></tr>
+                <tr><td>10</td><td>Other / أخرى</td><td><input type="checkbox" /></td></tr>
+              </tbody>
+            </table>
+            <div class="field-group mt-2">
+              <label>Additional Comments / تعليقات إضافية</label>
+              <textarea rows="3" placeholder="Enter any additional comments here…" aria-label="Additional Comments"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- PA / AAA signature strip -->
+        <div class="divider mt-2"></div>
+        <div class="sig-row">
+          <div class="sig-group">
+            <label>Performing Authority (PA) / سلطة الجهة المنفذة</label>
+            <div class="sig-line" tabindex="0" aria-label="PA Signature"></div>
+          </div>
+          <div class="sig-group">
+            <label>Date / التاريخ</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);width:100%;" />
+          </div>
+          <div class="sig-group">
+            <label>Affected Area Authority (AAA) / سلطة المنطقة المتأثرة</label>
+            <div class="sig-line" tabindex="0" aria-label="AAA Signature"></div>
+          </div>
+          <div class="sig-group">
+            <label>Date / التاريخ</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);width:100%;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: HSE Requirements -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">4</div>
+          <div>
+            <div class="section-title">HSE Requirements for Implementation by Performing Authority</div>
+            <div class="section-title-ar">متطلبات الصحة والسلامة والبيئة</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;">
+          <label class="check-item"><input type="checkbox" /> Appropriate Protective Clothing</label>
+          <label class="check-item"><input type="checkbox" /> Dust Mask / قناع الغبار</label>
+          <label class="check-item"><input type="checkbox" /> Goggles / Face shield</label>
+          <label class="check-item"><input type="checkbox" /> Fire watch required / مطلوب حارس الحريق</label>
+          <label class="check-item"><input type="checkbox" /> Ear Muffs / واقي الأذن</label>
+          <label class="check-item"><input type="checkbox" /> Flame Arrestor / كاتم اللهب</label>
+          <label class="check-item"><input type="checkbox" /> Hearing Protection / حماية السمع</label>
+          <label class="check-item"><input type="checkbox" /> Tool Box Talk Required</label>
+          <label class="check-item"><input type="checkbox" /> Safety Harness / Life lines</label>
+          <label class="check-item"><input type="checkbox" /> Barriers &amp; Warning signs</label>
+          <label class="check-item"><input type="checkbox" /> Material cleared / escape route cleared</label>
+          <label class="check-item"><input type="checkbox" /> SCBA to be worn</label>
+        </div>
+        <div class="sig-row mt-2">
+          <div class="sig-group">
+            <label>HSE Representative (HSE-R) / مسؤول الصحة والسلامة</label>
+            <div class="sig-line" tabindex="0" aria-label="HSE Rep Signature"></div>
+          </div>
+          <div class="sig-group" style="max-width:100px;">
+            <label>Sign</label>
+            <div class="sig-line" tabindex="0"></div>
+          </div>
+          <div class="sig-group" style="max-width:120px;">
+            <label>Date</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);width:100%;" />
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Time</label>
+            <input type="time" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);width:100%;" />
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /col-left -->
+
+    <!-- ======================================
+         RIGHT COLUMN
+         ====================================== -->
+    <div class="col-right">
+
+      <!-- SECTION 5: Authorisation by Area Authority -->
+      <div class="auth-section">
+        <div class="section-header">
+          <div class="section-number">5</div>
+          <div>
+            <div class="section-title">Authorisation for Worker by Area Authority (AA) or Delegate</div>
+            <div class="section-title-ar text-ar" style="font-size:10.5px;">إذن عمل من سلطة المنطقة/المفوض</div>
+          </div>
+        </div>
+        <p class="note">
+          I have reviewed the hazard and risks for the work described. I agree that precautions &amp; controls are served. I hereby declare that all administration have been identified/implemented for the mentioned activity on this PTW and I authorise the work to be carried out.
+        </p>
+        <div class="sig-row">
+          <div class="sig-group">
+            <label>Area Authority (1) / مسؤول المنطقة</label>
+            <div class="sig-line" tabindex="0" aria-label="Area Authority 1 Signature"></div>
+          </div>
+          <div class="sig-group" style="max-width:110px;">
+            <label>Date</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Time</label>
+            <input type="time" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+        </div>
+        <div class="sig-row mt-1">
+          <div class="sig-group">
+            <label>Area Authority (2) / مسؤول المنطقة</label>
+            <div class="sig-line" tabindex="0" aria-label="Area Authority 2 Signature"></div>
+          </div>
+          <div class="sig-group" style="max-width:110px;">
+            <label>Date</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Time</label>
+            <input type="time" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 6: Gas Tests -->
+      <div class="section" style="background:var(--blue-bg);">
+        <div class="section-header">
+          <div class="section-number" style="background:var(--blue);">6</div>
+          <div>
+            <div class="section-title" style="color:var(--blue);">Gas Tests / اختبارات الغاز</div>
+            <div class="section-title-ar">فحص الغاز قبل بدء النشاط من قِبل الشخص المفوض</div>
+          </div>
+        </div>
+        <table class="data-table" aria-label="Gas Tests Table">
+          <thead>
+            <tr>
+              <th>Time / الوقت</th>
+              <th>O₂ %</th>
+              <th>LEL %</th>
+              <th>H₂S ppm</th>
+              <th>Other / أخرى</th>
+              <th>Name / الاسم</th>
+              <th>Signature / التوقيع</th>
+              <th>Date / التاريخ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><input type="time" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="date" /></td></tr>
+            <tr><td><input type="time" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="date" /></td></tr>
+            <tr><td><input type="time" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="date" /></td></tr>
+            <tr><td><input type="time" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="text" /></td><td><input type="date" /></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SECTION 7: Performer (P) -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number">7</div>
+          <div>
+            <div class="section-title">Performer (P) / المنفذ</div>
+          </div>
+        </div>
+        <p class="text-xs" style="margin-bottom:6px;color:var(--gray-600);">
+          I declare that I am aware of the work to be executed and ensure we will not perform any other activity outside the PTW. I have checked the work site conditions and confirm that all the precautions are in place to SAFELY start activity. I fully accept responsibilities to carry out the job in the safest manner.
+        </p>
+        <div class="sig-row">
+          <div class="sig-group">
+            <label>Performer (P) / المنفذ</label>
+            <div class="sig-line" tabindex="0" aria-label="Performer Signature"></div>
+          </div>
+          <div class="sig-group" style="max-width:110px;">
+            <label>Sign / التوقيع</label>
+            <div class="sig-line" tabindex="0"></div>
+          </div>
+          <div class="sig-group" style="max-width:110px;">
+            <label>Date</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);width:100%;" />
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Time</label>
+            <input type="time" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:var(--gray-50);width:100%;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 8: Site Supervisor (PRA) -->
+      <div class="section" style="background:var(--yellow-bg);">
+        <div class="section-header">
+          <div class="section-number" style="background:var(--yellow);">8</div>
+          <div>
+            <div class="section-title" style="color:#7d6608;">Site Supervisor (PRA) / مشرف الموقع</div>
+          </div>
+        </div>
+        <p class="text-xs" style="margin-bottom:6px;color:var(--gray-600);">
+          I have checked the work site and found the preparation completed. There are no isolation, location and safety system conflicts.
+        </p>
+        <div class="sig-row">
+          <div class="sig-group">
+            <label>Site Supervisor (PRA) / مشرف الموقع</label>
+            <div class="sig-line" tabindex="0" aria-label="Site Supervisor Signature"></div>
+          </div>
+          <div class="sig-group" style="max-width:110px;">
+            <label>Date / التاريخ</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Time / الوقت</label>
+            <input type="time" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 9: Validation On Site -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-number" style="background:var(--green);">9</div>
+          <div>
+            <div class="section-title" style="color:var(--green);">Validation On Site — HSE Supervisor Sign Only for Critical Activities</div>
+          </div>
+        </div>
+        <table class="data-table" aria-label="On-site Validation Table">
+          <thead>
+            <tr>
+              <th>Open Date</th>
+              <th>Time</th>
+              <th>Shift</th>
+              <th>Performer (P)</th>
+              <th>Site Supervisor (PRA)</th>
+              <th>HSE-R</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="date" /></td>
+              <td><input type="time" /></td>
+              <td>
+                <select style="font-size:11px;border:none;width:100%;background:transparent;">
+                  <option>Day / نهار</option>
+                  <option>Night / ليل</option>
+                </select>
+              </td>
+              <td><input type="text" placeholder="Name + Sign" /></td>
+              <td><input type="text" placeholder="Name + Sign" /></td>
+              <td><input type="text" placeholder="Sign" /></td>
+            </tr>
+            <tr>
+              <td><input type="date" /></td>
+              <td><input type="time" /></td>
+              <td>
+                <select style="font-size:11px;border:none;width:100%;background:transparent;">
+                  <option>Day / نهار</option>
+                  <option>Night / ليل</option>
+                </select>
+              </td>
+              <td><input type="text" /></td>
+              <td><input type="text" /></td>
+              <td><input type="text" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- SECTION 10: Suspension & Re-Issue -->
+      <div class="suspension-section">
+        <div class="section-header">
+          <div class="section-number" style="background:var(--yellow);color:var(--gray-900);">10</div>
+          <div>
+            <div class="section-title" style="color:#7d6608;">Suspension &amp; Re-Issue / التعليق وإعادة الإصدار</div>
+          </div>
+        </div>
+        <p class="text-xs" style="margin-bottom:6px;color:var(--gray-600);">
+          Due to for Operation &amp; Safety requirements, this PTW has been suspended and will remain inactive until further notice. Permit suspended by order of the administrators.
+        </p>
+        <div class="sig-row">
+          <div class="sig-group">
+            <label>Name / الاسم</label>
+            <input type="text" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+          <div class="sig-group">
+            <label>Position</label>
+            <input type="text" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Sign</label>
+            <div class="sig-line" tabindex="0"></div>
+          </div>
+          <div class="sig-group" style="max-width:110px;">
+            <label>Date</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Time</label>
+            <input type="time" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+        </div>
+
+        <div class="divider" style="margin:8px 0;border-color:#f9ca74;"></div>
+
+        <!-- Normal Operation Resumed -->
+        <div style="font-weight:700;font-size:11.5px;color:#7d6608;margin-bottom:4px;font-family:var(--font-head);">
+          Normal Operation Have Been Resumed / استئناف التشغيل العادي
+        </div>
+        <p class="text-xs" style="color:var(--gray-600);margin-bottom:6px;">
+          The worksite has been inspected and controls are in place. This PTW may now be re-issued.
+        </p>
+        <div class="sig-row">
+          <div class="sig-group">
+            <label>Site Supervisor (PRA)</label>
+            <div class="sig-line" tabindex="0"></div>
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Sign</label>
+            <div class="sig-line" tabindex="0"></div>
+          </div>
+          <div class="sig-group" style="max-width:110px;">
+            <label>Date</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Time</label>
+            <input type="time" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 11: Work Completion / Clearance -->
+      <div class="completion-section">
+        <div class="section-header">
+          <div class="section-number" style="background:var(--green);">11</div>
+          <div>
+            <div class="section-title" style="color:var(--green);">Work Completion / Clearance / إكمال الأعمال والإنهاء</div>
+          </div>
+        </div>
+        <div class="flex gap-2 mt-1" style="flex-wrap:wrap;margin-bottom:6px;">
+          <label class="check-item"><input type="checkbox" /> Completed / منجز</label>
+          <label class="check-item"><input type="checkbox" /> Stopped in a safe condition / توقف في حالة آمنة</label>
+        </div>
+        <p class="text-xs" style="color:var(--gray-600);margin-bottom:6px;">
+          I hereby declare that the worksite has been left in a clear, clean and safe condition. F&amp;G/ESD system(s) returned to service. All equipment returned as condition, with exception of indicated items. The equipment is in a condition to be returned to service.
+        </p>
+        <div class="flex gap-2" style="flex-wrap:wrap;margin-bottom:6px;">
+          <label class="check-item"><input type="checkbox" /> Work is to CONTINUE under new PTW</label>
+          <label class="check-item"><input type="checkbox" /> Work is COMPLETE</label>
+        </div>
+        <div class="sig-row">
+          <div class="sig-group">
+            <label>Performing Authority / سلطة الأداء (PA)</label>
+            <div class="sig-line" tabindex="0"></div>
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Sign</label>
+            <div class="sig-line" tabindex="0"></div>
+          </div>
+          <div class="sig-group" style="max-width:110px;">
+            <label>Date</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Time</label>
+            <input type="time" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+        </div>
+        <div class="sig-row mt-1">
+          <div class="sig-group">
+            <label>Site Supervisor (PRA) / مشرف الموقع</label>
+            <div class="sig-line" tabindex="0"></div>
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Sign</label>
+            <div class="sig-line" tabindex="0"></div>
+          </div>
+          <div class="sig-group" style="max-width:110px;">
+            <label>Date</label>
+            <input type="date" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+          <div class="sig-group" style="max-width:90px;">
+            <label>Time</label>
+            <input type="time" style="border:1px solid var(--border);border-radius:4px;padding:4px 7px;font-size:12px;background:#fff;width:100%;" />
+          </div>
+        </div>
+
+        <!-- PERMIT CLOSED notice -->
+        <div style="margin-top:8px;background:var(--green);color:#fff;border-radius:6px;padding:8px 12px;font-family:var(--font-head);font-size:13px;font-weight:700;letter-spacing:.5px;text-align:center;">
+          ✅ THIS PERMIT IS NOW CLOSED — Permit Register to be Updated
+        </div>
+      </div>
+
+    </div><!-- /col-right -->
+  </div><!-- /permit-body -->
+
+  <!-- ============================================================
+       DISTRIBUTION BAR
+       ============================================================ -->
+  <div class="distribution-bar" role="contentinfo" aria-label="Distribution">
+    <strong>Distribution:</strong>
+    <span>Original – At Work Area</span>
+    <span>|</span>
+    <span>Copy 1 &amp; Copy 4:1 – HSE Office</span>
+    <span>|</span>
+    <span>Copy 2 – Safety Office</span>
+    <span>|</span>
+    <span>Copy 3 – مكتب الإنتاج / Production Office</span>
+  </div>
+
+  <!-- ============================================================
+       CONTROLS: Print / Reset
+       ============================================================ -->
+  <div class="controls" role="toolbar" aria-label="Form Controls">
+    <button class="btn btn-outline" type="button" onclick="resetForm()" aria-label="Reset all fields">
+      ↺ Reset Form
+    </button>
+    <button class="btn btn-primary" type="button" onclick="window.print()" aria-label="Print permit">
+      🖨 Print Permit
+    </button>
+  </div>
+
+</div><!-- /permit-wrapper -->
+
+<script>
+// Auto-set today's date on permit-date field
+document.addEventListener('DOMContentLoaded', function () {
+  const today = new Date().toISOString().split('T')[0];
+  const dateField = document.getElementById('permit-date');
+  if (dateField && !dateField.value) dateField.value = today;
+});
+
+// Simple form reset
+function resetForm() {
+  if (!confirm('Reset all fields? This cannot be undone.')) return;
+  document.querySelectorAll('input:not([type="submit"]), select, textarea').forEach(el => {
+    if (el.type === 'checkbox' || el.type === 'radio') {
+      el.checked = false;
+    } else {
+      el.value = '';
+    }
+  });
+  // Re-set today's date
+  const today = new Date().toISOString().split('T')[0];
+  const dateField = document.getElementById('permit-date');
+  if (dateField) dateField.value = today;
+}
+</script>
+
+</body>
+</html>

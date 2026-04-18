@@ -1,0 +1,915 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+
+.wrap { padding: 1rem 0; }
+
+.phase-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 0;
+  margin-bottom: 0;
+}
+
+.phase-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 16px;
+  gap: 6px;
+  position: relative;
+}
+
+.phase-label::after {
+  content: '';
+  position: absolute;
+  top: 48px;
+  bottom: -20px;
+  left: 50%;
+  width: 1.5px;
+  background: var(--color-border-tertiary);
+}
+
+.phase-row:last-child .phase-label::after { display: none; }
+
+.phase-num {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 500;
+  border: 1.5px solid;
+  flex-shrink: 0;
+}
+
+.phase-name {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: 1.3;
+  max-width: 80px;
+}
+
+.cards-col { padding: 8px 0 24px 16px; }
+
+.phase-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 8px;
+}
+
+.card {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  position: relative;
+}
+
+.card:hover { border-color: var(--color-border-secondary); background: var(--color-background-secondary); }
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.card-icon {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+
+.card-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.impact-high { background: var(--color-background-danger); color: var(--color-text-danger); }
+.impact-med  { background: var(--color-background-warning); color: var(--color-text-warning); }
+.impact-low  { background: var(--color-background-success); color: var(--color-text-success); }
+.impact-info { background: var(--color-background-info); color: var(--color-text-info); }
+
+.p1-num { background: var(--color-background-danger); color: var(--color-text-danger); border-color: var(--color-border-danger); }
+.p2-num { background: var(--color-background-warning); color: var(--color-text-warning); border-color: var(--color-border-warning); }
+.p3-num { background: var(--color-background-success); color: var(--color-text-success); border-color: var(--color-border-success); }
+.p4-num { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
+
+.p1-icon { background: var(--color-background-danger); }
+.p2-icon { background: var(--color-background-warning); }
+.p3-icon { background: var(--color-background-success); }
+.p4-icon { background: var(--color-background-info); }
+
+.detail-panel {
+  background: var(--color-background-secondary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 14px 16px;
+  margin-top: 20px;
+  min-height: 80px;
+}
+
+.detail-title {
+  font-size: 14px; font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.detail-content {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.detail-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+  margin-top: 8px;
+}
+
+.detail-list li {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding-left: 12px;
+  position: relative;
+}
+.detail-list li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--color-text-tertiary);
+}
+
+.summary-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.sum-card {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.sum-num {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.sum-label {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  line-height: 1.3;
+}
+
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  padding-bottom: 8px;
+}
+
+.tab {
+  padding: 5px 12px;
+  border-radius: var(--border-radius-md);
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  border: 0.5px solid transparent;
+  transition: all 0.15s;
+  background: transparent;
+}
+
+.tab:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.tab.active { background: var(--color-background-primary); border-color: var(--color-border-secondary); color: var(--color-text-primary); }
+</style>
+
+<div class="wrap">
+  <h2 class="sr-only">خارطة تحسينات نظام تصريح العمل الساخن</h2>
+
+  <div class="summary-bar">
+    <div class="sum-card">
+      <div class="sum-num" style="color:var(--color-text-danger);">6</div>
+      <div class="sum-label">تحسينات حرجة فورية</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-num" style="color:var(--color-text-warning);">8</div>
+      <div class="sum-label">تحسينات المرحلة الثانية</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-num" style="color:var(--color-text-success);">7</div>
+      <div class="sum-label">ميزات متقدمة</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-num" style="color:var(--color-text-info);">5</div>
+      <div class="sum-label">تكاملات مستقبلية</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="filterPhase('all', this)">الكل</button>
+    <button class="tab" onclick="filterPhase('p1', this)">المرحلة 1 — حرج</button>
+    <button class="tab" onclick="filterPhase('p2', this)">المرحلة 2 — مهم</button>
+    <button class="tab" onclick="filterPhase('p3', this)">المرحلة 3 — متقدم</button>
+    <button class="tab" onclick="filterPhase('p4', this)">المرحلة 4 — مستقبل</button>
+  </div>
+
+  <div id="phases-container">
+
+  <!-- PHASE 1 -->
+  <div class="phase-row" data-phase="p1" id="phase-p1">
+    <div class="phase-label">
+      <div class="phase-num p1-num">1</div>
+      <div class="phase-name">فوري<br>0–2 أسبوع</div>
+    </div>
+    <div class="cards-col">
+      <div class="phase-title">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--color-text-danger);display:inline-block;"></span>
+        الأمان والامتثال — حرج لـ ISO 45001
+      </div>
+      <div class="cards-grid">
+
+        <div class="card" onclick="showDetail('sig')">
+          <div class="card-head">
+            <div class="card-icon p1-icon">✍</div>
+            <div class="card-title">توقيع رقمي حقيقي</div>
+          </div>
+          <div class="card-desc">Canvas API لرسم التوقيع يدوياً بدل الاسم النصي فقط</div>
+          <span class="badge impact-high">حرج</span>
+        </div>
+
+        <div class="card" onclick="showDetail('offline')">
+          <div class="card-head">
+            <div class="card-icon p1-icon">📶</div>
+            <div class="card-title">وضع Offline كامل</div>
+          </div>
+          <div class="card-desc">Service Worker + IndexedDB للعمل بدون إنترنت في الميدان</div>
+          <span class="badge impact-high">حرج</span>
+        </div>
+
+        <div class="card" onclick="showDetail('lock')">
+          <div class="card-head">
+            <div class="card-icon p1-icon">🔒</div>
+            <div class="card-title">قفل الحقول بعد التوقيع</div>
+          </div>
+          <div class="card-desc">منع تعديل الحقول المعتمدة — متطلب قانوني أساسي</div>
+          <span class="badge impact-high">حرج</span>
+        </div>
+
+        <div class="card" onclick="showDetail('timer')">
+          <div class="card-head">
+            <div class="card-icon p1-icon">⏱</div>
+            <div class="card-title">مؤقت انتهاء التصريح</div>
+          </div>
+          <div class="card-desc">عداد تنازلي مرئي + إنذار قبل انتهاء الصلاحية بـ 30 دقيقة</div>
+          <span class="badge impact-high">حرج</span>
+        </div>
+
+        <div class="card" onclick="showDetail('photo')">
+          <div class="card-head">
+            <div class="card-icon p1-icon">📸</div>
+            <div class="card-title">رفع صور الموقع</div>
+          </div>
+          <div class="card-desc">التقاط أو رفع صور الخطر والمعدات ومنطقة العمل</div>
+          <span class="badge impact-high">مهم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('pdf2')">
+          <div class="card-head">
+            <div class="card-icon p1-icon">📄</div>
+            <div class="card-title">تصدير PDF حقيقي</div>
+          </div>
+          <div class="card-desc">jsPDF أو Puppeteer لتوليد ملف PDF قابل للحفظ والمشاركة</div>
+          <span class="badge impact-high">حرج</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase-row" data-phase="p2" id="phase-p2">
+    <div class="phase-label">
+      <div class="phase-num p2-num">2</div>
+      <div class="phase-name">قريب<br>2–6 أسبوع</div>
+    </div>
+    <div class="cards-col">
+      <div class="phase-title">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--color-text-warning);display:inline-block;"></span>
+        تجربة المستخدم والكفاءة التشغيلية
+      </div>
+      <div class="cards-grid">
+
+        <div class="card" onclick="showDetail('wf')">
+          <div class="card-head">
+            <div class="card-icon p2-icon">🔄</div>
+            <div class="card-title">Workflow موافقات</div>
+          </div>
+          <div class="card-desc">تدفق إلزامي: PA → AA → HSE → PRA مع تتبع الحالة</div>
+          <span class="badge impact-med">مهم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('notif')">
+          <div class="card-head">
+            <div class="card-icon p2-icon">🔔</div>
+            <div class="card-title">إشعارات فورية</div>
+          </div>
+          <div class="card-desc">Push Notifications عند طلب الموافقة أو الرفض أو الانتهاء</div>
+          <span class="badge impact-med">مهم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('mobile')">
+          <div class="card-head">
+            <div class="card-icon p2-icon">📱</div>
+            <div class="card-title">تصميم Mobile-First</div>
+          </div>
+          <div class="card-desc">واجهة مخصصة للجوال — المشرفون يوقعون في الميدان</div>
+          <span class="badge impact-med">مهم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('gas2')">
+          <div class="card-head">
+            <div class="card-icon p2-icon">🧪</div>
+            <div class="card-title">تنبيهات قراءات الغاز</div>
+          </div>
+          <div class="card-desc">تلوين تلقائي للقراءات الخطرة + حجب التصريح إذا تجاوز الحد</div>
+          <span class="badge impact-med">مهم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('template')">
+          <div class="card-head">
+            <div class="card-icon p2-icon">📋</div>
+            <div class="card-title">قوالب العمل</div>
+          </div>
+          <div class="card-desc">حفظ تصاريح متكررة كقوالب لإعادة الاستخدام السريع</div>
+          <span class="badge impact-med">متوسط</span>
+        </div>
+
+        <div class="card" onclick="showDetail('ppe')">
+          <div class="card-head">
+            <div class="card-icon p2-icon">🦺</div>
+            <div class="card-title">تحقق PPE ذكي</div>
+          </div>
+          <div class="card-desc">اقتراح PPE تلقائي بناءً على المخاطر المحددة في القسم 2</div>
+          <span class="badge impact-med">مهم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('lang')">
+          <div class="card-head">
+            <div class="card-icon p2-icon">🌐</div>
+            <div class="card-title">دعم ثنائي اللغة</div>
+          </div>
+          <div class="card-desc">واجهة كاملة بالعربية والإنجليزية مع RTL صحيح للعربية</div>
+          <span class="badge impact-med">مهم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('qr2')">
+          <div class="card-head">
+            <div class="card-icon p2-icon">📲</div>
+            <div class="card-title">QR Code فعلي</div>
+          </div>
+          <div class="card-desc">QR حقيقي يفتح التصريح مباشرة — مسح في الموقع للتحقق</div>
+          <span class="badge impact-med">مهم</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase-row" data-phase="p3" id="phase-p3">
+    <div class="phase-label">
+      <div class="phase-num p3-num">3</div>
+      <div class="phase-name">متوسط<br>1–3 أشهر</div>
+    </div>
+    <div class="cards-col">
+      <div class="phase-title">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--color-text-success);display:inline-block;"></span>
+        الذكاء التشغيلي ولوحة التحكم
+      </div>
+      <div class="cards-grid">
+
+        <div class="card" onclick="showDetail('dash')">
+          <div class="card-head">
+            <div class="card-icon p3-icon">📊</div>
+            <div class="card-title">لوحة تحكم HSE</div>
+          </div>
+          <div class="card-desc">KPIs: عدد التصاريح، المعلقة، الحوادث، نسبة الامتثال</div>
+          <span class="badge impact-low">متقدم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('risk')">
+          <div class="card-head">
+            <div class="card-icon p3-icon">⚠</div>
+            <div class="card-title">مصفوفة المخاطر 5×5</div>
+          </div>
+          <div class="card-desc">حساب تلقائي لـ Risk Score بناءً على الاحتمالية × الخطورة</div>
+          <span class="badge impact-low">متقدم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('map')">
+          <div class="card-head">
+            <div class="card-icon p3-icon">🗺</div>
+            <div class="card-title">خريطة التصاريح</div>
+          </div>
+          <div class="card-desc">عرض جغرافي للتصاريح النشطة على مخطط المنشأة</div>
+          <span class="badge impact-low">متقدم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('conf')">
+          <div class="card-head">
+            <div class="card-icon p3-icon">⛔</div>
+            <div class="card-title">كشف التعارضات</div>
+          </div>
+          <div class="card-desc">تنبيه عند تداخل تصريحات في نفس المنطقة والوقت</div>
+          <span class="badge impact-low">متقدم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('report')">
+          <div class="card-head">
+            <div class="card-icon p3-icon">📈</div>
+            <div class="card-title">تقارير دورية</div>
+          </div>
+          <div class="card-desc">تقارير أسبوعية/شهرية للإدارة مع رسوم بيانية وتحليلات</div>
+          <span class="badge impact-low">متقدم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('checkin')">
+          <div class="card-head">
+            <div class="card-icon p3-icon">👤</div>
+            <div class="card-title">تسجيل دخول العمال</div>
+          </div>
+          <div class="card-desc">QR تسجيل حضور كل عامل في موقع التصريح + عدد بشري فعلي</div>
+          <span class="badge impact-low">متقدم</span>
+        </div>
+
+        <div class="card" onclick="showDetail('ai')">
+          <div class="card-head">
+            <div class="card-icon p3-icon">🤖</div>
+            <div class="card-title">مساعد AI للمخاطر</div>
+          </div>
+          <div class="card-desc">اقتراح تلقائي للمخاطر بناءً على نوع العمل والموقع والمعدة</div>
+          <span class="badge impact-low">ابتكار</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase-row" data-phase="p4" id="phase-p4">
+    <div class="phase-label">
+      <div class="phase-num p4-num">4</div>
+      <div class="phase-name">مستقبل<br>3–6 أشهر</div>
+    </div>
+    <div class="cards-col">
+      <div class="phase-title">
+        <span style="width:8px;height:8px;border-radius:50%;background:var(--color-text-info);display:inline-block;"></span>
+        تكاملات المنظومة الصناعية
+      </div>
+      <div class="cards-grid">
+
+        <div class="card" onclick="showDetail('erp')">
+          <div class="card-head">
+            <div class="card-icon p4-icon">🏭</div>
+            <div class="card-title">تكامل SAP/ERP</div>
+          </div>
+          <div class="card-desc">ربط أوامر العمل من SAP PM مباشرة بالتصاريح</div>
+          <span class="badge impact-info">تكامل</span>
+        </div>
+
+        <div class="card" onclick="showDetail('gas3')">
+          <div class="card-head">
+            <div class="card-icon p4-icon">📡</div>
+            <div class="card-title">أجهزة قياس الغاز IoT</div>
+          </div>
+          <div class="card-desc">استقبال قراءات الغاز مباشرة من الأجهزة عبر Bluetooth/WiFi</div>
+          <span class="badge impact-info">تكامل</span>
+        </div>
+
+        <div class="card" onclick="showDetail('iso')">
+          <div class="card-head">
+            <div class="card-icon p4-icon">🔌</div>
+            <div class="card-title">نظام العزل الكهربائي</div>
+          </div>
+          <div class="card-desc">ربط LOTO الرقمي مع تصاريح العزل الكهربائي المرتبطة</div>
+          <span class="badge impact-info">تكامل</span>
+        </div>
+
+        <div class="card" onclick="showDetail('blockchain')">
+          <div class="card-head">
+            <div class="card-icon p4-icon">⛓</div>
+            <div class="card-title">Blockchain للتوقيعات</div>
+          </div>
+          <div class="card-desc">تخزين التوقيعات على blockchain لضمان عدم التلاعب</div>
+          <span class="badge impact-info">مستقبل</span>
+        </div>
+
+        <div class="card" onclick="showDetail('ar')">
+          <div class="card-head">
+            <div class="card-icon p4-icon">🥽</div>
+            <div class="card-title">AR Overlay للمشرفين</div>
+          </div>
+          <div class="card-desc">عرض بيانات التصريح عبر نظارات AR في موقع العمل</div>
+          <span class="badge impact-info">ابتكار</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <!-- Detail Panel -->
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-title">اضغط على أي بطاقة لعرض التفاصيل والتنفيذ المقترح</div>
+    <div class="detail-content" id="detail-content" style="color:var(--color-text-tertiary);">
+      تحليل شامل لـ 26 تحسيناً عبر 4 مراحل — من الإصلاحات الحرجة الفورية إلى التكاملات المستقبلية
+    </div>
+  </div>
+
+</div>
+
+<script>
+const details = {
+  sig: {
+    title: "توقيع رقمي حقيقي بـ Canvas API",
+    content: "المشكلة الحالية: الاسم النصي ليس توقيعاً معتمداً قانونياً في أي معيار دولي.",
+    points: [
+      "Canvas للرسم اليدوي بالإصبع أو القلم",
+      "حفظ كـ Base64 PNG مدمج في التصريح",
+      "timestamp مشفر مع التوقيع",
+      "خيار مسح وإعادة الرسم",
+      "تحقق بصمة الوقت من الخادم",
+      "توافق مع eIDAS وIEC 62443"
+    ]
+  },
+  offline: {
+    title: "وضع Offline كامل مع Service Worker",
+    content: "الحقيقة الميدانية: 70% من العمل يتم في مناطق بدون إنترنت — tanks، confined spaces، remote areas.",
+    points: [
+      "Service Worker يخزن الواجهة كاملة",
+      "IndexedDB لحفظ بيانات التصريح محلياً",
+      "مزامنة تلقائية عند عودة الاتصال",
+      "مؤشر مرئي لحالة الاتصال/Offline",
+      "قائمة انتظار للعمليات غير المتزامنة",
+      "Background Sync API"
+    ]
+  },
+  lock: {
+    title: "قفل الحقول بعد التوقيع — متطلب ISO 45001",
+    content: "معيار ISO 45001 و OSHA يشترطان عدم قابلية تعديل التصريح بعد التوقيع — حالياً يمكن تغيير أي شيء!",
+    points: [
+      "readonly بعد كل توقيع مرحلي",
+      "SHA-256 hash للمحتوى عند التوقيع",
+      "زر 'طلب تعديل' يفتح revision جديد",
+      "سجل كامل لكل نسخة معدّلة",
+      "تمييز مرئي للحقول المقفولة",
+      "إشعار لجميع الموقعين عند التعديل"
+    ]
+  },
+  timer: {
+    title: "مؤقت انتهاء التصريح — Safety Critical",
+    content: "التصريح بدون مؤقت هو ثغرة أمنية كبرى — العمل قد يستمر بعد انتهاء الصلاحية.",
+    points: [
+      "عداد تنازلي مرئي كبير في الهيدر",
+      "تنبيه مرئي وصوتي قبل 30 دقيقة",
+      "تنبيه قبل 10 دقائق بلون أحمر وامض",
+      "تجميد التصريح تلقائياً عند الانتهاء",
+      "إشعار للـ AA و HSE Supervisor",
+      "خيار تمديد مع موافقة AA فقط"
+    ]
+  },
+  photo: {
+    title: "رفع صور الموقع والمعدات",
+    content: "الصور دليل قانوني على حالة الموقع قبل وبعد العمل — مطلب في معظم شركات النفط والغاز.",
+    points: [
+      "التقاط مباشر من الكاميرا",
+      "رفع من المعرض",
+      "تصنيف: قبل/أثناء/بعد العمل",
+      "إضافة تعليق نصي على الصورة",
+      "ضغط تلقائي للصور الكبيرة",
+      "معرض مصغر داخل التصريح"
+    ]
+  },
+  pdf2: {
+    title: "تصدير PDF احترافي",
+    content: "Print-to-PDF يعطي نتائج غير موثوقة — مطلوب PDF حقيقي بتنسيق A4 ثابت لأي طابعة.",
+    points: [
+      "jsPDF أو html2canvas للتوليد",
+      "تخطيط A4 صارم مع هوامش صحيحة",
+      "رأس وتذييل بمعلومات الشركة",
+      "التوقيعات كصور مدمجة",
+      "رقم صفحة وتاريخ الطباعة",
+      "watermark 'ORIGINAL/COPY' تلقائي"
+    ]
+  },
+  wf: {
+    title: "Workflow رسمي للموافقات",
+    content: "حالياً يمكن لأي شخص ملء أي حقل — لا يوجد تسلسل إلزامي للموافقات.",
+    points: [
+      "PA يملأ ويرسل ← AA يوافق ← HSE يراجع ← PRA يختم",
+      "كل مرحلة تفتح عند اكتمال السابقة",
+      "رفض مع سبب يعيد للمرحلة السابقة",
+      "تتبع زمني لكل خطوة",
+      "تفويض صلاحية عند الغياب",
+      "تذكير تلقائي إذا تجاوز 2 ساعة"
+    ]
+  },
+  notif: {
+    title: "إشعارات Push الفورية",
+    content: "المشرفون في الميدان لا يعلمون أن هناك تصريحاً ينتظر موافقتهم حتى يفتحوا التطبيق.",
+    points: [
+      "Web Push API للمتصفح",
+      "إشعار لحامل الدور عند وصول التصريح",
+      "تنبيه اقتراب انتهاء الصلاحية",
+      "إشعار التعليق/الاستئناف الفوري",
+      "إشعار إغلاق التصريح لجميع الموقعين",
+      "إعدادات تفضيل الإشعارات لكل مستخدم"
+    ]
+  },
+  mobile: {
+    title: "تصميم Mobile-First للميدان",
+    content: "70% من المشرفين يستخدمون الجوال — الواجهة الحالية مصممة للشاشات الكبيرة فقط.",
+    points: [
+      "Grid يتكيف للشاشات الصغيرة",
+      "أزرار كبيرة تناسب القفاز",
+      "Swipe للانتقال بين الأقسام",
+      "وضع الشاشة الكاملة للتوقيع",
+      "حجم خط لا يقل عن 16px في الميدان",
+      "Dark mode تلقائي في البيئات المظلمة"
+    ]
+  },
+  gas2: {
+    title: "تنبيهات ذكية لقراءات الغاز",
+    content: "حالياً لا يوجد أي تحقق من القراءات — يمكن إدخال H2S=500ppm والتصريح يُقبل!",
+    points: [
+      "حدود تلقائية: O2 19.5-23.5%, LEL<10%, H2S<5ppm, CO<25ppm",
+      "لون أخضر/أصفر/أحمر حسب القراءة",
+      "حجب زر الموافقة إذا قراءة خطرة",
+      "تنبيه نصي بالحد المسموح",
+      "طلب قراءة ثانية للتأكيد",
+      "سجل تاريخي لقراءات الغاز"
+    ]
+  },
+  template: {
+    title: "قوالب العمل المتكررة",
+    content: "أعمال اللحام الروتينية في نفس المنشآت تتكرر أسبوعياً — يجب ألا تُملأ من الصفر كل مرة.",
+    points: [
+      "حفظ تصريح كقالب بعد الإغلاق",
+      "مكتبة قوالب مصنفة حسب نوع العمل",
+      "تطبيق القالب مع مسح الحقول الحساسة",
+      "مشاركة القوالب بين المستخدمين",
+      "قوالب موافقة من الإدارة للمخاطر العالية",
+      "إصدار القالب وتتبع التغييرات"
+    ]
+  },
+  ppe: {
+    title: "اقتراح PPE تلقائي من المخاطر",
+    content: "المنطقي: إذا اخترت H2S ← يُقترح تلقائياً SCBA + Gas Monitor. حالياً لا يوجد ربط.",
+    points: [
+      "جدول ربط: كل خطر ← PPE مطلوبة",
+      "تحديد تلقائي عند تفعيل الخطر",
+      "إمكانية إلغاء التحديد مع سبب",
+      "تحذير إذا PPE مطلوبة غير محددة",
+      "إرشادات استخدام لكل PPE",
+      "توافق مع OSHA 1910 وEN ISO"
+    ]
+  },
+  lang: {
+    title: "دعم ثنائي اللغة عربي/إنجليزي",
+    content: "المنشآت في المنطقة العربية تستخدم كلتا اللغتين — الطباعة بلغة واحدة فقط غير كافٍ.",
+    points: [
+      "i18n JSON لكل النصوص",
+      "RTL كامل للعربية مع CSS dir",
+      "طباعة بالعربية أو الإنجليزية أو كلاهما",
+      "حقول مزدوجة للمصطلحات الرسمية",
+      "ترجمة تسميات الأزرار والأخطاء",
+      "توافق Unicode لكل أجهزة الطباعة"
+    ]
+  },
+  qr2: {
+    title: "QR Code حقيقي بـ qrcode.js",
+    content: "الـ QR الحالي decorative فقط — لا يمكن مسحه ولا يربط بالتصريح الفعلي.",
+    points: [
+      "مكتبة qrcode.js لتوليد QR حقيقي",
+      "URL يحتوي Permit ID + Hash للتحقق",
+      "صفحة عرض سريع عند المسح",
+      "QR مضمن في طباعة A4",
+      "تحديث تلقائي عند تغيير رقم التصريح",
+      "حجم مناسب للطباعة والمسح"
+    ]
+  },
+  dash: {
+    title: "لوحة تحكم HSE Manager",
+    content: "المديرون يحتاجون رؤية شاملة: كم تصريح نشط؟ أي مناطق الأكثر خطورة؟",
+    points: [
+      "عداد التصاريح: نشط/معلق/مغلق",
+      "خريطة حرارية للمخاطر حسب المنطقة",
+      "متوسط وقت الموافقة",
+      "نسبة الامتثال بـ PPE والتوقيعات",
+      "أكثر 5 مخاطر شيوعاً هذا الأسبوع",
+      "تصدير تقرير Excel/PDF"
+    ]
+  },
+  risk: {
+    title: "مصفوفة المخاطر 5×5 التفاعلية",
+    content: "Risk Assessment يستحق أكثر من checkbox — يجب حساب Risk Score كمي فعلي.",
+    points: [
+      "Likelihood 1-5 × Severity 1-5",
+      "Risk Score تلقائي مع اللون",
+      "1-4 أخضر، 5-9 أصفر، 10-25 أحمر",
+      "فعل إلزامي للمخاطر الحمراء",
+      "رسم مصفوفة 5×5 تفاعلية",
+      "ربط كل خطر بمصفوفته"
+    ]
+  },
+  map: {
+    title: "خريطة تفاعلية للتصاريح النشطة",
+    content: "مدير الموقع يريد رؤية كل التصاريح النشطة على مخطط المنشأة دفعة واحدة.",
+    points: [
+      "SVG لمخطط المنشأة",
+      "نقاط ملوّنة لكل تصريح نشط",
+      "click لعرض ملخص التصريح",
+      "تصفية حسب النوع/الخطر/الحالة",
+      "Layer منطقة العزل",
+      "تحديث كل 5 دقائق تلقائياً"
+    ]
+  },
+  conf: {
+    title: "كشف التعارضات بين التصاريح",
+    content: "تصريحان في نفس المنطقة في نفس الوقت قد يكونان متعارضَين — مثل لحام بجانب عمل confined space.",
+    points: [
+      "فحص التداخل الزمني والمكاني",
+      "قائمة التعارضات الممكنة",
+      "تحذير عند رفع تصريح متعارض",
+      "منع الموافقة مع اشتراط الحل",
+      "استثناءات معتمدة من AA",
+      "سجل قرارات التعارض"
+    ]
+  },
+  report: {
+    title: "تقارير دورية للإدارة",
+    content: "الإدارة العليا تطلب monthly HSE reports — يجب توليدها تلقائياً لا يدوياً.",
+    points: [
+      "تقرير أسبوعي/شهري/ربعي",
+      "رسوم بيانية: اتجاهات المخاطر",
+      "مقارنة بالفترات السابقة",
+      "قائمة الإجراءات المتخذة",
+      "نسبة الإغلاق في الوقت المحدد",
+      "تصدير PDF مع شعار الشركة"
+    ]
+  },
+  checkin: {
+    title: "تسجيل حضور العمال بـ QR",
+    content: "People Number حقل ثابت حالياً — يجب تسجيل هوية كل عامل فعلياً في الموقع.",
+    points: [
+      "QR فردي لكل عامل",
+      "مسح عند الدخول والخروج",
+      "قائمة حضور لحظية للمشرف",
+      "تنبيه تجاوز العدد المعتمد",
+      "ربط بـ HR/بطاقات الهوية",
+      "سجل دخول/خروج لكل تصريح"
+    ]
+  },
+  ai: {
+    title: "مساعد AI لتحديد المخاطر",
+    content: "بناءً على وصف العمل، يقترح AI المخاطر المحتملة التي قد ينساها المشرف.",
+    points: [
+      "NLP لتحليل وصف العمل",
+      "اقتراح 3-5 مخاطر إضافية محتملة",
+      "تعلم من بيانات الحوادث السابقة",
+      "API لنموذج Claude أو GPT",
+      "المستخدم يوافق أو يرفض الاقتراح",
+      "تحسين مستمر من feedback"
+    ]
+  },
+  erp: {
+    title: "تكامل SAP PM / ERP",
+    content: "رقم أمر العمل يُكتب يدوياً حالياً — يجب جلبه مباشرة من SAP مع كل بيانات المعدة.",
+    points: [
+      "API لـ SAP PM أو Maximo",
+      "جلب Work Order تلقائياً بالرقم",
+      "استيراد: Equipment, Location, Planner",
+      "تحديث حالة WO عند إغلاق PTW",
+      "تسجيل Hours في SAP تلقائياً",
+      "بيانات Functional Location من SAP"
+    ]
+  },
+  gas3: {
+    title: "أجهزة قياس الغاز IoT",
+    content: "القراءات اليدوية معرضة للخطأ — الأجهزة الحديثة تدعم Bluetooth وBLE.",
+    points: [
+      "Web Bluetooth API للاتصال المباشر",
+      "استقبال قراءات MSA، BW، RAE",
+      "تحديث تلقائي في جدول Gas Test",
+      "تخزين بيانات الجهاز مع القراءة",
+      "Calibration date tracking",
+      "تنبيه انتهاء صلاحية المعايرة"
+    ]
+  },
+  iso: {
+    title: "نظام LOTO الرقمي",
+    content: "العزل الكهربائي والميكانيكي يستحق نظاماً مخصصاً مربوطاً بالتصريح.",
+    points: [
+      "قائمة Lock-Out Tag-Out لكل نقطة عزل",
+      "QR لكل نقطة lock",
+      "تسلسل فك العزل معتمد",
+      "ربط بـ Electrical Isolation Certificate",
+      "تنبيه إذا حاول شخص العمل قبل LOTO",
+      "توافق مع IEC 60204 وOSHA 1910.147"
+    ]
+  },
+  blockchain: {
+    title: "Blockchain للتوقيعات والسجلات",
+    content: "للشركات التي تحتاج أعلى مستويات الثقة والإثبات القانوني — لا يمكن التلاعب.",
+    points: [
+      "Ethereum أو Hyperledger Fabric",
+      "كل توقيع = transaction على chain",
+      "Hash المحتوى مخزن على blockchain",
+      "Immutable audit trail",
+      "Smart contract للموافقات",
+      "تحقق مستقل بدون الرجوع للنظام"
+    ]
+  },
+  ar: {
+    title: "AR Overlay للمشرفين الميدانيين",
+    content: "مستقبل الصناعة: ارتداء نظارات AR ورؤية بيانات التصريح مباشرة على المعدة.",
+    points: [
+      "WebXR API للمتصفح",
+      "عرض بيانات التصريح فوق المعدة",
+      "مسح QR للتعرف على المعدة",
+      "تحذيرات الخطر بالـ AR",
+      "توافق Hololens 2 وMagic Leap",
+      "Proof of Concept أولاً في بيئة آمنة"
+    ]
+  }
+};
+
+function showDetail(key) {
+  const d = details[key];
+  if (!d) return;
+  const panel = document.getElementById('detail-panel');
+  const content = document.getElementById('detail-content');
+  document.querySelector('.detail-title').textContent = d.title;
+  content.innerHTML = `<p style="margin-bottom:10px;">${d.content}</p>
+    <ul class="detail-list">${d.points.map(p => `<li>${p}</li>`).join('')}</ul>`;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function filterPhase(phase, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.phase-row').forEach(row => {
+    if (phase === 'all' || row.dataset.phase === phase) {
+      row.style.display = 'grid';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+</script>

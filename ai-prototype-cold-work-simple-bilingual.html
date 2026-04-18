@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COLD Work Permit - تصريح العمل البارد</title>
+    <style>
+        :root {
+            --header-bg: #4a90e2;
+            --header-text: #ffffff;
+            --border-color: #000;
+            --section-bg: #e6f2ff;
+            --label-font-size: 12px;
+            --input-font-size: 13px;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border: 1px solid #ccc;
+        }
+
+        /* Header Styles */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .logo-area {
+            font-weight: bold;
+            font-size: 24px;
+            color: #0056b3;
+        }
+
+        .permit-title {
+            text-align: center;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        /* Grid Layouts */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: var(--label-font-size);
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .label-bilingual {
+            font-weight: normal;
+            color: #666;
+            font-size: 11px;
+        }
+
+        input[type="text"], input[type="date"], input[type="time"], input[type="number"], select, textarea {
+            border: 1px solid #999;
+            padding: 4px;
+            font-size: var(--input-font-size);
+            border-radius: 3px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        /* Section Styling */
+        .section-header {
+            background-color: var(--header-bg);
+            color: white;
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-box {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+        }
+
+        .section-box.blue-bg {
+            background-color: var(--section-bg);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        th, td {
+            border: 1px solid #999;
+            padding: 5px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e9e9e9;
+            font-weight: bold;
+        }
+
+        .hazard-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+        }
+        
+        .hazard-list div {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Signature Blocks */
+        .signature-block {
+            margin-top: 10px;
+            padding-top: 5px;
+            border-top: 1px dashed #ccc;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .sig-field { flex: 1; min-width: 150px; }
+
+        /* Footer */
+        .footer {
+            margin-top: 20px;
+            font-size: 11px;
+            text-align: center;
+            border-top: 2px solid #000;
+            padding-top: 5px;
+        }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+            input, textarea, select { border: none; border-bottom: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Header Area -->
+    <div class="main-header">
+        <div class="logo-area">zfd</div>
+        <div style="flex-grow: 1; margin: 0 20px;">
+            <div class="form-group">
+                <label>Main Permit Number / رقم التصريح الرئيسي</label>
+                <input type="text">
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <div class="form-group" style="text-align: center; border: 1px solid #000; padding: 5px;">
+                <label>SCE</label>
+                <div style="display: flex; justify-content: space-around; margin-top: 5px;">
+                    <div><label>Y نعم</label><br><input type="checkbox"></div>
+                    <div><label>N لا</label><br><input type="checkbox"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="permit-title">
+        COLD Work Permit / تصريح العمل البارد
+    </div>
+
+    <div class="grid-4" style="margin-bottom: 10px;">
+        <div class="form-group">
+            <label>Work order N / رقم أمر العمل</label>
+            <input type="text">
+        </div>
+        <div class="form-group">
+            <label>Work to be done by / باداري القيام بالعمل</label>
+            <div style="display: flex; gap: 10px;">
+                <label><input type="radio" name="work_by" value="zfod"> ZFOD حياة للتعدين</label>
+                <label><input type="radio" name="work_by" value="contractor"> Contractor مقاول</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Category of Risk / المخطر الفئة</label>
+            <div style="display: flex; gap: 10px;">
+                <label><input type="radio" name="risk_cat" value="H"> H</label>
+                <label><input type="radio" name="risk_cat" value="L"> L</label>
+            </div>
+        </div>
+        <!-- 5-Authorisation Header -->
+        <div class="section-box" style="margin:0; padding: 5px; background-color: #e6f2ff;">
+            <label style="font-size: 11px;">5-AUTHORISATION FOR WORKER BY AREA AUTHORITY (AA) ( or DELEGATE)</label>
+            <p style="font-size: 9px; margin: 2px 0;">I have reviewed the hazard and risks for the work described. I agree that precautions & controls are correct.</p>
+            <p style="font-size: 9px; margin: 2px 0;">I hereby declare that all above requirements have been identified/ implemented for the mentioned activity on this PTW and I authorize the work to be carried out.</p>
+            <div class="grid-2" style="gap: 2px;">
+                <div><label>Area Authority (1):</label><input type="text"></div>
+                <div><label>Sign/توقيع:</label><input type="text"></div>
+                <div><label>Date/التاريخ:</label><input type="date"></div>
+                <div><label>Time/الوقت:</label><input type="time"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1-DESCRIPTION OF THE WORK -->
+    <div class="section-header">1-DESCRIPTION OF THE WORK TO BE PERFORMED / وصف العمل</div>
+    <div class="section-box">
+        <div class="grid-3">
+            <div class="form-group">
+                <label>Work site / مكان العمل</label>
+                <input type="text">
+            </div>
+            <div class="form-group">
+                <label>Date... / التاريخ</label>
+                <input type="date">
+            </div>
+            <div class="form-group">
+                <label>Attachments / مرفقات</label>
+                <div class="grid-2">
+                    <label><input type="checkbox"> Risk Assessment (WRAP)</label>
+                    <label><input type="checkbox"> Scope/Method statement</label>
+                    <label><input type="checkbox"> Procedure/Std instruction</label>
+                    <label><input type="checkbox"> Drawing / sketch/PI&D</label>
+                </div>
+            </div>
+        </div>
+        <div class="grid-2" style="margin-top: 5px;">
+            <div class="form-group">
+                <label>Equipment Name / اسم المعدة</label>
+                <input type="text">
+            </div>
+            <div class="form-group">
+                <label>Work location / مكان العمل</label>
+                <input type="text">
+            </div>
+        </div>
+        <div class="grid-4" style="margin-top: 5px;">
+            <div class="form-group">
+                <label>Vehicle plate Numbers / رقم لوحة المركبة</label>
+                <input type="text">
+            </div>
+            <div class="form-group">
+                <label>Status / حالة</label>
+                <input type="text">
+            </div>
+            <div class="form-group">
+                <label>Tools and equipment required / العدد والمعدات المطلوبة</label>
+                <input type="text">
+            </div>
+            <div class="form-group">
+                <label>Equipment Numbers: / رقم المعدة</label>
+                <input type="text">
+            </div>
+        </div>
+        <div class="form-group" style="margin-top: 5px;">
+            <label>People Number / عدد العمال</label>
+            <div class="grid-2">
+                <input type="number" placeholder="Day Shift / نهار">
+                <input type="number" placeholder="Night Shift / ليل">
+            </div>
+        </div>
+    </div>
+
+    <!-- 2-HAZARDS IDENTIFICATION -->
+    <div class="section-header">2-HAZARDS IDENTIFICATION (PA)- / بيان الاخطار</div>
+    <div class="section-box">
+        <div class="hazard-list">
+            <div class="checkbox-group"><input type="checkbox"> Liquid or gas under pressure / سائل او غاز مضغوط</div>
+            <div class="checkbox-group"><input type="checkbox"> Flying Particles / مواد متطايرة</div>
+            <div class="checkbox-group"><input type="checkbox"> scaffolding to install / نصب السقالات</div>
+            <div class="checkbox-group"><input type="checkbox"> Toxic materials / مواد سامة</div>
+            <div class="checkbox-group"><input type="checkbox"> Electricity / كهرباء</div>
+            <div class="checkbox-group"><input type="checkbox"> Wind, Weather status / الحالة الجوية/ الرياح</div>
+            <div class="checkbox-group"><input type="checkbox"> Corrosive materials / مواد اكلة</div>
+            <div class="checkbox-group"><input type="checkbox"> Radioactivity / نشاط اشعاعي</div>
+            <div class="checkbox-group"><input type="checkbox"> Confined space Entry / دخول اماكن محصورة</div>
+            <div class="checkbox-group"><input type="checkbox"> Flammable Materials / مواد قابلة للاشتعال</div>
+            <div class="checkbox-group"><input type="checkbox"> Rotating Machinery / ماكينة دوارة</div>
+            <div class="checkbox-group"><input type="checkbox"> Others / مخاطر اخري: <input type="text" style="width: 80px; margin-left: 5px;"></div>
+            <div class="checkbox-group"><input type="checkbox"> Hot Materials / مواد ساخنة</div>
+            <div class="checkbox-group"><input type="checkbox"> Noisy area ( 85 db) / منطقة حوضاء لاكثر من</div>
+            <div class="checkbox-group"></div>
+            <div class="checkbox-group"><input type="checkbox"> O2 deficiency / نقص الاكسجين</div>
+            <div class="checkbox-group"><input type="checkbox"> Crane rigging Operation / عمليات رفع بالاوناش</div>
+            <div class="checkbox-group"></div>
+            <div class="checkbox-group"><input type="checkbox"> Possible H2S area - / غاز - يوجد احتمال H2S</div>
+            <div class="checkbox-group"><input type="checkbox"> Adjacent Operations / عمليات مجاورة</div>
+            <div class="checkbox-group"></div>
+            <div class="checkbox-group"><input type="checkbox"> Possible of TNORMs / احتمال وجود</div>
+            <div class="checkbox-group"><input type="checkbox"> Danger of falling / خطر السقوط</div>
+            <div class="checkbox-group"></div>
+        </div>
+        <div class="signature-block">
+            <div class="sig-field">
+                <label>Performing Authority(PA):</label>
+                <p style="font-size: 10px;">I authorise the mentioned competent person as performer to receive the permit & observe all requirements</p>
+                <div class="grid-2">
+                    <div><label>Name/الاسم:</label><input type="text"></div>
+                    <div><label>Position/الوظيفة:</label><input type="text"></div>
+                    <div><label>Company/بالشركة:</label><input type="text"></div>
+                    <div><label>Date/التاريخ:</label><input type="date"></div>
+                </div>
+                <div><label>Sign/التوقيع:</label><input type="text"></div>
+            </div>
+            <div class="sig-field">
+                <label>Performer name (P) / اسم القائم بالعمل:</label>
+                <div class="grid-2">
+                    <div><label>Position/الوظيفة:</label><input type="text"></div>
+                    <div><label>Company/الشركة:</label><input type="text"></div>
+                    <div><label>Date/التاريخ:</label><input type="date"></div>
+                    <div><label>Sign/التوقيع:</label><input type="text"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3-REQUIREMENT FOR SAFE WORKING CONDITIONS -->
+    <div class="section-header">3-REQUIREMENT FOR SAFE WORKING CONDITIONS / المتطلبات اللازمة لضمان ظروف عمل امنة</div>
+    <div class="section-box">
+        <div class="grid-3">
+            <div>
+                <label>STATUS / PLAN / محطة</label>
+                <div class="checkbox-group"><input type="checkbox"> In service / في الخدمة</div>
+                <div class="checkbox-group"><input type="checkbox"> Shut down / قيد الايقاف</div>
+                <div class="checkbox-group"><input type="checkbox"> Depressurized / غير مضغوط</div>
+                <div class="checkbox-group"><input type="checkbox"> Drained / مصرف</div>
+                <div class="checkbox-group"><input type="checkbox"> Water flushed / مغسول بالماء</div>
+                <div class="checkbox-group"><input type="checkbox"> Inerted with / ممتلئ بـ</div>
+                <div class="checkbox-group"><input type="checkbox"> Pressurized with / مضغوط بـ</div>
+                <div class="checkbox-group"><input type="checkbox"> Blanketed with / مغطى بـ</div>
+                <div class="checkbox-group"><input type="checkbox"> Full of (specify) / ممتلئ بـ(حدد)</div>
+                <div class="checkbox-group"><input type="checkbox"> Empty / فارغ</div>
+                <div class="checkbox-group"><input type="checkbox"> Open / مفتوح</div>
+                <div class="checkbox-group"><input type="checkbox"> Gas Free / خالي من الغاز</div>
+                <div class="checkbox-group"><input type="checkbox"> Steamed / بالبخار</div>
+                <div class="checkbox-group"><input type="checkbox"> Ventilated / مزود بالتهوية</div>
+            </div>
+            <div>
+                <label>EQUIP / SYST / محطة / نظام</label>
+                <div class="checkbox-group"><input type="checkbox"> Standby man / عامل الاستعداد</div>
+                <div class="checkbox-group"><input type="checkbox"> F&G/ESD syst override required / مطلوب تجاوز نظم الحماية من الحريق والغاز / ايقاف الطوارئ</div>
+                <div class="checkbox-group"><input type="checkbox"> Equipment is hot / معدة ساخنة</div>
+                <div class="checkbox-group"><input type="checkbox"> Gas check prior starting / فحص الغاز قبل البدء</div>
+                <div class="checkbox-group"><input type="checkbox"> Fire network pressurised / شبكة اطفاء مضغوطة</div>
+                <div class="checkbox-group"><input type="checkbox"> Fire hose lengthened / زيادة طول خرطوم الاطفاء</div>
+                <div class="checkbox-group"><input type="checkbox"> Foam protection / الحماية بالرغوة</div>
+                <div class="checkbox-group"><input type="checkbox"> Mobile fire water monitor / مدفع الحريق المائي</div>
+                <div class="checkbox-group"><input type="checkbox"> Portable fire extinguisher at site / طفاية حريق متنقلة</div>
+                <div class="checkbox-group"><input type="checkbox"> Flame retardant partition / الواح مقاومة للحريق</div>
+                <div class="checkbox-group"><input type="checkbox"> Fire Truck required / مطلوب سيارة اطفاء</div>
+                <div class="checkbox-group"><input type="checkbox"> Other:</div>
+            </div>
+            <div>
+                <label>Complementary Certificates / الشهادات التكميلية</label>
+                <div class="checkbox-group"><input type="checkbox"> Confined space Certificate / شهادة الامكان المحصورة</div>
+                <div class="checkbox-group"><input type="checkbox"> Mechanical Isolation Certificate / شهادة العزل الميكانيكي</div>
+                <div class="checkbox-group"><input type="checkbox"> Electrical Isolation Certificate / شهادة العزل الكهربائي</div>
+                <div class="checkbox-group"><input type="checkbox"> Radiation Certificate / شهادة الاشعاع</div>
+                <div class="checkbox-group"><input type="checkbox"> Hot Tapping / توصيل ساخن</div>
+                <div class="checkbox-group"><input type="checkbox"> Excavation Certificate / شهادة الحفر</div>
+                <div class="checkbox-group"><input type="checkbox"> Over Ride Certificate / شهادة التجاوز</div>
+                <div class="checkbox-group"><input type="checkbox"> De-Isolation Certificate / شهادة ازالة العزل</div>
+                <div class="checkbox-group"><input type="checkbox"> Scaffolding Certificate / شهادة قنعة السقالات</div>
+                <div class="checkbox-group"><input type="checkbox"> Other: اخرى</div>
+                <div class="form-group" style="margin-top: 10px;">
+                    <label>Additional Comments / تعليقات اضافية</label>
+                    <textarea rows="3"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="grid-2" style="margin-top: 5px; border-top: 1px solid #ccc; padding-top: 5px;">
+            <div class="checkbox-group"><input type="checkbox"> Continuity bonding / Earthing required مطلوب استمرارية الربط / التوصيل الارضي</div>
+            <div class="checkbox-group"><input type="checkbox"> Safety system(s) bypassed / inhibited تم تجاوز / ايقاف نظام السلامة</div>
+            <div class="checkbox-group"><input type="checkbox"> Continuous gas Monitoring مراقبة مستمرة للغاز</div>
+            <div class="checkbox-group"><input type="checkbox"> Fire fighting systems isolated / معزولة / انظمة مكافحة الحريق</div>
+            <div class="checkbox-group"><input type="checkbox"> Fuel gas blinded</div>
+            <div class="checkbox-group"><input type="checkbox"> Elec. Circuits isolated & tagged الدوائر الكهربائية معزولة ومزودة بعلامات</div>
+        </div>
+        <div class="signature-block">
+            <div class="sig-field">
+                <label>Performing Authority (PA) / مسئول الجهة المنفذة</label>
+                <label>Sign/التوقيع:</label><input type="text">
+                <label>Date/التاريخ:</label><input type="date">
+                <label>Time/الوقت:</label><input type="time">
+            </div>
+            <div class="sig-field">
+                <label>Affected Area Authority (AAA) / مسئول المنطقة المتاثرة</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-HSE REQUIREMENTS -->
+    <div class="section-header">4-HSE REQUIREMENTS FOR IMPLEMENTATION BY PERFORMING AUTHORITY</div>
+    <div class="section-box">
+        <div class="grid-3">
+            <div>
+                <div class="checkbox-group"><input type="checkbox"> Appropriate Protective Clothing / الملابس الواقية المناسبة</div>
+                <div class="checkbox-group"><input type="checkbox"> Goggles/ Face shield / النظارات / واقي الوجه</div>
+                <div class="checkbox-group"><input type="checkbox"> Ear Muffs / واقي الاذن</div>
+                <div class="checkbox-group"><input type="checkbox"> Hands protection / حماية اليدين</div>
+                <div class="checkbox-group"><input type="checkbox"> Safety Harness / Life Lines / احزمة الامان / الحبال الحياة</div>
+                <div class="checkbox-group"><input type="checkbox"> Combustible material cleared / تم ازالة المواد القابلة للاشتعال</div>
+                <div class="checkbox-group"><input type="checkbox"> Access / Escape Route Cleared / مسالك الطوارئ سالكة</div>
+                <div class="checkbox-group"><input type="checkbox"> SCBA to be worn / يجب ارتداء جهاز التنفس</div>
+            </div>
+            <div>
+                <div class="checkbox-group"><input type="checkbox"> Dust Mask / قناع الغبار</div>
+                <div class="checkbox-group"><input type="checkbox"> Fire watch required / مطلوب مراقب للحرائق</div>
+                <div class="checkbox-group"><input type="checkbox"> Flame Arrester / حاجز حريق</div>
+                <div class="checkbox-group"><input type="checkbox"> Tool Box Talk Required / مطلوب مناقشة فنية</div>
+                <div class="checkbox-group"><input type="checkbox"> Barriers & Warning signs / الحواجز وعلامات التحذير</div>
+            </div>
+            <div>
+                <label>Additional Comments / تعليقات اضافية</label>
+                <textarea rows="5"></textarea>
+                <div class="signature-block" style="border:none; padding:0; margin-top:5px;">
+                    <div class="sig-field">
+                        <label>HSE Representative (HSER): / مسئول الصحة والسلامة والبيئة</label>
+                        <label>Sign/التوقيع:</label><input type="text">
+                        <label>Date/التاريخ:</label><input type="date">
+                        <label>Time/الوقت:</label><input type="time">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6-GAS TESTS -->
+    <div class="section-header">6- GAS TESTS - اختبارات الغاز</div>
+    <div class="section-box">
+        <p style="font-size: 11px; margin: 0 0 5px 0;">Gas test to be carried out before starting the activity by authorised person. / اختبارات الغاز يتم اجراؤها قبل اي انشطة من قبل الشخص المخول</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>LEL / الحد الأدنى للتفجير</th>
+                    <th>O2 / اكسجين</th>
+                    <th>H2S / كبريتيد الهيدروجين</th>
+                    <th>Other / اخرى</th>
+                    <th>Name / الاسم</th>
+                    <th>Signature / توقيع</th>
+                    <th>Date / التاريخ</th>
+                    <th>Time / الوقت</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td><td><input type="time"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td><td><input type="time"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td><td><input type="time"></td></tr>
+                <tr><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td><td><input type="date"></td><td><input type="time"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 7-PERFORMER -->
+    <div class="section-header">7-PERFORMER(P): / المنفذ</div>
+    <div class="section-box">
+        <p style="font-size: 11px;">I declare that I am aware of the work to be executed and ensure we will not perform any other activity. / اقر انني على علم بالعمل الذي سيتم تنفيذه واضمن عدم القيام بأي نشاط آخر</p>
+        <p style="font-size: 11px;">I have checked the work site conditions and confirm that all the precautions are in place to SAFELY start activity. / لقد تفقدت ظروف موقع العمل وتأكدت من ان جميع الاحتياطات متخذة لهذه النشاط بأمان</p>
+        <p style="font-size: 11px;">I fully accept responsibilities to carry out the job in the safest manner. / اقبل تماما مسؤوليات تنفيذ المهمة بالطريقة الأكثر أمانا</p>
+        <div class="grid-3">
+            <div class="form-group"><label>Performer / المنفذ</label><input type="text"></div>
+            <div class="form-group"><label>Sign/التوقيع:</label><input type="text"></div>
+            <div class="form-group"><label>Date/التاريخ:</label><input type="date"></div>
+            <div class="form-group"><label>Time/الوقت:</label><input type="time"></div>
+        </div>
+    </div>
+
+    <!-- 8-SITE SUPERVISOR -->
+    <div class="section-header">8-SITE SUPERVISOR (PRA): / مشرف الموقع</div>
+    <div class="section-box">
+        <p style="font-size: 11px;">I have checked the work site and found the preparation completed. There are no isolation ,location and safety system conflicts. / لقد تفقدت من موقع العمل ووجدت انه تم الانتهاء من التجهيز. لا يوجد أي تعارض في العزل، أو الموقع، أو نظام السلامة</p>
+        <div class="grid-3">
+            <div class="form-group"><label>Site Supervisor (PRA) / مشرف الموقع</label><input type="text"></div>
+            <div class="form-group"><label>Sign/التاريخ:</label><input type="text"></div>
+            <div class="form-group"><label>Date/التاريخ:</label><input type="date"></div>
+            <div class="form-group"><label>Time/الوقت:</label><input type="time"></div>
+        </div>
+    </div>
+
+    <!-- 9-VALIDATION ON SITE -->
+    <div class="section-header">9-VALIDATION ON SITE: HSE Supervisor sign only for critical activities / يوقع مشرف الصحة والسلامة والبيئة للأنشطة الحرجة فقط</div>
+    <div class="section-box">
+        <table>
+            <thead>
+                <tr>
+                    <th>Open Date / تاريخ الفتح</th>
+                    <th>Time / الوقت</th>
+                    <th>Shift</th>
+                    <th>Performer (P) / المنفذ<br><span style="font-weight:normal; font-size:10px;">(work safe to start) / يمكن بدء العمل بأمان</span></th>
+                    <th>Site Supervisor (PRA) / مشرف الموقع<br><span style="font-weight:normal; font-size:10px;">safe working conditions implemented / شروط ظروف العمل الآمنة</span></th>
+                    <th>HSER / مسئول الصحة والسلامة والبيئة<br><span style="font-weight:normal; font-size:10px;">worksite checked & found safe / شخص موقع العمل ووجد أمنا</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><input type="date"></td><td><input type="time"></td><td>Day/نهار</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="date"></td><td><input type="time"></td><td>Night/ليل</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="date"></td><td><input type="time"></td><td>Day/نهار</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="date"></td><td><input type="time"></td><td>Night/ليل</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="date"></td><td><input type="time"></td><td>Day/نهار</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="date"></td><td><input type="time"></td><td>Night/ليل</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="date"></td><td><input type="time"></td><td>Day/نهار</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="date"></td><td><input type="time"></td><td>Night/ليل</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="date"></td><td><input type="time"></td><td>Day/نهار</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+                <tr><td><input type="date"></td><td><input type="time"></td><td>Night/ليل</td><td><input type="text"></td><td><input type="text"></td><td><input type="text"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 10-SUSPENSION & RE-ISSUE -->
+    <div class="section-header">10-SUSPENSION & RE-ISSUE: / الايقاف وإعادة الإصدار</div>
+    <div class="section-box">
+        <label style="background: #e9e9e9; padding: 2px 5px;">in case of suspension / في حالة الايقاف</label>
+        <p style="font-size: 11px;">Due to Operation & Safety requirements, this PTW has been suspended and will remain inactive until further notice. Permit suspended by: / نظرا لمتطلبات التشغيل والسلامة، تم تعليق تصريح العمل هذا، وسيظل غير ساري المفعول حتى اشعار اخر. قام بتعليق التصريح:</p>
+        <div class="grid-3">
+            <div class="form-group"><label>Name / الاسم</label><input type="text"></div>
+            <div class="form-group"><label>Position / الوظيفة</label><input type="text"></div>
+            <div class="form-group"><label>Sign/التوقيع:</label><input type="text"></div>
+            <div class="form-group"><label>Date/التاريخ:</label><input type="date"></div>
+            <div class="form-group"><label>Time/الوقت:</label><input type="time"></div>
+        </div>
+        
+        <label style="background: #e9e9e9; padding: 2px 5px; margin-top: 10px; display: block;">Normal Operation have been resumed / تم فحص موقع العمل ووجد ان الشروط والاحتياطات مطبقة</label>
+        <p style="font-size: 11px;">The worksite has been inspected and controls and precautions are in place.</p>
+        <p style="font-size: 11px;">This PTW may now be re-issued. / يمكن الآن إعادة إصدار تصريح العمل هذا.</p>
+        <div class="grid-3">
+            <div class="form-group"><label>Site Supervisor (PRA) / مشرف الموقع</label><input type="text"></div>
+            <div class="form-group"><label>Sign/التوقيع:</label><input type="text"></div>
+            <div class="form-group"><label>Date/التاريخ:</label><input type="date"></div>
+            <div class="form-group"><label>Time/الوقت:</label><input type="time"></div>
+            <div class="form-group"><label>Performing Authority (PA) / الجهة المنفذة</label><input type="text"></div>
+        </div>
+    </div>
+
+    <!-- 11-WORK COMPLETION -->
+    <div class="section-header">11-WORK COMPLETION/ CLEARANCE ... / اكتمال العمل/ الانتهاء</div>
+    <div class="section-box">
+        <p style="font-size: 11px;">I hereby declare that the work detailed in this permit has been / اقر أن العمل المذكور في هذا التصريح قد</p>
+        <div class="checkbox-group"><input type="checkbox"> completed / اكتمل العمل</div>
+        <div class="checkbox-group"><input type="checkbox"> stopped in a safe condition and that de-isolation & re-instatement may take / د. متوقف، أو. في حالة العمل، أو إعادة العزلة قد تأخذ</div>
+        <p style="font-size: 11px;">place and that the worksite has been left in a clear, clean and safe condition. F&G/ESD system(s) returned to service.</p>
+        <p style="font-size: 11px;">The equipment is / is not in a condition to be returned to service with the exception of: / المعدة في حالة يمكن بها ارجاعها للخدمة / ليس بعد</p>
+        <input type="text" placeholder="Exceptions...">
+        <div class="checkbox-group" style="margin-top: 5px;"><input type="checkbox"> Work is to CONTINUE under new PTW / سيكمل العمل بموجب تصريح عمل جديد</div>
+        
+        <div class="grid-3" style="margin-top: 10px;">
+            <div class="form-group"><label>Performing Authority (PA) / الجهة المنفذة</label><input type="text"></div>
+            <div class="form-group"><label>Sign/التوقيع:</label><input type="text"></div>
+            <div class="form-group"><label>Date/التاريخ:</label><input type="date"></div>
+            <div class="form-group"><label>Time/الوقت:</label><input type="time"></div>
+            <div class="form-group"><label>Site Supervisor (PRA) / مشرف الموقع</label><input type="text"></div>
+            <div class="form-group"><label>Sign/التوقيع:</label><input type="text"></div>
+            <div class="form-group"><label>Date/التاريخ:</label><input type="date"></div>
+            <div class="form-group"><label>Time/الوقت:</label><input type="time"></div>
+        </div>
+        <div class="section-box" style="background-color: #4a90e2; color: white; text-align: center; margin-top: 10px;">
+            This Permit is now CLOSED. Permit Register to be updated / تم اغلاق هذا التصريح الآن. يجب تحديث سجل التصاريح
+        </div>
+    </div>
+
+    <div class="footer">
+        Distribution : Original - at work area / الاصل بالعمل مكان العمل | Copy 1 & Copy 4 (نسخة 1 و نسخة 4) HSE office / مكتب السلامة والصحة | Copy 2 مكتب الانتاج Production Office | Copy 3 نسخة 3
+    </div>
+
+</div>
+
+</body>
+</html>

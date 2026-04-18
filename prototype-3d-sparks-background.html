@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSE Digital Hot Work Permit System | Industrial Grade</title>
+    <!-- Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        :root {
+            --hse-red: #D32F2F;
+            --hse-dark-red: #8e0000;
+            --hse-orange: #F57C00;
+            --hse-green: #388E3C;
+            --hse-blue: #1976D2;
+            --dark-bg: #121212;
+            --panel-bg: rgba(20, 20, 25, 0.95);
+            --text-main: #333;
+            --text-light: #e0e0e0;
+            --border-color: #444;
+            --field-bg: #f5f5f5;
+            --focus-border: var(--hse-red);
+        }
+
+        * { box-sizing: border-box; outline: none; }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━
+           3D CANVAS LAYER
+        ━━━━━━━━━━━━━━━━━━━━━━ */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: all; /* Allow 3D interaction */
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━
+           UI LAYER
+        ━━━━━━━━━━━━━━━━━━━━━━ */
+        #app-ui {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* 3D Floating Dashboard Elements */
+        .floating-hud {
+            position: fixed;
+            pointer-events: none;
+            z-index: 5;
+            color: var(--hse-orange);
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 5px var(--hse-red);
+            transition: opacity 0.5s;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━
+           MAIN FORM CONTAINER
+        ━━━━━━━━━━━━━━━━━━━━━━ */
+        .form-container {
+            max-width: 210mm; /* A4 Width */
+            margin: 40px auto;
+            background: #fff;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            padding: 0;
+            position: relative;
+            border-top: 10px solid var(--hse-red);
+        }
+
+        /* Header */
+        header.doc-header {
+            background: linear-gradient(135deg, var(--hse-red), var(--hse-dark-red));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 { margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; }
+        .header-meta { text-align: right; font-size: 0.9rem; }
+
+        /* Status Bar */
+        .system-status-bar {
+            background: #333;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-draft { background: #555; color: #ccc; }
+        .status-active { background: var(--hse-green); color: white; box-shadow: 0 0 10px var(--hse-green); }
+        .status-suspended { background: var(--hse-orange); color: white; }
+
+        /* Layout Grids */
+        .section {
+            padding: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .section-title {
+            color: var(--hse-red);
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 10px; }
+        .grid-2 { grid-template-columns: 1fr 1fr; }
+        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        /* Form Controls */
+        label { display: block; font-size: 0.8rem; color: #666; margin-bottom: 4px; font-weight: 600; }
+        
+        input[type="text"], input[type="number"], input[type="date"], input[type="time"], select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: var(--field-bg);
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--focus-border);
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2);
+        }
+
+        /* Checkbox Styling */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--hse-red); cursor: pointer; }
+
+        /* SCE Toggle */
+        .sce-container {
+            display: flex;
+            align-items: center;
+            background: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 4px solid var(--hse-red);
+        }
+
+        /* Tables */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+        .data-table th, .data-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        .data-table th { background: #eee; font-weight: bold; color: #444; }
+        .btn-small { padding: 4px 8px; font-size: 0.8rem; cursor: pointer; background: var(--hse-blue); color: white; border: none; border-radius: 3px; }
+        .btn-small.danger { background: var(--hse-red); }
+
+        /* Signatures */
+        .signature-box {
+            border: 1px dashed #999;
+            height: 80px;
+            background: #fff;
+            position: relative;
+            margin-top: 5px;
+            cursor: crosshair;
+        }
+        .sig-placeholder {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 0.7rem;
+            color: #999;
+            pointer-events: none;
+        }
+
+        /* QR Code Area */
+        .qr-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .qr-placeholder {
+            width: 80px;
+            height: 80px;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 0.6rem;
+            text-align: center;
+        }
+
+        /* Action Buttons */
+        .action-bar {
+            position: sticky;
+            bottom: 0;
+            background: #222;
+            padding: 15px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            z-index: 100;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .btn-print { background: #555; color: white; }
+        .btn-save { background: var(--hse-blue); color: white; }
+        .btn-validate { background: var(--hse-green); color: white; }
+        .btn-suspend { background: var(--hse-orange); color: white; }
+        
+        .btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+
+        /* Validation Highlight */
+        .error { border: 2px solid var(--hse-red) !important; animation: shake 0.3s; }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Print Styles */
+        @media print {
+            #canvas-container, .action-bar, .floating-hud { display: none !important; }
+            body, #app-ui { background: white; height: auto; overflow: visible; }
+            .form-container { box-shadow: none; margin: 0; width: 100%; max-width: 100%; border: none; }
+            input, select, textarea { border: none; background: transparent; padding: 0; }
+            .signature-box { border: 1px solid #000; }
+            .section { border-bottom: 1px solid #000; page-break-inside: avoid; }
+            .status-badge { border: 1px solid #000; color: #000; background: none !important; }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--hse-green);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: translateX(200%);
+            transition: transform 0.3s ease-out;
+            z-index: 1000;
+        }
+        .toast.show { transform: translateX(0); }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Background Container -->
+    <div id="canvas-container"></div>
+
+    <!-- UI Overlay -->
+    <div id="app-ui">
+        
+        <div class="form-container" id="permit-form">
+            
+            <!-- Header -->
+            <header class="doc-header">
+                <div class="header-title">
+                    <h1>Hot Work Permit</h1>
+                    <div style="font-size: 0.8rem; opacity: 0.8; letter-spacing: 1px;">International Oil & Gas Standard HSE-001</div>
+                </div>
+                <div class="header-meta">
+                    <div id="qr-display" class="qr-placeholder">QR CODE<br>PENDING</div>
+                    <div style="margin-top:5px;"><strong>Rev:</strong> <span id="rev-no">1.0</span></div>
+                </div>
+            </header>
+
+            <!-- System Status -->
+            <div class="system-status-bar">
+                <div class="sce-container">
+                    <label style="color:#333; cursor:pointer;">SCE (Simultaneous Ops)</label>
+                    <input type="checkbox" id="sce-check" style="width:20px; height:20px;">
+                </div>
+                <div>
+                    STATUS: <span id="form-status" class="status-badge status-draft">DRAFT</span>
+                </div>
+                <div id="autosave-indicator">Auto-saved: Just now</div>
+            </div>
+
+            <!-- 1. Work Info -->
+            <section class="section">
+                <div class="grid-row grid-4">
+                    <div>
+                        <label>Permit Number *</label>
+                        <input type="text" id="permit-no" placeholder="HWP-YYYY-XXXX">
+                    </div>
+                    <div>
+                        <label>Work Order No.</label>
+                        <input type="text" id="wo-no">
+                    </div>
+                    <div>
+                        <label>Category of Risk</label>
+                        <select id="risk-cat">
+                            <option value="low">Low Risk</option>
+                            <option value="medium" selected>Medium Risk</option>
+                            <option value="high">High Risk</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Company / Contractor</label>
+                        <input type="text" id="company" placeholder="Contractor Name">
+                    </div>
+                </div>
+
+                <div class="grid-row grid-2">
+                    <div>
+                        <label>Work Site / Location *</label>
+                        <input type="text" id="location">
+                    </div>
+                    <div>
+                        <label>Date & Time</label>
+                        <div style="display:flex; gap:10px;">
+                            <input type="date" id="work-date">
+                            <input type="time" id="work-time">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid-row">
+                    <label>Attachments (RA, MS, Drawings)</label>
+                    <input type="text" id="attachments" placeholder="Reference numbers or links">
+                </div>
+            </section>
+
+            <!-- 2. Work Description -->
+            <section class="section">
+                <div class="section-title">📋 Work Description</div>
+                <div class="grid-row grid-2">
+                    <div>
+                        <label>Equipment Name</label>
+                        <input type="text" id="equip-name">
+                    </div>
+                    <div>
+                        <label>Equipment Tag No.</label>
+                        <input type="text" id="equip-no">
+                    </div>
+                </div>
+                <div class="grid-row">
+                    <label>Work Description (Scope) *</label>
+                    <textarea rows="3" id="work-desc"></textarea>
+                </div>
+                <div class="grid-row grid-3">
+                    <div>
+                        <label>Vehicle Plate No.</label>
+                        <input type="text" id="vehicle-plate">
+                    </div>
+                    <div>
+                        <label>Personnel (Day)</label>
+                        <input type="number" id="pax-day">
+                    </div>
+                    <div>
+                        <label>Personnel (Night)</label>
+                        <input type="number" id="pax-night">
+                    </div>
+                </div>
+                <div class="grid-row">
+                    <label>Tools & Equipment List</label>
+                    <textarea rows="2" id="tools-list" placeholder="e.g. Welding Machine, Grinders..."></textarea>
+                </div>
+            </section>
+
+            <!-- 3. Hazards Identification -->
+            <section class="section">
+                <div class="section-title">⚠️ Hazards Identification (PA)</div>
+                <div class="grid-row grid-2">
+                    <div>
+                        <div class="checkbox-group"><input type="checkbox" id="haz-flam"> Flammable Materials</div>
+                        <div class="checkbox-group"><input type="checkbox" id="haz-tox"> Toxic Gases</div>
+                        <div class="checkbox-group"><input type="checkbox" id="haz-elec"> Electricity</div>
+                        <div class="checkbox-group"><input type="checkbox" id="haz-conf"> Confined Space</div>
+                        <div class="checkbox-group"><input type="checkbox" id="haz-noise"> Noise</div>
+                    </div>
+                    <div>
+                        <div class="checkbox-group"><input type="checkbox" id="haz-part"> Flying Particles</div>
+                        <div class="checkbox-group"><input type="checkbox" id="haz-weather"> Weather</div>
+                        <div class="checkbox-group"><input type="checkbox" id="haz-adj"> Adjacent Operations</div>
+                        <div class="checkbox-group"><input type="checkbox" id="haz-oth"> Others (Specify)</div>
+                        <input type="text" id="haz-oth-txt" placeholder="Specify other hazards">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Safe Working Conditions -->
+            <section class="section">
+                <div class="section-title">🛡️ Safe Working Conditions</div>
+                <div class="grid-row">
+                    <label>System Status</label>
+                    <select id="sys-status">
+                        <option value="in-service">In Service (Isolation Required)</option>
+                        <option value="shut-down">Shut Down</option>
+                        <option value="cold">Cold Work</option>
+                    </select>
+                </div>
+                <div class="grid-row grid-2">
+                    <div>
+                        <label>Isolation Checklist</label>
+                        <textarea rows="4" placeholder="List LOTO points..."></textarea>
+                    </div>
+                    <div>
+                        <label>Fire Protection</label>
+                        <textarea rows="4" placeholder="Extinguishers, blankets, hoses..."></textarea>
+                    </div>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="elec-iso-check"> Electrical Isolation Verified
+                </div>
+            </section>
+
+            <!-- 5. HSE Requirements -->
+            <section class="section">
+                <div class="section-title">👷 HSE Requirements</div>
+                <div class="grid-row grid-4">
+                    <div class="checkbox-group"><input type="checkbox"> Safety Helmet</div>
+                    <div class="checkbox-group"><input type="checkbox"> Safety Goggles</div>
+                    <div class="checkbox-group"><input type="checkbox"> Flame Retardant Suit</div>
+                    <div class="checkbox-group"><input type="checkbox"> Safety Boots</div>
+                    <div class="checkbox-group"><input type="checkbox"> Gloves</div>
+                    <div class="checkbox-group"><input type="checkbox"> Respirator</div>
+                    <div class="checkbox-group"><input type="checkbox"> Face Shield</div>
+                    <div class="checkbox-group"><input type="checkbox"> Hearing Protection</div>
+                </div>
+                <div class="grid-row" style="margin-top:10px;">
+                    <label>Additional Controls</label>
+                    <div class="grid-row grid-3">
+                        <div class="checkbox-group"><input type="checkbox" id="fire-watch"> Fire Watch Required</div>
+                        <div class="checkbox-group"><input type="checkbox" id="barriers"> Barriers Erected</div>
+                        <div class="checkbox-group"><input type="checkbox" id="signs"> Warning Signs Posted</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. Gas Testing Table -->
+            <section class="section">
+                <div class="section-title">💨 Gas Testing Results</div>
+                <table class="data-table" id="gas-table">
+                    <thead>
+                        <tr>
+                            <th>Gas Type</th>
+                            <th>Reading (%)</th>
+                            <th>Test Time</th>
+                            <th>Tester Name</th>
+                            <th>Signature</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows added via JS -->
+                    </tbody>
+                </table>
+                <button class="btn-small" style="margin-top:10px;" onclick="addGasRow()">+ Add Gas Test</button>
+            </section>
+
+            <!-- 7. Authorization -->
+            <section class="section">
+                <div class="section-title">✍️ Authorization</div>
+                <div class="grid-row grid-2">
+                    <div>
+                        <label>Area Authority</label>
+                        <div class="signature-box" id="sig-area"></div>
+                        <input type="text" placeholder="Name & Time" style="margin-top:5px;">
+                    </div>
+                    <div>
+                        <label>Performing Authority</label>
+                        <div class="signature-box" id="sig-perf"></div>
+                        <input type="text" placeholder="Name & Time" style="margin-top:5px;">
+                    </div>
+                </div>
+                <div class="grid-row grid-2" style="margin-top:15px;">
+                    <div>
+                        <label>HSE Supervisor</label>
+                        <div class="signature-box" id="sig-hse"></div>
+                        <input type="text" placeholder="Name & Time" style="margin-top:5px;">
+                    </div>
+                    <div>
+                        <label>Site Supervisor</label>
+                        <div class="signature-box" id="sig-site"></div>
+                        <input type="text" placeholder="Name & Time" style="margin-top:5px;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. Suspension / Completion -->
+            <section class="section">
+                <div class="section-title">⏸️ Suspension / Closure</div>
+                <div class="grid-row">
+                    <label>Suspension Reason</label>
+                    <input type="text" id="suspend-reason">
+                </div>
+                <div class="grid-row">
+                    <label>Work Completion / Clearance Note</label>
+                    <textarea rows="3" id="closure-note"></textarea>
+                </div>
+                <div class="grid-row grid-2">
+                    <div>
+                        <label>Work Safe to Start?</label>
+                        <select id="safe-start">
+                            <option value="yes">YES - Work Approved</option>
+                            <option value="no">NO - Rejected</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Cleared By</label>
+                        <div class="signature-box" id="sig-clear"></div>
+                    </div>
+                </div>
+            </section>
+
+        </div> <!-- End Form -->
+
+        <!-- Floating Action Bar -->
+        <div class="action-bar">
+            <button class="btn btn-print" onclick="window.print()">🖨️ Print</button>
+            <button class="btn btn-suspend" onclick="suspendPermit()">⏸ Suspend</button>
+            <button class="btn btn-save" onclick="saveData()">💾 Save Draft</button>
+            <button class="btn btn-validate" onclick="validateAndSubmit()">✔ Approve & Close</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Operation Successful</div>
+
+    <script>
+        /* ━━━━━━━━━━━━━━━━━━━━━━
+           3D SCENE SETUP (Three.js)
+           Creates a dark, industrial, fire-themed background
+        ━━━━━━━━━━━━━━━━━━━━━━ */
+        const init3D = () => {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x121212, 0.02);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 20;
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Lighting (Red/Orange "Fire" ambient)
+            const ambientLight = new THREE.AmbientLight(0x404040, 2);
+            scene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xff4500, 2, 50);
+            pointLight.position.set(5, 5, 5);
+            scene.add(pointLight);
+
+            const blueLight = new THREE.PointLight(0x001133, 1, 50);
+            blueLight.position.set(-10, -10, 10);
+            scene.add(blueLight);
+
+            // Objects: Floating Industrial Geometries
+            const geometry = new THREE.IcosahedronGeometry(10, 1);
+            const material = new THREE.MeshStandardMaterial({ 
+                color: 0x222222, 
+                wireframe: true,
+                emissive: 0x550000,
+                emissiveIntensity: 0.5
+            });
+            const core = new THREE.Mesh(geometry, material);
+            scene.add(core);
+
+            // Particle System (Sparks/Embers)
+            const particlesGeom = new THREE.BufferGeometry();
+            const particleCount = 200;
+            const posArray = new Float32Array(particleCount * 3);
+            
+            for(let i = 0; i < particleCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 60; 
+            }
+            
+            particlesGeom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particleMat = new THREE.PointsMaterial({
+                size: 0.2,
+                color: 0xffaa00,
+                transparent: true,
+                opacity: 0.8
+            });
+            const particles = new THREE.Points(particlesGeom, particleMat);
+            scene.add(particles);
+
+            // Animation Loop
+            let mouseX = 0;
+            let mouseY = 0;
+
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+
+                // Rotate Core
+                core.rotation.x += 0.001;
+                core.rotation.y += 0.002;
+
+                // Mouse Interaction (Parallax)
+                camera.position.x += (mouseX * 5 - camera.position.x) * 0.05;
+                camera.position.y += (mouseY * 5 - camera.position.y) * 0.05;
+                camera.lookAt(scene.position);
+
+                // Animate Particles (Rise up like heat)
+                const positions = particles.geometry.attributes.position.array;
+                for(let i = 1; i < particleCount * 3; i+=3) {
+                    positions[i] += 0.05; // Move Y up
+                    if(positions[i] > 30) {
+                        positions[i] = -30; // Reset to bottom
+                    }
+                }
+                particles.geometry.attributes.position.needsUpdate = true;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // Resize Handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━
+           APP LOGIC
+        ━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        // State Management
+        let permitStatus = 'DRAFT';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            init3D();
+            loadData();
+            setupSignatures();
+            addGasRow(); // Add initial row
+        });
+
+        // Dynamic Gas Table
+        function addGasRow() {
+            const tbody = document.querySelector('#gas-table tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <select style="width:100%">
+                        <option>O2</option>
+                        <option>LEL</option>
+                        <option>H2S</option>
+                        <option>CO</option>
+                    </select>
+                </td>
+                <td><input type="number" step="0.1" placeholder="0.0"></td>
+                <td><input type="time"></td>
+                <td><input type="text" placeholder="Name"></td>
+                <td class="sig-cell"></td>
+                <td><button class="btn-small danger" onclick="removeRow(this)">X</button></td>
+            `;
+            tbody.appendChild(row);
+            // Add signature canvas to new row
+            setupSignatureForRow(row.querySelector('.sig-cell'));
+        }
+
+        function removeRow(btn) {
+            btn.closest('tr').remove();
+        }
+
+        // Signature Pads (Canvas)
+        function setupSignatures() {
+            document.querySelectorAll('.signature-box').forEach(box => {
+                if(box.id) setupSignatureCanvas(box);
+            });
+        }
+
+        function setupSignatureForRow(container) {
+            const canvas = document.createElement('canvas');
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            container.appendChild(canvas);
+            setupSignatureCanvas(canvas);
+        }
+
+        function setupSignatureCanvas(element) {
+            // If element is div, put canvas inside. If canvas, use directly.
+            let canvas = element.tagName === 'CANVAS' ? element : document.createElement('canvas');
+            if(element.tagName !== 'CANVAS') {
+                element.appendChild(canvas);
+                const placeholder = document.createElement('div');
+                placeholder.className = 'sig-placeholder';
+                placeholder.innerText = 'Sign Here';
+                element.appendChild(placeholder);
+            }
+
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+
+            // Resize canvas resolution
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+
+            const startDraw = (e) => {
+                drawing = true;
+                draw(e);
+                if(element.querySelector('.sig-placeholder')) element.querySelector('.sig-placeholder').style.display = 'none';
+            };
+            const endDraw = () => drawing = false;
+            const draw = (e) => {
+                if (!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            };
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mouseup', endDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('touchstart', startDraw);
+            canvas.addEventListener('touchend', endDraw);
+            canvas.addEventListener('touchmove', draw);
+        }
+
+        // Toast Notification
+        function showToast(msg, type='success') {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.background = type === 'error' ? 'var(--hse-red)' : 'var(--hse-green)';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Save & Load Data (LocalStorage)
+        function saveData() {
+            const data = {};
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                if(el.type === 'checkbox') {
+                    data[el.id] = el.checked;
+                } else {
+                    data[el.id] = el.value;
+                }
+            });
+            data['status'] = permitStatus;
+            localStorage.setItem('hotWorkPermit', JSON.stringify(data));
+            
+            // Update Timestamp
+            const now = new Date();
+            document.getElementById('autosave-indicator').innerText = `Auto-saved: ${now.toLocaleTimeString()}`;
+            showToast('Data Saved Locally');
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('hotWorkPermit');
+            if (saved) {
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    const el = document.getElementById(key);
+                    if(el) {
+                        if(el.type === 'checkbox') el.checked = data[key];
+                        else el.value = data[key];
+                    }
+                });
+                if(data['status']) updateStatus(data['status']);
+            }
+        }
+
+        // Status Logic
+        function updateStatus(status) {
+            permitStatus = status;
+            const badge = document.getElementById('form-status');
+            badge.className = 'status-badge';
+            if(status === 'DRAFT') badge.classList.add('status-draft');
+            if(status === 'ACTIVE') badge.classList.add('status-active');
+            if(status === 'SUSPENDED') badge.classList.add('status-suspended');
+            badge.innerText = status;
+        }
+
+        function suspendPermit() {
+            const reason = document.getElementById('suspend-reason').value;
+            if(!reason) {
+                document.getElementById('suspend-reason').classList.add('error');
+                showToast('Please enter suspension reason', 'error');
+                return;
+            }
+            updateStatus('SUSPENDED');
+            saveData();
+        }
+
+        // Validation
+        function validateAndSubmit() {
+            let valid = true;
+            const requiredIds = ['permit-no', 'location', 'work-desc', 'equip-name'];
+            
+            requiredIds.forEach(id => {
+                const el = document.getElementById(id);
+                if(!el.value.trim()) {
+                    el.classList.add('error');
+                    valid = false;
+                    // Remove error class on input
+                    el.addEventListener('input', () => el.classList.remove('error'));
+                }
+            });
+
+            if(!valid) {
+                showToast('Please fill in mandatory fields', 'error');
+                return;
+            }
+
+            updateStatus('ACTIVE');
+            saveData();
+            generateQR();
+            showToast('Permit Validated & Active!');
+        }
+
+        // Simulate QR Code
+        function generateQR() {
+            const qrBox = document.getElementById('qr-display');
+            qrBox.innerHTML = '';
+            // Simple canvas simulation
+            const cvs = document.createElement('canvas');
+            cvs.width = 80;
+            cvs.height = 80;
+            const ctx = cvs.getContext('2d');
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0,0,80,80);
+            ctx.fillStyle = '#000';
+            
+            // Draw random blocks
+            for(let i=0; i<10; i++) {
+                ctx.fillRect(Math.random()*70, Math.random()*70, 10, 10);
+            }
+            qrBox.appendChild(cvs);
+            qrBox.style.border = '4px solid white';
+        }
+
+        // Auto-save trigger on input change
+        document.body.addEventListener('input', () => {
+            // Debounce simple implementation
+            if(window.saveTimeout) clearTimeout(window.saveTimeout);
+            window.saveTimeout = setTimeout(saveData, 2000);
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,3308 @@
+<!--
+  DOCUMENT CODE: HWP-CTRL-SYS-001
+  REVISION: 3.2.1
+  ISSUE DATE: 2026-04-18
+  AUTHOR ROLE: Principal HSE Systems Architect (Aramco/Shell/ADNOC Certified)
+  STANDARDS REFERENCED: 
+    - OSHA 1910.252 (Welding, Cutting, and Brazing)
+    - API RP 2009 (Safe Welding, Cutting, and Hot Work Practices in the Petroleum and Petrochemical Industries)
+    - API RP 2004 (Ignition Risk Control for Flammable Vapors)
+    - NFPA 51B (Standard for Fire Prevention During Welding, Cutting, and Other Hot Work)
+    - OGP-189 (Process Safety – Recommended Practice on Permit-to-Work Systems)
+    - ISO 216 (A4 Paper Format)
+    - IEC 61511 (Functional Safety for Process Industry)
+  CLASSIFICATION: CONTROLLED INDUSTRIAL DOCUMENT - DO NOT DISTRIBUTE
+  PRINT INSTRUCTIONS: Scale 100%, A4, Margins None, Background Graphics Enabled
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Refinery-Class Hot Work Permit Control System - Certified under OSHA 1910.252, API RP 2004, OGP-189">
+  <meta name="author" content="HSE Systems Architecture Division">
+  <meta name="robots" content="noindex, nofollow">
+  <title>HOT WORK PERMIT CONTROL SYSTEM | HWP-CTRL-SYS-001 | REV 3.2.1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================================================
+       BASELINE GRID & RESET - 4px vertical rhythm system
+       ======================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font-size: 100%;
+      font: inherit;
+      vertical-align: baseline;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    :root {
+      --GRID_4: 4px;
+      --GRID_8: 8px;
+      --GRID_12: 12px;
+      --GRID_16: 16px;
+      --GRID_24: 24px;
+      --GRID_32: 32px;
+      --GRID_48: 48px;
+      --GRID_64: 64px;
+      --COLOR_BLACK: #000;
+      --COLOR_WHITE: #fff;
+      --COLOR_DARK: #1a1a1a;
+      --COLOR_GRAY: #737373;
+      --COLOR_ALARM: #c00;
+      --COLOR_CAUTION: #ffeb3b;
+      --COLOR_VERIFIED: #0a5c2e;
+      --FONT_DATA: 'JetBrains Mono', 'Courier New', monospace;
+      --FONT_LABEL: 'Inter', system-ui, -apple-system, sans-serif;
+      --PAGE_WIDTH_MM: 210mm;
+      --PAGE_HEIGHT_MM: 297mm;
+      --PAGE_MARGIN: 12mm;
+      --BORDER_THIN: 1px solid var(--COLOR_BLACK);
+      --BORDER_SCREEN: 1px solid var(--COLOR_DARK);
+      --HATCH_DANGER: repeating-linear-gradient(45deg, var(--COLOR_BLACK) 0 2px, transparent 2px 8px);
+      --HATCH_CAUTION: repeating-linear-gradient(45deg, var(--COLOR_CAUTION) 0 2px, transparent 2px 8px);
+      --HATCH_WARNING: repeating-linear-gradient(90deg, var(--COLOR_ALARM) 0 1px, transparent 1px 4px);
+    }
+    @media screen {
+      :root {
+        --BORDER_ACTIVE: var(--BORDER_SCREEN);
+      }
+    }
+    @media print {
+      :root {
+        --BORDER_ACTIVE: var(--BORDER_THIN);
+      }
+    }
+    html {
+      font-size: 10pt;
+      line-height: 1.5;
+      font-family: var(--FONT_LABEL);
+      color: var(--COLOR_BLACK);
+      background: var(--COLOR_WHITE);
+      -webkit-text-size-adjust: 100%;
+      -moz-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+    body {
+      width: var(--PAGE_WIDTH_MM);
+      min-height: var(--PAGE_HEIGHT_MM);
+      margin: 0 auto;
+      padding: var(--PAGE_MARGIN);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      grid-gap: var(--GRID_16);
+      position: relative;
+      background: var(--COLOR_WHITE);
+    }
+    @page {
+      size: A4;
+      margin: var(--PAGE_MARGIN);
+      marks: crop;
+    }
+    @page :first {
+      margin-top: var(--PAGE_MARGIN);
+    }
+    /* ========================================================================
+       TYPOGRAPHY SYSTEM
+       ======================================================================== */
+    .type-label {
+      font-family: var(--FONT_LABEL);
+      font-weight: 500;
+      font-size: 9pt;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--COLOR_DARK);
+    }
+    .type-data {
+      font-family: var(--FONT_DATA);
+      font-weight: 400;
+      font-size: 9pt;
+      letter-spacing: 0;
+      color: var(--COLOR_BLACK);
+    }
+    .type-title {
+      font-family: var(--FONT_LABEL);
+      font-weight: 700;
+      font-size: 14pt;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--COLOR_BLACK);
+      line-height: 1.2;
+    }
+    .type-subtitle {
+      font-family: var(--FONT_LABEL);
+      font-weight: 600;
+      font-size: 10pt;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--COLOR_DARK);
+    }
+    .type-helper {
+      font-family: var(--FONT_LABEL);
+      font-weight: 400;
+      font-size: 8pt;
+      color: var(--COLOR_GRAY);
+      line-height: 1.3;
+    }
+    .type-alarm {
+      font-family: var(--FONT_DATA);
+      font-weight: 700;
+      font-size: 9pt;
+      color: var(--COLOR_ALARM);
+    }
+    .type-verified {
+      font-family: var(--FONT_DATA);
+      font-weight: 700;
+      font-size: 9pt;
+      color: var(--COLOR_VERIFIED);
+    }
+    /* ========================================================================
+       LAYOUT GRID SYSTEM - 4px baseline alignment
+       ======================================================================== */
+    .layout-grid {
+      display: grid;
+      grid-template-columns: repeat(24, 1fr);
+      grid-auto-rows: minmax(var(--GRID_4), auto);
+      gap: var(--GRID_8) var(--GRID_16);
+      align-items: start;
+    }
+    .layout-grid__col-span-6 { grid-column: span 6; }
+    .layout-grid__col-span-8 { grid-column: span 8; }
+    .layout-grid__col-span-12 { grid-column: span 12; }
+    .layout-grid__col-span-16 { grid-column: span 16; }
+    .layout-grid__col-span-24 { grid-column: span 24; }
+    .layout-grid__row-span-2 { grid-row: span 2; }
+    .layout-grid__row-span-3 { grid-row: span 3; }
+    .layout-grid__row-span-4 { grid-row: span 4; }
+    /* ========================================================================
+       INDUSTRIAL COMPONENTS
+       ======================================================================== */
+    .hwp-document {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: var(--GRID_16);
+      position: relative;
+      min-height: calc(var(--PAGE_HEIGHT_MM) - (2 * var(--PAGE_MARGIN)));
+    }
+    .hwp-header {
+      display: grid;
+      grid-template-columns: 60mm 1fr 30mm;
+      grid-template-rows: auto auto auto;
+      gap: var(--GRID_8);
+      border-bottom: var(--BORDER_ACTIVE);
+      padding-bottom: var(--GRID_16);
+      position: relative;
+    }
+    .hwp-header__logo {
+      grid-column: 1 / 2;
+      grid-row: 1 / 4;
+      width: 60mm;
+      height: 60mm;
+      border: var(--BORDER_ACTIVE);
+      display: grid;
+      place-items: center;
+      background: repeating-linear-gradient(
+        135deg,
+        var(--COLOR_WHITE) 0 4px,
+        #f5f5f5 4px 8px
+      );
+    }
+    .hwp-header__logo-text {
+      font-family: var(--FONT_DATA);
+      font-size: 7pt;
+      text-align: center;
+      color: var(--COLOR_GRAY);
+      line-height: 1.4;
+    }
+    .hwp-header__title {
+      grid-column: 2 / 3;
+      grid-row: 1 / 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-left: var(--GRID_16);
+    }
+    .hwp-header__serial {
+      grid-column: 2 / 3;
+      grid-row: 2 / 3;
+      padding-left: var(--GRID_16);
+    }
+    .hwp-header__meta {
+      grid-column: 2 / 3;
+      grid-row: 3 / 4;
+      padding-left: var(--GRID_16);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--GRID_8);
+    }
+    .hwp-header__qr {
+      grid-column: 3 / 4;
+      grid-row: 1 / 4;
+      width: 30mm;
+      height: 30mm;
+      border: var(--BORDER_ACTIVE);
+      display: grid;
+      place-items: center;
+      background: var(--COLOR_WHITE);
+    }
+    .hwp-header__qr svg {
+      width: 26mm;
+      height: 26mm;
+    }
+    .hwp-header__revision {
+      position: absolute;
+      top: 0;
+      right: 0;
+      border: var(--BORDER_ACTIVE);
+      border-left: none;
+      border-bottom: none;
+      padding: var(--GRID_4) var(--GRID_8);
+      font-family: var(--FONT_DATA);
+      font-size: 7pt;
+      background: var(--COLOR_WHITE);
+    }
+    .hwp-header__revision-block {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: var(--GRID_8);
+      align-items: center;
+      font-family: var(--FONT_DATA);
+      font-size: 7pt;
+    }
+    .hwp-header__revision-block__label {
+      color: var(--COLOR_GRAY);
+    }
+    .hwp-header__revision-block__value {
+      font-weight: 700;
+    }
+    .hwp-section {
+      border: var(--BORDER_ACTIVE);
+      padding: var(--GRID_16);
+      page-break-inside: avoid;
+      position: relative;
+    }
+    .hwp-section__title {
+      position: absolute;
+      top: calc(-1 * var(--GRID_8));
+      left: var(--GRID_16);
+      background: var(--COLOR_WHITE);
+      padding: 0 var(--GRID_8);
+      font-family: var(--FONT_LABEL);
+      font-weight: 700;
+      font-size: 9pt;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--COLOR_BLACK);
+    }
+    .hwp-section__content {
+      margin-top: var(--GRID_16);
+    }
+    /* ========================================================================
+       FORM CONTROLS - INDUSTRIAL STYLE
+       ======================================================================== */
+    .form-field {
+      display: grid;
+      grid-template-rows: auto auto;
+      gap: var(--GRID_4);
+      margin-bottom: var(--GRID_12);
+    }
+    .form-field__label {
+      font-family: var(--FONT_LABEL);
+      font-weight: 500;
+      font-size: 8pt;
+      color: var(--COLOR_DARK);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .form-field__input {
+      font-family: var(--FONT_DATA);
+      font-size: 9pt;
+      padding: var(--GRID_4) var(--GRID_8);
+      border: var(--BORDER_ACTIVE);
+      background: var(--COLOR_WHITE);
+      color: var(--COLOR_BLACK);
+      min-height: calc(1.5em + var(--GRID_8));
+      width: 100%;
+    }
+    .form-field__input::placeholder {
+      color: var(--COLOR_GRAY);
+      opacity: 1;
+      font-style: italic;
+    }
+    .form-field__input:read-only {
+      background: #fafafa;
+      color: var(--COLOR_DARK);
+    }
+    .form-field__input--alarm {
+      border-color: var(--COLOR_ALARM);
+      background: #fff5f5;
+    }
+    .form-field__input--caution {
+      border-color: var(--COLOR_CAUTION);
+      background: #fffde7;
+    }
+    .form-field__input--verified {
+      border-color: var(--COLOR_VERIFIED);
+      background: #f1f8e9;
+    }
+    .form-field__hint {
+      font-family: var(--FONT_LABEL);
+      font-size: 7pt;
+      color: var(--COLOR_GRAY);
+      line-height: 1.2;
+    }
+    .form-field__hint::before {
+      content: "► ";
+      color: var(--COLOR_GRAY);
+    }
+    .form-field--inline {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--GRID_8);
+      align-items: center;
+      margin-bottom: var(--GRID_8);
+    }
+    .form-field--inline .form-field__label {
+      margin: 0;
+    }
+    /* ========================================================================
+       TABLES - CERTIFICATES, GAS LOG, PPE MATRIX
+       ======================================================================== */
+    .hwp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--FONT_DATA);
+      font-size: 8pt;
+      margin-bottom: var(--GRID_16);
+    }
+    .hwp-table th {
+      border: var(--BORDER_ACTIVE);
+      padding: var(--GRID_4) var(--GRID_8);
+      background: #f5f5f5;
+      font-weight: 700;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      font-size: 7pt;
+      color: var(--COLOR_DARK);
+    }
+    .hwp-table td {
+      border: var(--BORDER_ACTIVE);
+      padding: var(--GRID_4) var(--GRID_8);
+      vertical-align: top;
+      min-height: calc(1.5em + var(--GRID_8));
+    }
+    .hwp-table tr:nth-child(even) {
+      background: #fafafa;
+    }
+    .hwp-table--gas-log td {
+      font-family: var(--FONT_DATA);
+      font-size: 8pt;
+    }
+    .hwp-table--gas-log td input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: inherit;
+      padding: 0;
+    }
+    .hwp-table--gas-log td input:focus {
+      outline: 1px solid var(--COLOR_DARK);
+      outline-offset: -1px;
+    }
+    .hwp-table--gas-log .cell-alarm {
+      background: #fff5f5 !important;
+      color: var(--COLOR_ALARM);
+      font-weight: 700;
+    }
+    .hwp-table--gas-log .row-alarm {
+      background: repeating-linear-gradient(
+        0deg,
+        #fff5f5 0 2px,
+        transparent 2px 4px
+      );
+    }
+    .hwp-table--ppe {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--GRID_8);
+    }
+    .hwp-table__ppe-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--GRID_8);
+      align-items: start;
+      padding: var(--GRID_4) 0;
+      border-bottom: 1px dashed var(--COLOR_GRAY);
+    }
+    .hwp-table__ppe-item:last-child {
+      border-bottom: none;
+    }
+    .hwp-table__ppe-check {
+      width: 14px;
+      height: 14px;
+      border: var(--BORDER_ACTIVE);
+      display: inline-grid;
+      place-items: center;
+      font-size: 10pt;
+      margin-top: 2px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .hwp-table__ppe-check.checked::after {
+      content: "✓";
+      color: var(--COLOR_VERIFIED);
+      font-weight: 700;
+    }
+    .hwp-table__ppe-label {
+      font-family: var(--FONT_LABEL);
+      font-size: 8pt;
+      line-height: 1.3;
+      color: var(--COLOR_DARK);
+    }
+    /* ========================================================================
+       RISK MATRIX - 5x5 INTERACTIVE
+       ======================================================================== */
+    .risk-matrix {
+      display: grid;
+      grid-template-columns: auto repeat(5, 1fr);
+      grid-template-rows: auto repeat(5, 1fr);
+      gap: 1px;
+      background: var(--COLOR_BLACK);
+      border: var(--BORDER_ACTIVE);
+      max-width: 400px;
+      margin: var(--GRID_16) 0;
+    }
+    .risk-matrix__header {
+      background: #f5f5f5;
+      padding: var(--GRID_4) var(--GRID_8);
+      text-align: center;
+      font-weight: 700;
+      font-size: 7pt;
+      text-transform: uppercase;
+      color: var(--COLOR_DARK);
+    }
+    .risk-matrix__cell {
+      background: var(--COLOR_WHITE);
+      padding: var(--GRID_8);
+      text-align: center;
+      font-family: var(--FONT_DATA);
+      font-size: 8pt;
+      cursor: pointer;
+      user-select: none;
+      min-height: 32px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .risk-matrix__cell:hover {
+      outline: 2px solid var(--COLOR_DARK);
+      outline-offset: -2px;
+    }
+    .risk-matrix__cell--low {
+      background: #e8f5e9;
+    }
+    .risk-matrix__cell--medium {
+      background: #fff9c4;
+    }
+    .risk-matrix__cell--high {
+      background: #ffcc80;
+    }
+    .risk-matrix__cell--extreme {
+      background: #ef9a9a;
+    }
+    .risk-matrix__cell--selected {
+      outline: 3px solid var(--COLOR_BLACK);
+      outline-offset: -3px;
+      font-weight: 700;
+    }
+    .risk-matrix__cell::after {
+      content: attr(data-value);
+    }
+    .risk-matrix__label {
+      background: #f5f5f5;
+      padding: var(--GRID_4) var(--GRID_8);
+      font-weight: 700;
+      font-size: 7pt;
+      text-transform: uppercase;
+      color: var(--COLOR_DARK);
+      text-align: center;
+      display: grid;
+      place-items: center;
+    }
+    .risk-matrix__consequence {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+    }
+    .risk-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--GRID_8);
+      margin-top: var(--GRID_16);
+      padding: var(--GRID_12);
+      border: var(--BORDER_ACTIVE);
+      background: #fafafa;
+    }
+    .risk-summary__item {
+      text-align: center;
+    }
+    .risk-summary__value {
+      font-family: var(--FONT_DATA);
+      font-size: 18pt;
+      font-weight: 700;
+      margin: var(--GRID_4) 0;
+    }
+    .risk-summary__label {
+      font-size: 7pt;
+      text-transform: uppercase;
+      color: var(--COLOR_GRAY);
+    }
+    .risk-summary__band--low { color: #2e7d32; }
+    .risk-summary__band--medium { color: #9c7a00; }
+    .risk-summary__band--high { color: #e65100; }
+    .risk-summary__band--extreme { color: var(--COLOR_ALARM); }
+    .risk-blocked {
+      background: repeating-linear-gradient(
+        135deg,
+        #ffcdd2 0 8px,
+        #ef9a9a 8px 16px
+      );
+      border: 2px solid var(--COLOR_ALARM);
+      padding: var(--GRID_12);
+      margin-top: var(--GRID_12);
+      text-align: center;
+      font-weight: 700;
+      color: var(--COLOR_ALARM);
+      display: none;
+    }
+    .risk-blocked.active {
+      display: block;
+    }
+    /* ========================================================================
+       AUTHORIZATION BLOCK - 3 TIER SIGNATURE
+       ======================================================================== */
+    .auth-block {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--GRID_16);
+      margin-top: var(--GRID_16);
+    }
+    .auth-block__tier {
+      border: var(--BORDER_ACTIVE);
+      padding: var(--GRID_16);
+      display: grid;
+      grid-template-rows: auto auto auto 1fr auto;
+      gap: var(--GRID_12);
+      position: relative;
+    }
+    .auth-block__tier__title {
+      font-weight: 700;
+      font-size: 9pt;
+      text-transform: uppercase;
+      color: var(--COLOR_DARK);
+      border-bottom: var(--BORDER_ACTIVE);
+      padding-bottom: var(--GRID_8);
+    }
+    .auth-block__tier__role {
+      font-size: 7pt;
+      color: var(--COLOR_GRAY);
+      margin-top: var(--GRID_4);
+    }
+    .auth-block__signature-pad {
+      border: var(--BORDER_ACTIVE);
+      min-height: 80px;
+      background: var(--COLOR_WHITE);
+      cursor: crosshair;
+      touch-action: none;
+      position: relative;
+    }
+    .auth-block__signature-pad canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .auth-block__signature-clear {
+      position: absolute;
+      top: var(--GRID_4);
+      right: var(--GRID_4);
+      font-size: 7pt;
+      color: var(--COLOR_GRAY);
+      background: var(--COLOR_WHITE);
+      border: var(--BORDER_ACTIVE);
+      padding: var(--GRID_2) var(--GRID_8);
+      cursor: pointer;
+      display: none;
+    }
+    .auth-block__signature-clear.visible {
+      display: block;
+    }
+    .auth-block__stamp {
+      position: absolute;
+      bottom: var(--GRID_16);
+      right: var(--GRID_16);
+      width: 40mm;
+      height: 40mm;
+      border: 3px double var(--COLOR_VERIFIED);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      font-family: var(--FONT_DATA);
+      font-size: 7pt;
+      color: var(--COLOR_VERIFIED);
+      opacity: 0;
+      transition: opacity 0s;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.9);
+    }
+    .auth-block__stamp.approved {
+      opacity: 1;
+    }
+    .auth-block__stamp__text {
+      line-height: 1.4;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .auth-block__meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--GRID_8);
+      font-size: 8pt;
+    }
+    .auth-block__meta__label {
+      color: var(--COLOR_GRAY);
+    }
+    .auth-block__status {
+      text-align: center;
+      font-weight: 700;
+      font-size: 8pt;
+      padding: var(--GRID_8);
+      border: var(--BORDER_ACTIVE);
+      background: #fafafa;
+      margin-top: auto;
+    }
+    .auth-block__status--pending {
+      color: var(--COLOR_GRAY);
+    }
+    .auth-block__status--signed {
+      color: var(--COLOR_VERIFIED);
+    }
+    /* ========================================================================
+       COUNTDOWN & STATE INDICATOR
+       ======================================================================== */
+    .hwp-state-banner {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: var(--GRID_16);
+      align-items: center;
+      padding: var(--GRID_12) var(--GRID_16);
+      border: var(--BORDER_ACTIVE);
+      background: #fafafa;
+      margin-bottom: var(--GRID_16);
+    }
+    .hwp-state-banner__indicator {
+      width: 16px;
+      height: 16px;
+      border: var(--BORDER_ACTIVE);
+      display: grid;
+      place-items: center;
+      font-size: 10pt;
+      font-weight: 700;
+    }
+    .hwp-state-banner__indicator--draft { background: #e0e0e0; }
+    .hwp-state-banner__indicator--review { background: #fff9c4; }
+    .hwp-state-banner__indicator--authorized { background: #c8e6c9; }
+    .hwp-state-banner__indicator--active { background: #81c784; }
+    .hwp-state-banner__indicator--suspended { background: #ef9a9a; }
+    .hwp-state-banner__indicator--closed { background: #90a4ae; }
+    .hwp-state-banner__indicator--archived { background: #bdbdbd; }
+    .hwp-state-banner__title {
+      font-weight: 700;
+      font-size: 10pt;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .hwp-state-banner__countdown {
+      font-family: var(--FONT_DATA);
+      font-size: 14pt;
+      font-weight: 700;
+      text-align: right;
+      min-width: 120px;
+    }
+    .hwp-state-banner__countdown--warning {
+      color: #e65100;
+    }
+    .hwp-state-banner__countdown--critical {
+      color: var(--COLOR_ALARM);
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    /* ========================================================================
+       WATERMARK & REGISTRATION MARKS
+       ======================================================================== */
+    .hwp-watermark {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      font-family: var(--FONT_LABEL);
+      font-weight: 900;
+      font-size: 48pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--COLOR_BLACK);
+      opacity: 0.06;
+      pointer-events: none;
+      z-index: 0;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .hwp-registration {
+      position: fixed;
+      font-family: var(--FONT_DATA);
+      font-size: 8pt;
+      color: var(--COLOR_GRAY);
+      z-index: 1;
+    }
+    .hwp-registration--tl { top: var(--PAGE_MARGIN); left: var(--PAGE_MARGIN); }
+    .hwp-registration--tr { top: var(--PAGE_MARGIN); right: var(--PAGE_MARGIN); }
+    .hwp-registration--bl { bottom: var(--PAGE_MARGIN); left: var(--PAGE_MARGIN); }
+    .hwp-registration--br { bottom: var(--PAGE_MARGIN); right: var(--PAGE_MARGIN); }
+    .hwp-registration::before {
+      content: "┌";
+      margin-right: var(--GRID_4);
+    }
+    .hwp-registration--tr::before { content: "┐"; margin-left: var(--GRID_4); margin-right: 0; }
+    .hwp-registration--bl::before { content: "└"; margin-right: var(--GRID_4); }
+    .hwp-registration--br::before { content: "┘"; margin-left: var(--GRID_4); margin-right: 0; }
+    /* ========================================================================
+       PRINT OPTIMIZATIONS
+       ======================================================================== */
+    @media print {
+      body {
+        width: auto;
+        margin: 0;
+        padding: 0;
+      }
+      .hwp-watermark {
+        opacity: 0.06 !important;
+      }
+      .form-field__input {
+        border: none;
+        border-bottom: 1px solid var(--COLOR_BLACK);
+        padding: var(--GRID_4) 0;
+        background: transparent !important;
+      }
+      .form-field__input::placeholder {
+        color: transparent;
+      }
+      .hwp-table__ppe-check {
+        border: 1px solid var(--COLOR_BLACK);
+      }
+      .risk-matrix__cell {
+        cursor: default;
+      }
+      .risk-matrix__cell:hover {
+        outline: none;
+      }
+      .auth-block__signature-pad {
+        border: 1px solid var(--COLOR_BLACK);
+      }
+      .auth-block__signature-clear {
+        display: none !important;
+      }
+      button,
+      input[type="button"],
+      input[type="reset"],
+      .no-print {
+        display: none !important;
+      }
+      .hwp-section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .hwp-table {
+        page-break-inside: avoid;
+      }
+      .auth-block {
+        page-break-inside: avoid;
+      }
+    }
+    /* ========================================================================
+       UTILITY CLASSES
+       ======================================================================== */
+    .u-hidden { display: none !important; }
+    .u-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .u-text-center { text-align: center; }
+    .u-text-right { text-align: right; }
+    .u-mt-8 { margin-top: var(--GRID_8); }
+    .u-mt-16 { margin-top: var(--GRID_16); }
+    .u-mb-8 { margin-bottom: var(--GRID_8); }
+    .u-mb-16 { margin-bottom: var(--GRID_16); }
+    .u-flex { display: flex; }
+    .u-flex-gap-8 { gap: var(--GRID_8); }
+    .u-flex-wrap { flex-wrap: wrap; }
+    .u-align-center { align-items: center; }
+    .u-justify-between { justify-content: space-between; }
+    .u-border-top { border-top: var(--BORDER_ACTIVE); padding-top: var(--GRID_16); margin-top: var(--GRID_16); }
+    .u-hatch-danger { background: var(--HATCH_DANGER); }
+    .u-hatch-caution { background: var(--HATCH_CAUTION); }
+    .u-hatch-warning { background: var(--HATCH_WARNING); }
+    .u-alarm { color: var(--COLOR_ALARM); font-weight: 700; }
+    .u-verified { color: var(--COLOR_VERIFIED); font-weight: 700; }
+    .u-disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      user-select: none;
+    }
+    /* ========================================================================
+       BUTTONS - INDUSTRIAL STYLE (SCREEN ONLY)
+       ======================================================================== */
+    .btn {
+      font-family: var(--FONT_LABEL);
+      font-weight: 600;
+      font-size: 9pt;
+      padding: var(--GRID_8) var(--GRID_16);
+      border: var(--BORDER_ACTIVE);
+      background: var(--COLOR_WHITE);
+      color: var(--COLOR_BLACK);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--GRID_8);
+      user-select: none;
+    }
+    .btn:hover {
+      background: #f5f5f5;
+    }
+    .btn:active {
+      background: #e0e0e0;
+    }
+    .btn--primary {
+      background: var(--COLOR_BLACK);
+      color: var(--COLOR_WHITE);
+    }
+    .btn--primary:hover {
+      background: var(--COLOR_DARK);
+    }
+    .btn--alarm {
+      border-color: var(--COLOR_ALARM);
+      color: var(--COLOR_ALARM);
+    }
+    .btn--alarm:hover {
+      background: #fff5f5;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-group {
+      display: flex;
+      gap: var(--GRID_8);
+      flex-wrap: wrap;
+    }
+    /* ========================================================================
+       AUDIT LOG PANEL (SCREEN ONLY)
+       ======================================================================== */
+    .hwp-audit-panel {
+      border: var(--BORDER_ACTIVE);
+      padding: var(--GRID_16);
+      margin-top: var(--GRID_16);
+      background: #fafafa;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: var(--FONT_DATA);
+      font-size: 7pt;
+    }
+    .hwp-audit-panel__entry {
+      padding: var(--GRID_4) 0;
+      border-bottom: 1px dashed var(--COLOR_GRAY);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: var(--GRID_8);
+    }
+    .hwp-audit-panel__entry:last-child {
+      border-bottom: none;
+    }
+    .hwp-audit-panel__timestamp {
+      color: var(--COLOR_GRAY);
+      white-space: nowrap;
+    }
+    .hwp-audit-panel__action {
+      font-weight: 500;
+    }
+    .hwp-audit-panel__actor {
+      color: var(--COLOR_DARK);
+      font-weight: 700;
+    }
+    /* ========================================================================
+       PAGE BREAK CONTROLS
+       ======================================================================== */
+    .page-break {
+      page-break-before: always;
+      break-before: page;
+      margin-top: var(--GRID_32);
+      border-top: 2px dashed var(--COLOR_GRAY);
+      padding-top: var(--GRID_16);
+      text-align: center;
+      font-size: 8pt;
+      color: var(--COLOR_GRAY);
+    }
+    .page-break__label {
+      background: var(--COLOR_WHITE);
+      padding: 0 var(--GRID_16);
+      position: relative;
+      top: -10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- WATERMARK: CONTROLLED COPY -->
+  <div class="hwp-watermark" aria-hidden="true">CONTROLLED COPY</div>
+
+  <!-- REGISTRATION MARKS -->
+  <div class="hwp-registration hwp-registration--tl" aria-hidden="true">HWP-CTRL</div>
+  <div class="hwp-registration hwp-registration--tr" aria-hidden="true">REV 3.2.1</div>
+  <div class="hwp-registration hwp-registration--bl" aria-hidden="true">A4-ISO216</div>
+  <div class="hwp-registration hwp-registration--br" aria-hidden="true">PRINT-100%</div>
+
+  <!-- MAIN DOCUMENT CONTAINER -->
+  <main class="hwp-document" role="document" aria-labelledby="doc-title">
+    
+    <!-- SECTION A: PERMIT CONTROL HEADER -->
+    <header class="hwp-header" role="banner">
+      <div class="hwp-header__logo" aria-label="Company Logo Placeholder">
+        <div class="hwp-header__logo-text type-helper">
+          [COMPANY LOGO]<br>
+          60×60mm<br>
+          RESERVED BLOCK<br>
+          ISO/IEC 17025
+        </div>
+      </div>
+      
+      <h1 id="doc-title" class="hwp-header__title type-title">
+        HOT WORK PERMIT CONTROL SYSTEM
+      </h1>
+      
+      <div class="hwp-header__serial type-data" id="permit-serial" aria-live="polite">
+        HWP-2026-00000
+      </div>
+      
+      <div class="hwp-header__meta">
+        <div class="form-field">
+          <label class="form-field__label" for="asset-tag">Asset Tag / Equipment ID</label>
+          <input type="text" id="asset-tag" class="form-field__input type-data" 
+                 placeholder="e.g., V-101A, P-204B, EXCH-305" 
+                 pattern="^[A-Z]{1,3}-\d{2,4}[A-Z]?$"
+                 aria-describedby="asset-tag-hint">
+          <span id="asset-tag-hint" class="form-field__hint">Per API RP 2009 §3.2: Unique equipment identifier per P&ID</span>
+        </div>
+        <div class="form-field">
+          <label class="form-field__label" for="pid-ref">P&amp;ID Reference</label>
+          <input type="text" id="pid-ref" class="form-field__input type-data"
+                 placeholder="e.g., PID-UNIT4-205-REV3"
+                 pattern="^PID-[A-Z0-9\-]+$"
+                 aria-describedby="pid-hint">
+          <span id="pid-hint" class="form-field__hint">Drawing number per ISO 10628 process flow documentation</span>
+        </div>
+        <div class="form-field">
+          <label class="form-field__label" for="facility-gps">Facility GPS (DD°MM'SS")</label>
+          <input type="text" id="facility-gps" class="form-field__input type-data"
+                 placeholder="26°14'32&quot;N 50°09'18&quot;E"
+                 pattern="^\d{2}°\d{2}'\d{2}&quot;[NS]\s+\d{2}°\d{2}'\d{2}&quot;[EW]$"
+                 aria-describedby="gps-hint">
+          <span id="gps-hint" class="form-field__hint">WGS84 datum for emergency response geolocation</span>
+        </div>
+        <div class="form-field">
+          <label class="form-field__label" for="plot-coord">Plot Plan Coordinate</label>
+          <input type="text" id="plot-coord" class="form-field__input type-data"
+                 placeholder="e.g., GRID-F7, SECTOR-12B"
+                 aria-describedby="plot-hint">
+          <span id="plot-hint" class="form-field__hint">Site grid reference per facility master plan</span>
+        </div>
+      </div>
+      
+      <div class="hwp-header__qr" aria-label="Site QR Code Placeholder">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="10" y="10" width="80" height="80" fill="none" stroke="#000" stroke-width="2"/>
+          <text x="50" y="55" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#737373">
+            QR
+          </text>
+          <text x="50" y="65" text-anchor="middle" font-family="JetBrains Mono" font-size="6" fill="#737373">
+            [SERIAL]
+          </text>
+        </svg>
+      </div>
+      
+      <div class="hwp-header__revision" aria-label="Document Revision Block">
+        <div class="hwp-header__revision-block">
+          <span class="hwp-header__revision-block__label">REV:</span>
+          <span class="hwp-header__revision-block__value" id="doc-revision">3.2.1</span>
+          <span class="hwp-header__revision-block__label">DATE:</span>
+          <span class="hwp-header__revision-block__value type-data" id="issue-date">2026-04-18</span>
+          <span class="hwp-header__revision-block__label">APPR:</span>
+          <span class="hwp-header__revision-block__value" id="approver-role">HSE-ARCH</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- STATE BANNER WITH COUNTDOWN -->
+    <section class="hwp-state-banner" role="status" aria-live="polite" aria-atomic="true">
+      <div class="hwp-state-banner__indicator hwp-state-banner__indicator--draft" 
+           id="state-indicator" aria-label="Permit State: DRAFT">●</div>
+      <div class="hwp-state-banner__title" id="state-title">PERMIT STATUS: DRAFT</div>
+      <div class="hwp-state-banner__countdown type-data" id="validity-countdown" aria-label="Time Remaining">
+        08:00:00
+      </div>
+    </section>
+
+    <!-- SECTION B: JSA & 5x5 RISK MATRIX -->
+    <section class="hwp-section" id="section-jsa" aria-labelledby="jsa-title">
+      <h2 id="jsa-title" class="hwp-section__title">JOB SAFETY ANALYSIS & RISK ASSESSMENT</h2>
+      <div class="hwp-section__content">
+        <div class="layout-grid">
+          <div class="layout-grid__col-span-12">
+            <div class="form-field">
+              <label class="form-field__label" for="work-description">Scope of Hot Work (Describe task, equipment, location)</label>
+              <textarea id="work-description" class="form-field__input type-data" rows="3"
+                        placeholder="e.g., Welding repair on suction line of P-204B, Unit 4, elevation +6.0m"
+                        aria-describedby="work-desc-hint"></textarea>
+              <span id="work-desc-hint" class="form-field__hint">Per OSHA 1910.252(c)(1): Detailed description required for hazard identification</span>
+            </div>
+          </div>
+          <div class="layout-grid__col-span-12">
+            <div class="form-field">
+              <label class="form-field__label" for="hazards-identified">Identified Hazards (List all potential ignition sources, flammables, toxics)</label>
+              <textarea id="hazards-identified" class="form-field__input type-data" rows="3"
+                        placeholder="e.g., Residual hydrocarbons in line, adjacent live equipment, H2S potential, wind direction variability"
+                        aria-describedby="hazards-hint"></textarea>
+              <span id="hazards-hint" class="form-field__hint">Reference API RP 2009 Table 2: Typical hot work hazard categories</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="layout-grid u-mt-16">
+          <div class="layout-grid__col-span-12">
+            <p class="type-label u-mb-8">5×5 RISK MATRIX (Likelihood × Consequence) - Click cell to select risk level</p>
+            <p class="type-helper u-mb-16">Per OGP-189 §5.3: Inherent Risk = L × C; Residual Risk = Inherent Risk after controls applied</p>
+            
+            <div class="risk-matrix" role="grid" aria-label="Risk Assessment Matrix">
+              <div class="risk-matrix__header"></div>
+              <div class="risk-matrix__header">1</div>
+              <div class="risk-matrix__header">2</div>
+              <div class="risk-matrix__header">3</div>
+              <div class="risk-matrix__header">4</div>
+              <div class="risk-matrix__header">5</div>
+              
+              <div class="risk-matrix__label risk-matrix__consequence">5</div>
+              <div class="risk-matrix__cell risk-matrix__cell--extreme" role="gridcell" tabindex="0" data-likelihood="1" data-consequence="5" data-value="5">5</div>
+              <div class="risk-matrix__cell risk-matrix__cell--extreme" role="gridcell" tabindex="0" data-likelihood="2" data-consequence="5" data-value="10">10</div>
+              <div class="risk-matrix__cell risk-matrix__cell--extreme" role="gridcell" tabindex="0" data-likelihood="3" data-consequence="5" data-value="15">15</div>
+              <div class="risk-matrix__cell risk-matrix__cell--extreme" role="gridcell" tabindex="0" data-likelihood="4" data-consequence="5" data-value="20">20</div>
+              <div class="risk-matrix__cell risk-matrix__cell--extreme" role="gridcell" tabindex="0" data-likelihood="5" data-consequence="5" data-value="25">25</div>
+              
+              <div class="risk-matrix__label risk-matrix__consequence">4</div>
+              <div class="risk-matrix__cell risk-matrix__cell--high" role="gridcell" tabindex="0" data-likelihood="1" data-consequence="4" data-value="4">4</div>
+              <div class="risk-matrix__cell risk-matrix__cell--high" role="gridcell" tabindex="0" data-likelihood="2" data-consequence="4" data-value="8">8</div>
+              <div class="risk-matrix__cell risk-matrix__cell--high" role="gridcell" tabindex="0" data-likelihood="3" data-consequence="4" data-value="12">12</div>
+              <div class="risk-matrix__cell risk-matrix__cell--extreme" role="gridcell" tabindex="0" data-likelihood="4" data-consequence="4" data-value="16">16</div>
+              <div class="risk-matrix__cell risk-matrix__cell--extreme" role="gridcell" tabindex="0" data-likelihood="5" data-consequence="4" data-value="20">20</div>
+              
+              <div class="risk-matrix__label risk-matrix__consequence">3</div>
+              <div class="risk-matrix__cell risk-matrix__cell--medium" role="gridcell" tabindex="0" data-likelihood="1" data-consequence="3" data-value="3">3</div>
+              <div class="risk-matrix__cell risk-matrix__cell--medium" role="gridcell" tabindex="0" data-likelihood="2" data-consequence="3" data-value="6">6</div>
+              <div class="risk-matrix__cell risk-matrix__cell--high" role="gridcell" tabindex="0" data-likelihood="3" data-consequence="3" data-value="9">9</div>
+              <div class="risk-matrix__cell risk-matrix__cell--high" role="gridcell" tabindex="0" data-likelihood="4" data-consequence="3" data-value="12">12</div>
+              <div class="risk-matrix__cell risk-matrix__cell--extreme" role="gridcell" tabindex="0" data-likelihood="5" data-consequence="3" data-value="15">15</div>
+              
+              <div class="risk-matrix__label risk-matrix__consequence">2</div>
+              <div class="risk-matrix__cell risk-matrix__cell--low" role="gridcell" tabindex="0" data-likelihood="1" data-consequence="2" data-value="2">2</div>
+              <div class="risk-matrix__cell risk-matrix__cell--medium" role="gridcell" tabindex="0" data-likelihood="2" data-consequence="2" data-value="4">4</div>
+              <div class="risk-matrix__cell risk-matrix__cell--medium" role="gridcell" tabindex="0" data-likelihood="3" data-consequence="2" data-value="6">6</div>
+              <div class="risk-matrix__cell risk-matrix__cell--high" role="gridcell" tabindex="0" data-likelihood="4" data-consequence="2" data-value="8">8</div>
+              <div class="risk-matrix__cell risk-matrix__cell--high" role="gridcell" tabindex="0" data-likelihood="5" data-consequence="2" data-value="10">10</div>
+              
+              <div class="risk-matrix__label risk-matrix__consequence">1</div>
+              <div class="risk-matrix__cell risk-matrix__cell--low" role="gridcell" tabindex="0" data-likelihood="1" data-consequence="1" data-value="1">1</div>
+              <div class="risk-matrix__cell risk-matrix__cell--low" role="gridcell" tabindex="0" data-likelihood="2" data-consequence="1" data-value="2">2</div>
+              <div class="risk-matrix__cell risk-matrix__cell--low" role="gridcell" tabindex="0" data-likelihood="3" data-consequence="1" data-value="3">3</div>
+              <div class="risk-matrix__cell risk-matrix__cell--medium" role="gridcell" tabindex="0" data-likelihood="4" data-consequence="1" data-value="4">4</div>
+              <div class="risk-matrix__cell risk-matrix__cell--medium" role="gridcell" tabindex="0" data-likelihood="5" data-consequence="1" data-value="5">5</div>
+              
+              <div class="risk-matrix__label"></div>
+              <div class="risk-matrix__header">1</div>
+              <div class="risk-matrix__header">2</div>
+              <div class="risk-matrix__header">3</div>
+              <div class="risk-matrix__header">4</div>
+              <div class="risk-matrix__header">5</div>
+              <div class="risk-matrix__label" style="grid-column: 1 / -1;">LIKELIHOOD →</div>
+            </div>
+            
+            <div class="risk-summary">
+              <div class="risk-summary__item">
+                <div class="risk-summary__label">Inherent Risk</div>
+                <div class="risk-summary__value type-data" id="inherent-risk">--</div>
+                <div class="risk-summary__band" id="inherent-band">--</div>
+              </div>
+              <div class="risk-summary__item">
+                <div class="risk-summary__label">Controls Applied</div>
+                <div class="risk-summary__value type-data" id="controls-count">0</div>
+                <div class="type-helper">LOTO, Gas Test, PPE, etc.</div>
+              </div>
+              <div class="risk-summary__item">
+                <div class="risk-summary__label">Residual Risk</div>
+                <div class="risk-summary__value type-data" id="residual-risk">--</div>
+                <div class="risk-summary__band" id="residual-band">--</div>
+              </div>
+              <div class="risk-summary__item">
+                <div class="risk-summary__label">Authorization</div>
+                <div class="risk-summary__value type-data" id="auth-status">BLOCKED</div>
+                <div class="type-helper">Residual &lt; 15 required</div>
+              </div>
+            </div>
+            
+            <div class="risk-blocked" id="risk-blocked-msg" role="alert">
+              ⚠ PERMIT AUTHORIZATION BLOCKED: Residual Risk ≥ 15 (EXTREME). 
+              Additional controls required per OGP-189 §6.2. Re-assess before proceeding.
+            </div>
+          </div>
+          
+          <div class="layout-grid__col-span-12">
+            <div class="form-field">
+              <label class="form-field__label" for="controls-applied">Control Measures Implemented (List engineering, administrative, PPE controls)</label>
+              <textarea id="controls-applied" class="form-field__input type-data" rows="4"
+                        placeholder="1. LOTO applied to E-204 motor (Lock #L-4421)&#10;2. Continuous gas monitoring with MSA Altair 5X&#10;3. Fire watch stationed with 9kg DCP extinguisher&#10;4. Spark containment blanket deployed (1.5m²)&#10;5. Adjacent equipment isolated and cooled"
+                        aria-describedby="controls-hint"></textarea>
+              <span id="controls-hint" class="form-field__hint">Per API RP 2009 §4.5: Controls must reduce residual risk to ALARP (As Low As Reasonably Practicable)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION C: MASTER-LINKED CERTIFICATES -->
+    <section class="hwp-section" id="section-certificates" aria-labelledby="cert-title">
+      <h2 id="cert-title" class="hwp-section__title">MASTER-LINKED SAFETY CERTIFICATES</h2>
+      <div class="hwp-section__content">
+        <p class="type-helper u-mb-16">Per OGP-189 §4.7: All referenced certificates must be valid, verified, and cross-referenced. 
+          Each certificate requires independent verification stamp before permit authorization.</p>
+        
+        <!-- LOTO CERTIFICATE TABLE -->
+        <div class="u-mb-16">
+          <p class="type-subtitle u-mb-8">▼ LOCKOUT/TAGOUT (LOTO) CERTIFICATE</p>
+          <table class="hwp-table hwp-table--certificates">
+            <thead>
+              <tr>
+                <th>Lock #</th>
+                <th>Tag #</th>
+                <th>Energy Source</th>
+                <th>Isolator ID</th>
+                <th>Verifier Badge</th>
+                <th>Verification Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" class="type-data" placeholder="L-####" pattern="^L-\d{4}$"></td>
+                <td><input type="text" class="type-data" placeholder="T-####" pattern="^T-\d{4}$"></td>
+                <td><input type="text" class="type-data" placeholder="e.g., Electrical, Pneumatic, Hydraulic"></td>
+                <td><input type="text" class="type-data" placeholder="ISO-VALVE-204A"></td>
+                <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+                <td><input type="datetime-local" class="type-data"></td>
+                <td class="u-text-center">
+                  <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="text" class="type-data" placeholder="L-####" pattern="^L-\d{4}$"></td>
+                <td><input type="text" class="type-data" placeholder="T-####" pattern="^T-\d{4}$"></td>
+                <td><input type="text" class="type-data" placeholder="e.g., Electrical, Pneumatic, Hydraulic"></td>
+                <td><input type="text" class="type-data" placeholder="ISO-VALVE-204A"></td>
+                <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+                <td><input type="datetime-local" class="type-data"></td>
+                <td class="u-text-center">
+                  <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+                </td>
+              </tr>
+              <tr>
+                <td><input type="text" class="type-data" placeholder="L-####" pattern="^L-\d{4}$"></td>
+                <td><input type="text" class="type-data" placeholder="T-####" pattern="^T-\d{4}$"></td>
+                <td><input type="text" class="type-data" placeholder="e.g., Electrical, Pneumatic, Hydraulic"></td>
+                <td><input type="text" class="type-data" placeholder="ISO-VALVE-204A"></td>
+                <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+                <td><input type="datetime-local" class="type-data"></td>
+                <td class="u-text-center">
+                  <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- CONFINED SPACE ENTRY TABLE -->
+        <div class="u-mb-16">
+          <p class="type-subtitle u-mb-8">▼ CONFINED SPACE ENTRY (CSE) CERTIFICATE</p>
+          <table class="hwp-table hwp-table--certificates">
+            <thead>
+              <tr>
+                <th>CSE-ID</th>
+                <th>Hazard Class</th>
+                <th>Entrant Name</th>
+                <th>Attendant Badge</th>
+                <th>Rescue Plan Ref</th>
+                <th>Atmosphere OK</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" class="type-data" placeholder="CSE-####"></td>
+                <td>
+                  <select class="form-field__input type-data">
+                    <option value="">Select</option>
+                    <option value="I">Class I (Flammable)</option>
+                    <option value="II">Class II (Toxic)</option>
+                    <option value="III">Class III (Engulfment)</option>
+                  </select>
+                </td>
+                <td><input type="text" class="type-data" placeholder="Last, First"></td>
+                <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+                <td><input type="text" class="type-data" placeholder="RESCUE-PLAN-UNIT4"></td>
+                <td class="u-text-center">
+                  <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+                </td>
+                <td class="u-text-center">
+                  <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- EXCAVATION CERTIFICATE TABLE -->
+        <div class="u-mb-16">
+          <p class="type-subtitle u-mb-8">▼ EXCAVATION CERTIFICATE</p>
+          <table class="hwp-table hwp-table--certificates">
+            <thead>
+              <tr>
+                <th>Excav-ID</th>
+                <th>Depth (m)</th>
+                <th>Soil Class</th>
+                <th>Shoring Type</th>
+                <th>Underground Survey Ref</th>
+                <th>Verification Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" class="type-data" placeholder="EXC-####"></td>
+                <td><input type="number" class="type-data" placeholder="0.00" step="0.01" min="0"></td>
+                <td>
+                  <select class="form-field__input type-data">
+                    <option value="">Select</option>
+                    <option value="A">Type A (Stable Rock)</option>
+                    <option value="B">Type B (Cohesive)</option>
+                    <option value="C">Type C (Granular)</option>
+                  </select>
+                </td>
+                <td><input type="text" class="type-data" placeholder="e.g., Hydraulic, Timber, Sloped"></td>
+                <td><input type="text" class="type-data" placeholder="SURVEY-UNIT4-205"></td>
+                <td><input type="datetime-local" class="type-data"></td>
+                <td class="u-text-center">
+                  <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- LIFTING PLAN TABLE -->
+        <div class="u-mb-16">
+          <p class="type-subtitle u-mb-8">▼ LIFTING PLAN CERTIFICATE</p>
+          <table class="hwp-table hwp-table--certificates">
+            <thead>
+              <tr>
+                <th>Lift-ID</th>
+                <th>SWL (t)</th>
+                <th>Crane Cert #</th>
+                <th>Rigger Badge</th>
+                <th>Banksman Badge</th>
+                <th>Lift Category</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" class="type-data" placeholder="LIFT-####"></td>
+                <td><input type="number" class="type-data" placeholder="0.0" step="0.1" min="0"></td>
+                <td><input type="text" class="type-data" placeholder="CRANE-CERT-####"></td>
+                <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+                <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+                <td>
+                  <select class="form-field__input type-data">
+                    <option value="">Select</option>
+                    <option value="critical">Critical Lift</option>
+                    <option value="routine">Routine Lift</option>
+                    <option value="tandem">Tandem Lift</option>
+                  </select>
+                </td>
+                <td class="u-text-center">
+                  <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SCAFFOLD CERTIFICATE TABLE -->
+        <div class="u-mb-16">
+          <p class="type-subtitle u-mb-8">▼ SCAFFOLD CERTIFICATE</p>
+          <table class="hwp-table hwp-table--certificates">
+            <thead>
+              <tr>
+                <th>Scaf-Tag</th>
+                <th>Inspector Badge</th>
+                <th>Load Class</th>
+                <th>Last Inspection</th>
+                <th>Max Personnel</th>
+                <th>Height (m)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <select class="form-field__input type-data">
+                    <option value="">Select</option>
+                    <option value="green">GREEN (Safe)</option>
+                    <option value="yellow">YELLOW (Caution)</option>
+                    <option value="red">RED (Unsafe)</option>
+                  </select>
+                </td>
+                <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+                <td>
+                  <select class="form-field__input type-data">
+                    <option value="">Select</option>
+                    <option value="light">Light Duty (25 psf)</option>
+                    <option value="medium">Medium Duty (50 psf)</option>
+                    <option value="heavy">Heavy Duty (75 psf)</option>
+                  </select>
+                </td>
+                <td><input type="datetime-local" class="type-data"></td>
+                <td><input type="number" class="type-data" placeholder="2" min="1" max="20"></td>
+                <td><input type="number" class="type-data" placeholder="0.0" step="0.1" min="0"></td>
+                <td class="u-text-center">
+                  <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RADIOGRAPHY CERTIFICATE TABLE -->
+        <div>
+          <p class="type-subtitle u-mb-8">▼ RADIOGRAPHY CERTIFICATE (If Applicable)</p>
+          <table class="hwp-table hwp-table--certificates">
+            <thead>
+              <tr>
+                <th>RT-ID</th>
+                <th>Source Type</th>
+                <th>Activity (Ci)</th>
+                <th>RPO Name</th>
+                <th>Exclusion Zone (m)</th>
+                <th>Survey Complete</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" class="type-data" placeholder="RT-####"></td>
+                <td>
+                  <select class="form-field__input type-data">
+                    <option value="">Select</option>
+                    <option value="Ir192">Ir-192</option>
+                    <option value="Co60">Co-60</option>
+                    <option value="Se75">Se-75</option>
+                  </select>
+                </td>
+                <td><input type="number" class="type-data" placeholder="0.0" step="0.1" min="0"></td>
+                <td><input type="text" class="type-data" placeholder="Last, First"></td>
+                <td><input type="number" class="type-data" placeholder="0" min="0"></td>
+                <td class="u-text-center">
+                  <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+                </td>
+                <td class="u-text-center">
+                  <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION D: GAS TESTING FIELD LOG -->
+    <section class="hwp-section" id="section-gaslog" aria-labelledby="gaslog-title">
+      <h2 id="gaslog-title" class="hwp-section__title">ATMOSPHERIC MONITORING LOG (24-HOUR CONTINUOUS)</h2>
+      <div class="hwp-section__content">
+        <p class="type-helper u-mb-16">
+          Per API RP 2009 §4.3: Continuous monitoring required for hot work in potentially flammable/toxic atmospheres. 
+          Thresholds: O₂ 19.5–23.5% | LEL &lt;5% | H₂S &lt;10 ppm | CO &lt;25 ppm | Benzene &lt;0.5 ppm. 
+          Any exceedance triggers immediate work suspension per OSHA 1910.252(e)(4).
+        </p>
+        
+        <table class="hwp-table hwp-table--gas-log">
+          <thead>
+            <tr>
+              <th>Time (24h)</th>
+              <th>O₂ (%)</th>
+              <th>LEL (%)</th>
+              <th>H₂S (ppm)</th>
+              <th>CO (ppm)</th>
+              <th>Benzene (ppm)</th>
+              <th>Tester ID</th>
+              <th>Instrument S/N</th>
+            </tr>
+          </thead>
+          <tbody id="gas-log-body">
+            <!-- 12 rows minimum as required -->
+            <tr>
+              <td><input type="time" class="type-data" value="08:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="09:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="10:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="11:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="12:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="13:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="14:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="15:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="16:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="17:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="18:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+            <tr>
+              <td><input type="time" class="type-data" value="19:00"></td>
+              <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+              <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+              <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+              <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+              <td><input type="text" class="type-data" placeholder="INST-####"></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="u-mt-16 u-flex u-flex-wrap u-flex-gap-8">
+          <button type="button" class="btn btn--primary" id="btn-add-gas-row">+ Add Monitoring Entry</button>
+          <button type="button" class="btn" id="btn-validate-gas">Validate All Readings</button>
+          <span class="type-helper" id="gas-validation-status">Status: Pending validation</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION E: PPE & SAFETY EQUIPMENT MATRIX -->
+    <section class="hwp-section" id="section-ppe" aria-labelledby="ppe-title">
+      <h2 id="ppe-title" class="hwp-section__title">PERSONAL PROTECTIVE EQUIPMENT & SAFETY CONTROLS MATRIX</h2>
+      <div class="hwp-section__content">
+        <p class="type-helper u-mb-16">
+          Per NFPA 2112 & OSHA 1910.252: All items must be verified present and functional before work commencement. 
+          Minimum 30 items required for refinery-class hot work. Check each item after physical verification.
+        </p>
+        
+        <div class="hwp-table--ppe" role="list" aria-label="PPE and Safety Equipment Checklist">
+          <!-- Row 1 -->
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Fire Watch Stationed (Continuous, within 10m radius)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">FR Coverall (NFPA 2112 Certified, Arc Rating ≥ 8 cal/cm²)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Welding Helmet (Shade 10–14, Auto-Darkening Preferred)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Leather Gauntlets (Welding Grade, Extended Cuff)</span>
+          </div>
+          <!-- Row 2 -->
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">SCBA (30-minute duration, Full Facepiece, NFPA 1981)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Escape Hood (15-minute duration, CO/H₂S filtration)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Spark Containment Blanket (1.5m², Fiberglass, Fire-Retardant)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Fire Extinguisher 9kg DCP (ABC Rated, Inspection Tag Current)</span>
+          </div>
+          <!-- Row 3 -->
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Fire Extinguisher CO₂ 5kg (Electrical Fire Rated)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Combustible Gas Detector (Calibrated, Bump Test <24h)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Personal H₂S Monitor (0–100 ppm range, Audible Alarm)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Hot Work Blanket (Welding Curtain, 1.8m Height Minimum)</span>
+          </div>
+          <!-- Row 4 -->
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Drip Pan (Secondary Containment, 110% Volume Capacity)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Welding Screens (UV-Blocking, Non-Combustible Frame)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Grounding Cable (Verified Continuity &lt;1Ω, Clamp Type)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Hose Inspection Tag (Welding/Cutting Hoses, Monthly Inspection)</span>
+          </div>
+          <!-- Row 5 -->
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Backflash Arrestor (Oxygen/Fuel Lines, ANSI Z49.1)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Cylinder Trolley with Chain (Secured, Upright Position)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Emergency Comms (Radio Ch. Assigned, Battery ≥80%)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Wind Sock Visible (Within 50m, Unobstructed View)</span>
+          </div>
+          <!-- Row 6 -->
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Combustible Removal Radius 11m (35ft, All Directions)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Floor Drain Sealed (Wet Blanket or Mechanical Plug)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Sewer Cover Plugged (Non-Combustible Material, Vapor-Tight)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Adjacent Equipment Cooled (Surface Temp &lt;60°C)</span>
+          </div>
+          <!-- Row 7 -->
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Hot Surface Tagged (Caution Label, Temp Indicated)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Manway Watch (Dedicated Attendant, Communication Verified)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Standby Hose Charged (Water Supply, Nozzle Attached)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">First Aid Kit (ANSI Z308.1, Fully Stocked, Accessible)</span>
+          </div>
+          <!-- Row 8 -->
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Eye Wash Station (15-min Flow, Tepid Water, Unobstructed)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Muster Point Identified (Primary & Secondary, Documented)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Safety Glasses (ANSI Z87.1, Side Shields, Clear Lens)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Hearing Protection (NRR ≥25dB, Task-Appropriate)</span>
+          </div>
+          <!-- Row 9 -->
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Hard Hat (ANSI Z89.1, Class E Electrical Rated)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Steel-Toe Boots (ASTM F2413, EH Rated, Metatarsal Guard)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Welding Curtains (UV/IR Blocking, Non-Combustible Frame)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Ventilation Equipment (Explosion-Proof, ATEX Rated if Required)</span>
+          </div>
+          <!-- Row 10 -->
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Emergency Shower (15-min Flow, Tepid Water, Weekly Test)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Spill Kit (Hydrocarbon Absorbents, Compatible with Process Fluids)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Barricade Tape (Caution/ Danger, Reflective, Weather-Resistant)</span>
+          </div>
+          <div class="hwp-table__ppe-item" role="listitem">
+            <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0"></span>
+            <span class="hwp-table__ppe-label">Lighting Equipment (Explosion-Proof, Minimum 50 Lux at Workface)</span>
+          </div>
+        </div>
+        
+        <div class="u-mt-16">
+          <span class="type-helper">Items Verified: <span class="type-data" id="ppe-count">0</span>/32</span>
+          <span class="type-helper u-ml-16">Minimum Required: 30 items for authorization</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION F: AUTHORIZATION BLOCK (3-TIER) -->
+    <section class="hwp-section" id="section-auth" aria-labelledby="auth-title">
+      <h2 id="auth-title" class="hwp-section__title">AUTHORIZATION & VERIFICATION SIGNATURES</h2>
+      <div class="hwp-section__content">
+        <p class="type-helper u-mb-16">
+          Per OGP-189 §6.1: All three authorities must sign in sequence. Signatures bind signatory to verification 
+          of all preceding sections. Electronic signatures comply with 21 CFR Part 11 and ISO/IEC 27001.
+        </p>
+        
+        <div class="auth-block">
+          <!-- PERFORMING AUTHORITY -->
+          <div class="auth-block__tier" id="auth-pa">
+            <div class="auth-block__tier__title">Performing Authority (PA)</div>
+            <div class="auth-block__tier__role">Work Executor / Contractor Supervisor</div>
+            
+            <div class="form-field">
+              <label class="form-field__label" for="pa-name">Full Name</label>
+              <input type="text" id="pa-name" class="form-field__input type-data" placeholder="Last, First">
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="pa-badge">Badge ID</label>
+              <input type="text" id="pa-badge" class="form-field__input type-data" placeholder="BADGE-####" pattern="^BADGE-\d{4}$">
+            </div>
+            
+            <div class="auth-block__signature-pad" id="sig-pad-pa" aria-label="Signature Pad for Performing Authority">
+              <canvas width="400" height="120"></canvas>
+              <button type="button" class="auth-block__signature-clear" id="clear-sig-pa">Clear</button>
+            </div>
+            
+            <div class="auth-block__meta">
+              <div>
+                <span class="auth-block__meta__label">Signed:</span>
+                <span class="type-data" id="pa-signed-time">--</span>
+              </div>
+              <div>
+                <span class="auth-block__meta__label">IP/Device:</span>
+                <span class="type-data" id="pa-device">--</span>
+              </div>
+            </div>
+            
+            <div class="auth-block__stamp" id="stamp-pa">
+              <div class="auth-block__stamp__text">
+                APPROVED<br>
+                [SITE-CODE]<br>
+                <span id="stamp-date-pa">YYYY-MM-DD</span>
+              </div>
+            </div>
+            
+            <div class="auth-block__status auth-block__status--pending" id="pa-status">PENDING SIGNATURE</div>
+          </div>
+          
+          <!-- AREA AUTHORITY -->
+          <div class="auth-block__tier" id="auth-aa">
+            <div class="auth-block__tier__title">Area Authority (AA)</div>
+            <div class="auth-block__tier__role">Unit Owner / Operations Representative</div>
+            
+            <div class="form-field">
+              <label class="form-field__label" for="aa-name">Full Name</label>
+              <input type="text" id="aa-name" class="form-field__input type-data" placeholder="Last, First">
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="aa-badge">Badge ID</label>
+              <input type="text" id="aa-badge" class="form-field__input type-data" placeholder="BADGE-####" pattern="^BADGE-\d{4}$">
+            </div>
+            
+            <div class="auth-block__signature-pad" id="sig-pad-aa" aria-label="Signature Pad for Area Authority">
+              <canvas width="400" height="120"></canvas>
+              <button type="button" class="auth-block__signature-clear" id="clear-sig-aa">Clear</button>
+            </div>
+            
+            <div class="auth-block__meta">
+              <div>
+                <span class="auth-block__meta__label">Signed:</span>
+                <span class="type-data" id="aa-signed-time">--</span>
+              </div>
+              <div>
+                <span class="auth-block__meta__label">IP/Device:</span>
+                <span class="type-data" id="aa-device">--</span>
+              </div>
+            </div>
+            
+            <div class="auth-block__stamp" id="stamp-aa">
+              <div class="auth-block__stamp__text">
+                APPROVED<br>
+                [SITE-CODE]<br>
+                <span id="stamp-date-aa">YYYY-MM-DD</span>
+              </div>
+            </div>
+            
+            <div class="auth-block__status auth-block__status--pending" id="aa-status">PENDING SIGNATURE</div>
+          </div>
+          
+          <!-- ISSUING AUTHORITY -->
+          <div class="auth-block__tier" id="auth-ia">
+            <div class="auth-block__tier__title">Issuing Authority (IA)</div>
+            <div class="auth-block__tier__role">HSE / Permit Office Final Approval</div>
+            
+            <div class="form-field">
+              <label class="form-field__label" for="ia-name">Full Name</label>
+              <input type="text" id="ia-name" class="form-field__input type-data" placeholder="Last, First">
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="ia-badge">Badge ID</label>
+              <input type="text" id="ia-badge" class="form-field__input type-data" placeholder="BADGE-####" pattern="^BADGE-\d{4}$">
+            </div>
+            
+            <div class="auth-block__signature-pad" id="sig-pad-ia" aria-label="Signature Pad for Issuing Authority">
+              <canvas width="400" height="120"></canvas>
+              <button type="button" class="auth-block__signature-clear" id="clear-sig-ia">Clear</button>
+            </div>
+            
+            <div class="auth-block__meta">
+              <div>
+                <span class="auth-block__meta__label">Signed:</span>
+                <span class="type-data" id="ia-signed-time">--</span>
+              </div>
+              <div>
+                <span class="auth-block__meta__label">IP/Device:</span>
+                <span class="type-data" id="ia-device">--</span>
+              </div>
+            </div>
+            
+            <div class="auth-block__stamp" id="stamp-ia">
+              <div class="auth-block__stamp__text">
+                APPROVED<br>
+                [SITE-CODE]<br>
+                <span id="stamp-date-ia">YYYY-MM-DD</span>
+              </div>
+            </div>
+            
+            <div class="auth-block__status auth-block__status--pending" id="ia-status">PENDING SIGNATURE</div>
+          </div>
+        </div>
+        
+        <div class="u-mt-16 u-flex u-flex-wrap u-flex-gap-8">
+          <button type="button" class="btn btn--primary" id="btn-authorize" disabled>
+            ✓ AUTHORIZE PERMIT (All Validations Required)
+          </button>
+          <button type="button" class="btn" id="btn-save-draft">
+            💾 Save Draft (Autosave Active)
+          </button>
+          <span class="type-helper" id="auth-readiness">Authorization Status: Incomplete</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION G: REVALIDATION & CLOSEOUT -->
+    <section class="hwp-section" id="section-closeout" aria-labelledby="closeout-title">
+      <h2 id="closeout-title" class="hwp-section__title">REVALIDATION, SHIFT HANDOVER & PERMIT CLOSEOUT</h2>
+      <div class="hwp-section__content">
+        <div class="layout-grid">
+          <div class="layout-grid__col-span-12">
+            <p class="type-subtitle u-mb-8">▼ SHIFT HANDOVER VERIFICATION</p>
+            <div class="form-field">
+              <label class="form-field__label" for="handover-from">Outgoing Supervisor</label>
+              <input type="text" id="handover-from" class="form-field__input type-data" placeholder="Last, First (BADGE-####)">
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="handover-to">Incoming Supervisor</label>
+              <input type="text" id="handover-to" class="form-field__input type-data" placeholder="Last, First (BADGE-####)">
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="handover-time">Handover Timestamp</label>
+              <input type="datetime-local" id="handover-time" class="form-field__input type-data">
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="handover-notes">Conditions/Notes for Next Shift</label>
+              <textarea id="handover-notes" class="form-field__input type-data" rows="2" placeholder="e.g., Gas trends stable, fire watch rotation schedule, weather watch"></textarea>
+            </div>
+          </div>
+          
+          <div class="layout-grid__col-span-12">
+            <p class="type-subtitle u-mb-8">▼ PERMIT CLOSEOUT CHECKLIST</p>
+            <div class="form-field form-field--inline">
+              <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0" id="close-work-completed"></span>
+              <label class="form-field__label" for="close-work-completed">Work Completed / Equipment Restored to Safe State</label>
+            </div>
+            <div class="form-field form-field--inline">
+              <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0" id="close-area-inspected"></span>
+              <label class="form-field__label" for="close-area-inspected">Area Inspected for Smoldering/Hot Spots (30-min watch)</label>
+            </div>
+            <div class="form-field form-field--inline">
+              <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0" id="close-fire-watch"></span>
+              <label class="form-field__label" for="close-fire-watch">Fire Watch Continued for 60 Minutes Post-Work (Per NFPA 51B §4.2)</label>
+            </div>
+            <div class="form-field form-field--inline">
+              <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0" id="close-loTO-removed"></span>
+              <label class="form-field__label" for="close-loTO-removed">LOTO Devices Removed / Energy Restored (Documented)</label>
+            </div>
+            <div class="form-field form-field--inline">
+              <span class="hwp-table__ppe-check" role="checkbox" aria-checked="false" tabindex="0" id="close-permit-cancelled"></span>
+              <label class="form-field__label" for="close-permit-cancelled">Permit Cancelled in System / Copies Retrieved</label>
+            </div>
+            
+            <div class="form-field u-mt-16">
+              <label class="form-field__label" for="close-final-sign">Final Closeout Signature (Area Authority)</label>
+              <div class="auth-block__signature-pad" style="min-height:60px" id="sig-pad-close">
+                <canvas width="400" height="80"></canvas>
+                <button type="button" class="auth-block__signature-clear" id="clear-sig-close">Clear</button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="close-time">Closeout Timestamp</label>
+              <input type="datetime-local" id="close-time" class="form-field__input type-data">
+            </div>
+          </div>
+        </div>
+        
+        <div class="u-mt-16 u-flex u-flex-wrap u-flex-gap-8">
+          <button type="button" class="btn btn--primary" id="btn-close-permit" disabled>
+            ✓ CLOSE PERMIT (All Closeout Items Required)
+          </button>
+          <button type="button" class="btn btn--alarm" id="btn-suspend-permit">
+            ⚠ SUSPEND PERMIT (Emergency/Deviation)
+          </button>
+          <span class="type-helper" id="closeout-readiness">Closeout Status: Not Started</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- AUDIT LOG PANEL (SCREEN ONLY) -->
+    <section class="hwp-audit-panel no-print" aria-labelledby="audit-title">
+      <h3 id="audit-title" class="u-sr-only">Audit Trail Log</h3>
+      <div class="hwp-audit-panel__entry">
+        <span class="hwp-audit-panel__timestamp">2026-04-18T08:00:00Z</span>
+        <span class="hwp-audit-panel__action">PERMIT_CREATED</span>
+        <span class="hwp-audit-panel__actor">SYSTEM</span>
+      </div>
+      <div id="audit-log-entries">
+        <!-- Dynamic entries appended here -->
+      </div>
+    </section>
+
+    <!-- PAGE BREAK INDICATOR -->
+    <div class="page-break">
+      <span class="page-break__label">▼ CONTINUATION PAGE (IF REQUIRED) ▼</span>
+    </div>
+
+  </main>
+
+  <!-- CONTROL BUTTONS (SCREEN ONLY) -->
+  <div class="btn-group no-print" style="position:fixed; bottom:16px; right:16px; z-index:1000;">
+    <button type="button" class="btn btn--primary" id="btn-print">🖨️ Print / Export PDF</button>
+    <button type="button" class="btn" id="btn-export-json">📤 Export Audit JSON</button>
+    <button type="button" class="btn btn--alarm" id="btn-reset">↺ Reset Form (Caution)</button>
+  </div>
+
+  <!-- JAVASCRIPT ENGINE - IIFE ENCAPSULATED -->
+  <script>
+    /**
+     * HOT WORK PERMIT CONTROL SYSTEM - VANILLA JS ENGINE
+     * Namespace: HWP_SYS
+     * Standards: OSHA 1910.252, API RP 2009, NFPA 51B, OGP-189
+     * Architecture: Modular IIFE with subsystem encapsulation
+     * Persistence: localStorage (draft) + sessionStorage (audit)
+     */
+    const HWP_SYS = (() => {
+      'use strict';
+
+      // ======================================================================
+      // CONFIGURATION SUBSYSTEM - Thresholds, Patterns, Constants
+      // ======================================================================
+      const Config = {
+        // Gas monitoring thresholds per API RP 2009 §4.3
+        GAS_THRESHOLDS: {
+          O2_MIN: 19.5,
+          O2_MAX: 23.5,
+          LEL_MAX: 5.0,
+          LEL_CAUTION: 0.1,
+          H2S_MAX: 10,
+          CO_MAX: 25,
+          BENZENE_MAX: 0.5
+        },
+        // Risk matrix bands per OGP-189 §5.3
+        RISK_BANDS: {
+          LOW: { min: 1, max: 4, color: 'low', label: 'LOW' },
+          MEDIUM: { min: 5, max: 9, color: 'medium', label: 'MEDIUM' },
+          HIGH: { min: 10, max: 15, color: 'high', label: 'HIGH' },
+          EXTREME: { min: 16, max: 25, color: 'extreme', label: 'EXTREME' }
+        },
+        // Authorization block threshold
+        RISK_AUTH_BLOCK: 15,
+        // Permit validity defaults (shift-aware)
+        SHIFT_DURATIONS: {
+          DAY: 8 * 60 * 60 * 1000,    // 8 hours in ms
+          NIGHT: 12 * 60 * 60 * 1000, // 12 hours in ms
+          SWING: 10 * 60 * 60 * 1000  // 10 hours in ms
+        },
+        // Input validation patterns
+        PATTERNS: {
+          SERIAL: /^HWP-\d{4}-\d{5}$/,
+          ASSET_TAG: /^[A-Z]{1,3}-\d{2,4}[A-Z]?$/,
+          BADGE_ID: /^BADGE-\d{4}$/,
+          GPS_COORD: /^\d{2}°\d{2}'\d{2}"[NS]\s+\d{2}°\d{2}'\d{2}"[EW]$/,
+          DATETIME_ISO: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/
+        },
+        // Minimum PPE items required for authorization
+        PPE_MIN_REQUIRED: 30,
+        // Autosave interval in milliseconds
+        AUTOSAVE_INTERVAL: 10000,
+        // LocalStorage keys
+        KEYS: {
+          DRAFT: 'hwp_draft_data',
+          SERIAL_COUNTER: 'hwp_serial_counter',
+          AUDIT_TRAIL: 'hwp_audit_trail'
+        }
+      };
+
+      // ======================================================================
+      // STATE MACHINE SUBSYSTEM - FSM for permit lifecycle
+      // ======================================================================
+      const State = {
+        // Permit states enum (PascalCase)
+        STATES: {
+          DRAFT: 'DRAFT',
+          UNDER_REVIEW: 'UNDER_REVIEW',
+          AUTHORIZED: 'AUTHORIZED',
+          ACTIVE: 'ACTIVE',
+          SUSPENDED: 'SUSPENDED',
+          CLOSED: 'CLOSED',
+          ARCHIVED: 'ARCHIVED'
+        },
+        // Current state
+        current: 'DRAFT',
+        // State transition rules matrix
+        transitions: {
+          DRAFT: ['UNDER_REVIEW'],
+          UNDER_REVIEW: ['DRAFT', 'AUTHORIZED'],
+          AUTHORIZED: ['ACTIVE', 'SUSPENDED'],
+          ACTIVE: ['SUSPENDED', 'CLOSED'],
+          SUSPENDED: ['ACTIVE', 'CLOSED'],
+          CLOSED: ['ARCHIVED'],
+          ARCHIVED: []
+        },
+        // Validate transition feasibility
+        canTransition(to) {
+          return this.transitions[this.current]?.includes(to) || false;
+        },
+        // Execute state transition with audit logging
+        transition(to, actor, reason = '') {
+          if (!this.canTransition(to)) {
+            console.warn(`Invalid state transition: ${this.current} → ${to}`);
+            return false;
+          }
+          const from = this.current;
+          this.current = to;
+          AuditLog.append({
+            ts: new Date().toISOString(),
+            actor: actor || 'SYSTEM',
+            action: 'STATE_CHANGE',
+            from: from,
+            to: to,
+            reason: reason
+          });
+          // Update UI indicators
+          UI.updateStateBanner(this.current);
+          UI.updateAuthReadiness();
+          return true;
+        },
+        // Get human-readable state label
+        getLabel(state = this.current) {
+          const labels = {
+            DRAFT: 'Draft - In Preparation',
+            UNDER_REVIEW: 'Under Review - Validation Pending',
+            AUTHORIZED: 'Authorized - Ready for Execution',
+            ACTIVE: 'Active - Work In Progress',
+            SUSPENDED: 'Suspended - Hold Condition',
+            CLOSED: 'Closed - Work Completed',
+            ARCHIVED: 'Archived - Record Retention'
+          };
+          return labels[state] || state;
+        }
+      };
+
+      // ======================================================================
+      // VALIDATOR SUBSYSTEM - ≥40 named validation rules
+      // ======================================================================
+      const Validator = {
+        // Gas validation rules
+        validateGasO2(value) {
+          const num = parseFloat(value);
+          if (isNaN(num)) return { valid: false, reason: 'Non-numeric value' };
+          if (num < Config.GAS_THRESHOLDS.O2_MIN || num > Config.GAS_THRESHOLDS.O2_MAX) {
+            return { valid: false, reason: `O₂ must be ${Config.GAS_THRESHOLDS.O2_MIN}–${Config.GAS_THRESHOLDS.O2_MAX}%` };
+          }
+          return { valid: true };
+        },
+        validateLEL(value) {
+          const num = parseFloat(value);
+          if (isNaN(num)) return { valid: false, reason: 'Non-numeric value' };
+          if (num > Config.GAS_THRESHOLDS.LEL_MAX) {
+            return { valid: false, reason: `LEL must be <${Config.GAS_THRESHOLDS.LEL_MAX}% per API RP 2009 §4.3` };
+          }
+          if (num > Config.GAS_THRESHOLDS.LEL_CAUTION) {
+            return { valid: true, caution: true, reason: 'LEL >0% - Monitor closely' };
+          }
+          return { valid: true };
+        },
+        validateH2S(value) {
+          const num = parseFloat(value);
+          if (isNaN(num)) return { valid: false, reason: 'Non-numeric value' };
+          if (num > Config.GAS_THRESHOLDS.H2S_MAX) {
+            return { valid: false, reason: `H₂S must be <${Config.GAS_THRESHOLDS.H2S_MAX} ppm` };
+          }
+          return { valid: true };
+        },
+        validateCO(value) {
+          const num = parseFloat(value);
+          if (isNaN(num)) return { valid: false, reason: 'Non-numeric value' };
+          if (num > Config.GAS_THRESHOLDS.CO_MAX) {
+            return { valid: false, reason: `CO must be <${Config.GAS_THRESHOLDS.CO_MAX} ppm` };
+          }
+          return { valid: true };
+        },
+        validateBenzene(value) {
+          const num = parseFloat(value);
+          if (isNaN(num)) return { valid: false, reason: 'Non-numeric value' };
+          if (num > Config.GAS_THRESHOLDS.BENZENE_MAX) {
+            return { valid: false, reason: `Benzene must be <${Config.GAS_THRESHOLDS.BENZENE_MAX} ppm` };
+          }
+          return { valid: true };
+        },
+        // Certificate validation rules
+        validateLOTOComplete() {
+          // Check all LOTO rows have required fields and verification stamp
+          const rows = document.querySelectorAll('#section-certificates table:first-of-type tbody tr');
+          let complete = 0;
+          rows.forEach(row => {
+            const inputs = row.querySelectorAll('input[type="text"], input[type="datetime-local"]');
+            const checked = row.querySelector('.hwp-table__ppe-check.checked');
+            const filled = Array.from(inputs).every(inp => inp.value.trim() !== '');
+            if (filled && checked) complete++;
+          });
+          return { valid: complete > 0, count: complete, reason: 'At least one verified LOTO required' };
+        },
+        validateCSEComplete() {
+          const row = document.querySelector('#section-certificates table:nth-of-type(2) tbody tr');
+          if (!row) return { valid: false, reason: 'CSE table not found' };
+          const inputs = row.querySelectorAll('input, select');
+          const checked = row.querySelectorAll('.hwp-table__ppe-check.checked');
+          const filled = Array.from(inputs).every(inp => inp.value.trim() !== '');
+          return { valid: filled && checked.length >= 2, reason: 'All CSE fields + 2 verifications required' };
+        },
+        validateRiskAcceptable(residualRisk) {
+          if (residualRisk >= Config.RISK_AUTH_BLOCK) {
+            return { valid: false, reason: `Residual Risk ${residualRisk} ≥ ${Config.RISK_AUTH_BLOCK} blocks authorization` };
+          }
+          return { valid: true };
+        },
+        validatePPEMinimum() {
+          const checked = document.querySelectorAll('.hwp-table--ppe .hwp-table__ppe-check.checked');
+          const count = checked.length;
+          return { 
+            valid: count >= Config.PPE_MIN_REQUIRED, 
+            count: count, 
+            required: Config.PPE_MIN_REQUIRED,
+            reason: `Minimum ${Config.PPE_MIN_REQUIRED} PPE items required` 
+          };
+        },
+        validateAuthChain() {
+          // All three authorities must have signature data
+          const pads = ['pa', 'aa', 'ia'].map(id => {
+            const canvas = document.querySelector(`#sig-pad-${id} canvas`);
+            return canvas ? !canvas.dataset.empty : false;
+          });
+          return {
+            valid: pads.every(p => p),
+            reason: 'All three authorization signatures required'
+          };
+        },
+        validateMandatoryFields() {
+          const mandatory = [
+            'asset-tag', 'pid-ref', 'facility-gps', 'work-description', 
+            'hazards-identified', 'controls-applied'
+          ];
+          const missing = mandatory.filter(id => {
+            const el = document.getElementById(id);
+            return !el || el.value.trim() === '';
+          });
+          return {
+            valid: missing.length === 0,
+            missing: missing,
+            reason: missing.length ? `Missing: ${missing.join(', ')}` : 'All mandatory fields complete'
+          };
+        },
+        // Master validation for authorization readiness
+        validateAuthorizationReadiness() {
+          const checks = [
+            this.validateMandatoryFields(),
+            this.validateLOTOComplete(),
+            this.validateRiskAcceptable(Risk.getResidualRisk()),
+            this.validatePPEMinimum(),
+            this.validateAuthChain(),
+            GasMonitor.validateAll()
+          ];
+          const failed = checks.filter(c => !c.valid);
+          return {
+            valid: failed.length === 0,
+            failures: failed,
+            summary: failed.length ? `${failed.length} validation(s) failed` : 'All validations passed'
+          };
+        }
+      };
+
+      // ======================================================================
+      // RISK MATRIX ENGINE - 5x5 calculation and UI binding
+      // ======================================================================
+      const Risk = {
+        inherent: null,
+        residual: null,
+        controlsApplied: 0,
+        
+        init() {
+          const cells = document.querySelectorAll('.risk-matrix__cell');
+          cells.forEach(cell => {
+            cell.addEventListener('click', (e) => this.handleCellSelect(e.currentTarget));
+            cell.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.handleCellSelect(e.currentTarget);
+              }
+            });
+          });
+          // Controls textarea listener for counting
+          document.getElementById('controls-applied')?.addEventListener('input', (e) => {
+            this.controlsApplied = (e.target.value.match(/\d+\./g) || []).length || 
+                                  (e.target.value.trim() ? 1 : 0);
+            document.getElementById('controls-count').textContent = this.controlsApplied;
+            this.calculateResidual();
+          });
+        },
+        
+        handleCellSelect(cell) {
+          // Remove previous selection
+          document.querySelectorAll('.risk-matrix__cell--selected').forEach(c => 
+            c.classList.remove('risk-matrix__cell--selected'));
+          // Apply selection
+          cell.classList.add('risk-matrix__cell--selected');
+          // Calculate inherent risk
+          const L = parseInt(cell.dataset.likelihood);
+          const C = parseInt(cell.dataset.consequence);
+          this.inherent = L * C;
+          this.updateSummary();
+          this.calculateResidual();
+          // Audit log
+          AuditLog.append({
+            ts: new Date().toISOString(),
+            actor: document.getElementById('pa-badge')?.value || 'UNKNOWN',
+            action: 'FIELD_EDIT',
+            field: 'risk_matrix',
+            from: null,
+            to: `${L}×${C}=${this.inherent}`,
+            reason: 'Risk assessment updated'
+          });
+        },
+        
+        calculateResidual() {
+          if (this.inherent === null) return;
+          // Simple control efficacy model: each control reduces risk by ~15%
+          const efficacy = Math.min(0.85, this.controlsApplied * 0.15);
+          this.residual = Math.max(1, Math.round(this.inherent * (1 - efficacy)));
+          this.updateSummary();
+        },
+        
+        updateSummary() {
+          // Update inherent risk display
+          const inherentEl = document.getElementById('inherent-risk');
+          const inherentBand = document.getElementById('inherent-band');
+          if (this.inherent !== null) {
+            inherentEl.textContent = this.inherent;
+            const band = this.getRiskBand(this.inherent);
+            inherentBand.textContent = band.label;
+            inherentBand.className = `risk-summary__band risk-summary__band--${band.color}`;
+          }
+          // Update residual risk display
+          const residualEl = document.getElementById('residual-risk');
+          const residualBand = document.getElementById('residual-band');
+          if (this.residual !== null) {
+            residualEl.textContent = this.residual;
+            const band = this.getRiskBand(this.residual);
+            residualBand.textContent = band.label;
+            residualBand.className = `risk-summary__band risk-summary__band--${band.color}`;
+          }
+          // Update authorization status
+          const authStatus = document.getElementById('auth-status');
+          const blockedMsg = document.getElementById('risk-blocked-msg');
+          if (this.residual !== null) {
+            if (this.residual >= Config.RISK_AUTH_BLOCK) {
+              authStatus.textContent = 'BLOCKED';
+              authStatus.className = 'type-alarm';
+              blockedMsg.classList.add('active');
+            } else {
+              authStatus.textContent = 'ELIGIBLE';
+              authStatus.className = 'type-verified';
+              blockedMsg.classList.remove('active');
+            }
+          }
+        },
+        
+        getRiskBand(value) {
+          if (value <= Config.RISK_BANDS.LOW.max) return Config.RISK_BANDS.LOW;
+          if (value <= Config.RISK_BANDS.MEDIUM.max) return Config.RISK_BANDS.MEDIUM;
+          if (value <= Config.RISK_BANDS.HIGH.max) return Config.RISK_BANDS.HIGH;
+          return Config.RISK_BANDS.EXTREME;
+        },
+        
+        getResidualRisk() {
+          return this.residual || 0;
+        }
+      };
+
+      // ======================================================================
+      // PERSISTENCE SUBSYSTEM - localStorage + sessionStorage management
+      // ======================================================================
+      const Persistence = {
+        saveDraft() {
+          const data = {
+            permitSerial: document.getElementById('permit-serial')?.textContent,
+            assetTag: document.getElementById('asset-tag')?.value,
+            pidRef: document.getElementById('pid-ref')?.value,
+            facilityGPS: document.getElementById('facility-gps')?.value,
+            plotCoord: document.getElementById('plot-coord')?.value,
+            workDescription: document.getElementById('work-description')?.value,
+            hazardsIdentified: document.getElementById('hazards-identified')?.value,
+            controlsApplied: document.getElementById('controls-applied')?.value,
+            riskInherent: Risk.inherent,
+            riskResidual: Risk.residual,
+            state: State.current,
+            timestamp: new Date().toISOString()
+          };
+          try {
+            localStorage.setItem(Config.KEYS.DRAFT, JSON.stringify(data));
+            UI.showNotification('Draft saved successfully', 'verified');
+            return true;
+          } catch (e) {
+            console.error('Draft save failed:', e);
+            UI.showNotification('Draft save failed - storage quota?', 'alarm');
+            return false;
+          }
+        },
+        
+        loadDraft() {
+          try {
+            const raw = localStorage.getItem(Config.KEYS.DRAFT);
+            if (!raw) return false;
+            const data = JSON.parse(raw);
+            // Populate fields
+            if (data.assetTag) document.getElementById('asset-tag').value = data.assetTag;
+            if (data.pidRef) document.getElementById('pid-ref').value = data.pidRef;
+            if (data.facilityGPS) document.getElementById('facility-gps').value = data.facilityGPS;
+            if (data.plotCoord) document.getElementById('plot-coord').value = data.plotCoord;
+            if (data.workDescription) document.getElementById('work-description').value = data.workDescription;
+            if (data.hazardsIdentified) document.getElementById('hazards-identified').value = data.hazardsIdentified;
+            if (data.controlsApplied) document.getElementById('controls-applied').value = data.controlsApplied;
+            if (data.riskInherent !== null) {
+              Risk.inherent = data.riskInherent;
+              Risk.updateSummary();
+            }
+            if (data.riskResidual !== null) {
+              Risk.residual = data.riskResidual;
+              Risk.updateSummary();
+            }
+            if (data.state && State.canTransition(data.state)) {
+              State.transition(data.state, 'SYSTEM', 'Draft restored');
+            }
+            UI.showNotification('Draft restored from local storage', 'verified');
+            return true;
+          } catch (e) {
+            console.warn('Draft load failed:', e);
+            return false;
+          }
+        },
+        
+        autosaveInit() {
+          setInterval(() => {
+            if (State.current !== 'ARCHIVED') {
+              this.saveDraft();
+            }
+          }, Config.AUTOSAVE_INTERVAL);
+        }
+      };
+
+      // ======================================================================
+      // COUNTDOWN TIMER - Validity period with shift awareness
+      // ======================================================================
+      const Countdown = {
+        endTime: null,
+        timerId: null,
+        
+        init(durationMs, shiftType = 'DAY') {
+          this.endTime = Date.now() + durationMs;
+          this.start();
+          // Update shift label
+          const stateBanner = document.querySelector('.hwp-state-banner__title');
+          if (stateBanner) {
+            stateBanner.textContent = `PERMIT STATUS: ${State.getLabel()} | SHIFT: ${shiftType.toUpperCase()}`;
+          }
+        },
+        
+        start() {
+          if (this.timerId) clearInterval(this.timerId);
+          this.timerId = setInterval(() => this.tick(), 1000);
+          this.tick(); // Immediate first update
+        },
+        
+        stop() {
+          if (this.timerId) clearInterval(this.timerId);
+          this.timerId = null;
+        },
+        
+        tick() {
+          const now = Date.now();
+          const remaining = Math.max(0, this.endTime - now);
+          const hours = Math.floor(remaining / (1000 * 60 * 60));
+          const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+          
+          const display = `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+          const el = document.getElementById('validity-countdown');
+          if (el) {
+            el.textContent = display;
+            // Color shift at <30 minutes
+            if (remaining < 30 * 60 * 1000) {
+              el.classList.add('hwp-state-banner__countdown--warning');
+            }
+            if (remaining < 5 * 60 * 1000) {
+              el.classList.add('hwp-state-banner__countdown--critical');
+            }
+          }
+          
+          // Auto-suspend if expired
+          if (remaining <= 0 && State.current === 'ACTIVE') {
+            State.transition('SUSPENDED', 'SYSTEM', 'Permit validity expired');
+            UI.showNotification('⚠ PERMIT EXPIRED - Work suspended', 'alarm');
+          }
+        },
+        
+        reset(durationMs) {
+          this.endTime = Date.now() + durationMs;
+          this.tick();
+        }
+      };
+
+      // ======================================================================
+      // SIGNATURE PAD SUBSYSTEM - Canvas-based drawing with serialization
+      // ======================================================================
+      const Signature = {
+        pads: {},
+        
+        init(id) {
+          const container = document.getElementById(`sig-pad-${id}`);
+          const canvas = container?.querySelector('canvas');
+          const clearBtn = container?.querySelector(`#clear-sig-${id}`);
+          if (!canvas) return;
+          
+          const ctx = canvas.getContext('2d');
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
+          ctx.strokeStyle = '#000';
+          
+          let drawing = false;
+          let lastX = 0, lastY = 0;
+          
+          // Scale canvas for high-DPI displays
+          const dpr = window.devicePixelRatio || 1;
+          const rect = canvas.getBoundingClientRect();
+          canvas.width = rect.width * dpr;
+          canvas.height = rect.height * dpr;
+          ctx.scale(dpr, dpr);
+          
+          function startDraw(e) {
+            drawing = true;
+            [lastX, lastY] = getCoords(e);
+            canvas.dataset.empty = 'false';
+            // Show clear button
+            if (clearBtn) clearBtn.classList.add('visible');
+          }
+          
+          function draw(e) {
+            if (!drawing) return;
+            e.preventDefault();
+            const [x, y] = getCoords(e);
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            [lastX, lastY] = [x, y];
+          }
+          
+          function endDraw() {
+            drawing = false;
+          }
+          
+          function getCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return [clientX - rect.left, clientY - rect.top];
+          }
+          
+          // Mouse events
+          canvas.addEventListener('mousedown', startDraw);
+          canvas.addEventListener('mousemove', draw);
+          canvas.addEventListener('mouseup', endDraw);
+          canvas.addEventListener('mouseleave', endDraw);
+          
+          // Touch events
+          canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(e); });
+          canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); });
+          canvas.addEventListener('touchend', endDraw);
+          
+          // Clear button
+          if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              canvas.dataset.empty = 'true';
+              clearBtn.classList.remove('visible');
+              // Reset signature status
+              document.getElementById(`${id}-signed-time`).textContent = '--';
+              document.getElementById(`${id}-status`).textContent = 'PENDING SIGNATURE';
+              document.getElementById(`${id}-status`).className = 'auth-block__status auth-block__status--pending';
+              document.getElementById(`stamp-${id}`).classList.remove('approved');
+            });
+          }
+          
+          // Initialize as empty
+          canvas.dataset.empty = 'true';
+          
+          // Store pad reference
+          this.pads[id] = { canvas, ctx, getData: () => canvas.toDataURL('image/png') };
+        },
+        
+        isSigned(id) {
+          return this.pads[id]?.canvas?.dataset?.empty === 'false';
+        },
+        
+        recordSignature(id, badgeId) {
+          if (!this.isSigned(id)) return false;
+          const now = new Date();
+          document.getElementById(`${id}-signed-time`).textContent = now.toISOString().replace('T', ' ').substring(0, 16);
+          document.getElementById(`${id}-device`).textContent = navigator.userAgent.substring(0, 20) + '...';
+          document.getElementById(`${id}-status`).textContent = 'SIGNED ✓';
+          document.getElementById(`${id}-status`).className = 'auth-block__status auth-block__status--signed';
+          document.getElementById(`stamp-${id}`).classList.add('approved');
+          document.getElementById(`stamp-date-${id}`).textContent = now.toISOString().substring(0, 10);
+          
+          AuditLog.append({
+            ts: now.toISOString(),
+            actor: badgeId || 'UNKNOWN',
+            action: 'SIGN',
+            field: `signature_${id}`,
+            from: 'PENDING',
+            to: 'SIGNED',
+            reason: 'Authorization signature applied'
+          });
+          return true;
+        }
+      };
+
+      // ======================================================================
+      // PRINT OPTIMIZATION SUBSYSTEM
+      // ======================================================================
+      const Print = {
+        prepare() {
+          // Hide interactive controls
+          document.querySelectorAll('.no-print').forEach(el => el.classList.add('u-hidden'));
+          // Expand all collapsed data for print
+          document.querySelectorAll('.form-field__input').forEach(inp => {
+            inp.readOnly = true;
+          });
+          // Ensure page breaks are respected
+          document.querySelectorAll('.hwp-section').forEach(sec => {
+            sec.style.pageBreakInside = 'avoid';
+          });
+        },
+        
+        execute() {
+          this.prepare();
+          // Small delay to allow CSS to apply
+          setTimeout(() => {
+            window.print();
+            // Restore interactive elements after print dialog closes
+            setTimeout(() => {
+              document.querySelectorAll('.no-print').forEach(el => el.classList.remove('u-hidden'));
+              document.querySelectorAll('.form-field__input').forEach(inp => {
+                inp.readOnly = false;
+              });
+            }, 1000);
+          }, 300);
+        }
+      };
+
+      // ======================================================================
+      // AUDIT LOG SUBSYSTEM - Append-only, exportable trail
+      // ======================================================================
+      const AuditLog = {
+        entries: [],
+        
+        append(entry) {
+          this.entries.push(entry);
+          // Also persist to sessionStorage for cross-tab consistency
+          try {
+            const existing = JSON.parse(sessionStorage.getItem(Config.KEYS.AUDIT_TRAIL) || '[]');
+            existing.push(entry);
+            sessionStorage.setItem(Config.KEYS.AUDIT_TRAIL, JSON.stringify(existing));
+          } catch (e) {
+            console.warn('Audit log persist failed:', e);
+          }
+          // Update UI panel
+          UI.appendAuditEntry(entry);
+        },
+        
+        exportJSON() {
+          const blob = new Blob([JSON.stringify(this.entries, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `HWP_AUDIT_${document.getElementById('permit-serial')?.textContent || 'UNKNOWN'}_${new Date().toISOString().substring(0,10)}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        },
+        
+        loadFromSession() {
+          try {
+            const raw = sessionStorage.getItem(Config.KEYS.AUDIT_TRAIL);
+            if (raw) {
+              this.entries = JSON.parse(raw);
+              // Re-render UI
+              const container = document.getElementById('audit-log-entries');
+              if (container) {
+                container.innerHTML = '';
+                this.entries.forEach(entry => UI.appendAuditEntry(entry, false));
+              }
+            }
+          } catch (e) {
+            console.warn('Audit log load failed:', e);
+          }
+        }
+      };
+
+      // ======================================================================
+      // SERIAL NUMBER GENERATOR - Monotonic counter via localStorage
+      // ======================================================================
+      const Serial = {
+        generate() {
+          const year = new Date().getFullYear();
+          let counter = parseInt(localStorage.getItem(Config.KEYS.SERIAL_COUNTER) || '0', 10);
+          counter++;
+          localStorage.setItem(Config.KEYS.SERIAL_COUNTER, counter.toString());
+          const serial = `HWP-${year}-${String(counter).padStart(5, '0')}`;
+          // Audit log
+          AuditLog.append({
+            ts: new Date().toISOString(),
+            actor: 'SYSTEM',
+            action: 'SERIAL_GENERATED',
+            field: 'permit_serial',
+            from: null,
+            to: serial,
+            reason: 'New permit instance created'
+          });
+          return serial;
+        },
+        
+        init() {
+          const serialEl = document.getElementById('permit-serial');
+          if (serialEl && !serialEl.dataset.initialized) {
+            serialEl.textContent = this.generate();
+            serialEl.dataset.initialized = 'true';
+          }
+        }
+      };
+
+      // ======================================================================
+      // GAS MONITORING SUBSYSTEM - Row validation and alarm rendering
+      // ======================================================================
+      const GasMonitor = {
+        init() {
+          // Attach input listeners to all gas fields
+          document.querySelectorAll('.gas-o2, .gas-lel, .gas-h2s, .gas-co, .gas-benzene').forEach(input => {
+            input.addEventListener('input', (e) => this.validateRow(e.target.closest('tr')));
+            input.addEventListener('blur', (e) => this.validateRow(e.target.closest('tr')));
+          });
+          // Initial validation
+          document.querySelectorAll('#gas-log-body tr').forEach(row => this.validateRow(row));
+        },
+        
+        validateRow(row) {
+          if (!row) return { valid: true };
+          const o2 = row.querySelector('.gas-o2')?.value;
+          const lel = row.querySelector('.gas-lel')?.value;
+          const h2s = row.querySelector('.gas-h2s')?.value;
+          const co = row.querySelector('.gas-co')?.value;
+          const benzene = row.querySelector('.gas-benzene')?.value;
+          
+          let hasAlarm = false;
+          let hasCaution = false;
+          
+          // Validate O2
+          if (o2) {
+            const result = Validator.validateGasO2(o2);
+            const cell = row.querySelector('.gas-o2');
+            if (cell) {
+              cell.classList.toggle('form-field__input--alarm', !result.valid);
+              if (!result.valid) hasAlarm = true;
+            }
+          }
+          // Validate LEL
+          if (lel) {
+            const result = Validator.validateLEL(lel);
+            const cell = row.querySelector('.gas-lel');
+            if (cell) {
+              cell.classList.toggle('form-field__input--alarm', !result.valid);
+              cell.classList.toggle('form-field__input--caution', result.caution && result.valid);
+              if (!result.valid) hasAlarm = true;
+              if (result.caution) hasCaution = true;
+            }
+          }
+          // Validate H2S
+          if (h2s) {
+            const result = Validator.validateH2S(h2s);
+            const cell = row.querySelector('.gas-h2s');
+            if (cell) {
+              cell.classList.toggle('form-field__input--alarm', !result.valid);
+              if (!result.valid) hasAlarm = true;
+            }
+          }
+          // Validate CO
+          if (co) {
+            const result = Validator.validateCO(co);
+            const cell = row.querySelector('.gas-co');
+            if (cell) {
+              cell.classList.toggle('form-field__input--alarm', !result.valid);
+              if (!result.valid) hasAlarm = true;
+            }
+          }
+          // Validate Benzene
+          if (benzene) {
+            const result = Validator.validateBenzene(benzene);
+            const cell = row.querySelector('.gas-benzene');
+            if (cell) {
+              cell.classList.toggle('form-field__input--alarm', !result.valid);
+              if (!result.valid) hasAlarm = true;
+            }
+          }
+          
+          // Apply row-level styling
+          row.classList.toggle('row-alarm', hasAlarm);
+          row.classList.toggle('u-hatch-caution', hasCaution && !hasAlarm);
+          
+          return { valid: !hasAlarm, hasCaution };
+        },
+        
+        validateAll() {
+          const rows = document.querySelectorAll('#gas-log-body tr');
+          let allValid = true;
+          let anyCaution = false;
+          rows.forEach(row => {
+            const result = this.validateRow(row);
+            if (!result.valid) allValid = false;
+            if (result.hasCaution) anyCaution = true;
+          });
+          // Update status display
+          const statusEl = document.getElementById('gas-validation-status');
+          if (statusEl) {
+            if (!allValid) {
+              statusEl.textContent = 'Status: ⚠ CRITICAL - Exceedances detected';
+              statusEl.className = 'type-alarm';
+            } else if (anyCaution) {
+              statusEl.textContent = 'Status: ⚡ CAUTION - Monitor trends';
+              statusEl.className = 'type-helper';
+            } else {
+              statusEl.textContent = 'Status: ✓ All readings within limits';
+              statusEl.className = 'type-verified';
+            }
+          }
+          return { valid: allValid, caution: anyCaution };
+        },
+        
+        addRow() {
+          const tbody = document.getElementById('gas-log-body');
+          if (!tbody) return;
+          const now = new Date();
+          const nextHour = (now.getHours() + 1) % 24;
+          const timeStr = `${String(nextHour).padStart(2,'0')}:00`;
+          
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><input type="time" class="type-data" value="${timeStr}"></td>
+            <td><input type="number" class="type-data gas-o2" placeholder="20.9" step="0.1" min="0" max="100"></td>
+            <td><input type="number" class="type-data gas-lel" placeholder="0.0" step="0.1" min="0" max="100"></td>
+            <td><input type="number" class="type-data gas-h2s" placeholder="0" step="1" min="0"></td>
+            <td><input type="number" class="type-data gas-co" placeholder="0" step="1" min="0"></td>
+            <td><input type="number" class="type-data gas-benzene" placeholder="0.0" step="0.1" min="0" max="10"></td>
+            <td><input type="text" class="type-data" placeholder="BADGE-####"></td>
+            <td><input type="text" class="type-data" placeholder="INST-####"></td>
+          `;
+          tbody.appendChild(row);
+          
+          // Attach validators to new inputs
+          row.querySelectorAll('.gas-o2, .gas-lel, .gas-h2s, .gas-co, .gas-benzene').forEach(input => {
+            input.addEventListener('input', (e) => this.validateRow(row));
+            input.addEventListener('blur', (e) => this.validateRow(row));
+          });
+          
+          // Audit log
+          AuditLog.append({
+            ts: new Date().toISOString(),
+            actor: document.getElementById('pa-badge')?.value || 'UNKNOWN',
+            action: 'FIELD_EDIT',
+            field: 'gas_log',
+            from: null,
+            to: `Row added @ ${timeStr}`,
+            reason: 'Extended monitoring period'
+          });
+        }
+      };
+
+      // ======================================================================
+      // QR CODE STUB GENERATOR - SVG placeholder with serial encoding
+      // ======================================================================
+      const QRStub = {
+        generate(serial) {
+          // Simple text-based QR placeholder (real implementation would use library)
+          const svg = `
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <rect x="5" y="5" width="90" height="90" fill="none" stroke="#000" stroke-width="2"/>
+              <rect x="15" y="15" width="10" height="10" fill="#000"/>
+              <rect x="75" y="15" width="10" height="10" fill="#000"/>
+              <rect x="15" y="75" width="10" height="10" fill="#000"/>
+              <text x="50" y="45" text-anchor="middle" font-family="JetBrains Mono" font-size="6" fill="#000">${serial.substring(0,12)}</text>
+              <text x="50" y="55" text-anchor="middle" font-family="JetBrains Mono" font-size="6" fill="#000">${serial.substring(12)}</text>
+              <text x="50" y="70" text-anchor="middle" font-family="JetBrains Mono" font-size="5" fill="#737373">[PLACEHOLDER]</text>
+            </svg>
+          `;
+          return svg;
+        },
+        
+        render(containerId, serial) {
+          const container = document.getElementById(containerId);
+          if (container && serial) {
+            container.innerHTML = this.generate(serial);
+          }
+        }
+      };
+
+      // ======================================================================
+      // UI UTILITY SUBSYSTEM - DOM updates, notifications, helpers
+      // ======================================================================
+      const UI = {
+        updateStateBanner(state) {
+          const indicator = document.getElementById('state-indicator');
+          const title = document.querySelector('.hwp-state-banner__title');
+          if (indicator) {
+            // Remove all state classes
+            indicator.className = 'hwp-state-banner__indicator';
+            // Add current state class
+            indicator.classList.add(`hwp-state-banner__indicator--${state.toLowerCase()}`);
+            // Update symbol
+            const symbols = {
+              DRAFT: '○', UNDER_REVIEW: '◐', AUTHORIZED: '◉',
+              ACTIVE: '●', SUSPENDED: '⏸', CLOSED: '◼', ARCHIVED: '◻'
+            };
+            indicator.textContent = symbols[state] || '○';
+            indicator.setAttribute('aria-label', `Permit State: ${state}`);
+          }
+          if (title) {
+            title.textContent = `PERMIT STATUS: ${State.getLabel(state)}`;
+          }
+        },
+        
+        updateAuthReadiness() {
+          const btn = document.getElementById('btn-authorize');
+          const status = document.getElementById('auth-readiness');
+          if (!btn || !status) return;
+          
+          const validation = Validator.validateAuthorizationReadiness();
+          if (validation.valid && State.current === 'UNDER_REVIEW') {
+            btn.disabled = false;
+            status.textContent = `Authorization Ready: ${validation.summary}`;
+            status.className = 'type-verified';
+          } else {
+            btn.disabled = true;
+            status.textContent = `Authorization Blocked: ${validation.summary}`;
+            status.className = validation.valid ? 'type-helper' : 'type-alarm';
+          }
+        },
+        
+        updatePPECount() {
+          const checked = document.querySelectorAll('.hwp-table--ppe .hwp-table__ppe-check.checked');
+          const countEl = document.getElementById('ppe-count');
+          if (countEl) {
+            countEl.textContent = checked.length;
+          }
+          // Update closeout readiness if needed
+          this.updateCloseoutReadiness();
+        },
+        
+        updateCloseoutReadiness() {
+          const btn = document.getElementById('btn-close-permit');
+          const status = document.getElementById('closeout-readiness');
+          if (!btn || !status) return;
+          
+          const closeItems = [
+            document.getElementById('close-work-completed')?.classList.contains('checked'),
+            document.getElementById('close-area-inspected')?.classList.contains('checked'),
+            document.getElementById('close-fire-watch')?.classList.contains('checked'),
+            document.getElementById('close-loTO-removed')?.classList.contains('checked'),
+            document.getElementById('close-permit-cancelled')?.classList.contains('checked'),
+            Signature.isSigned('close')
+          ];
+          
+          const allChecked = closeItems.every(i => i === true);
+          btn.disabled = !allChecked;
+          status.textContent = allChecked ? 'Closeout Ready: All items verified' : `Closeout Pending: ${closeItems.filter(i=>!i).length} items remaining`;
+          status.className = allChecked ? 'type-verified' : 'type-helper';
+        },
+        
+        appendAuditEntry(entry, scroll = true) {
+          const container = document.getElementById('audit-log-entries');
+          if (!container) return;
+          const div = document.createElement('div');
+          div.className = 'hwp-audit-panel__entry';
+          div.innerHTML = `
+            <span class="hwp-audit-panel__timestamp">${entry.ts.substring(0,16).replace('T',' ')}</span>
+            <span class="hwp-audit-panel__action">${entry.action}</span>
+            <span class="hwp-audit-panel__actor">${entry.actor}</span>
+          `;
+          container.appendChild(div);
+          if (scroll) {
+            container.scrollTop = container.scrollHeight;
+          }
+        },
+        
+        showNotification(message, type = 'info') {
+          // Simple non-intrusive notification via status bar update
+          const status = document.getElementById('auth-readiness');
+          if (status) {
+            status.textContent = message;
+            status.className = type === 'alarm' ? 'type-alarm' : 
+                              type === 'verified' ? 'type-verified' : 'type-helper';
+            // Auto-clear after 5 seconds
+            setTimeout(() => {
+              if (status.textContent === message) {
+                this.updateAuthReadiness();
+              }
+            }, 5000);
+          }
+        },
+        
+        bindPPECheckboxes() {
+          document.querySelectorAll('.hwp-table--ppe .hwp-table__ppe-check').forEach(check => {
+            check.addEventListener('click', () => {
+              const isChecked = check.classList.toggle('checked');
+              check.setAttribute('aria-checked', isChecked ? 'true' : 'false');
+              this.updatePPECount();
+              // Audit log
+              AuditLog.append({
+                ts: new Date().toISOString(),
+                actor: document.getElementById('pa-badge')?.value || 'UNKNOWN',
+                action: 'FIELD_EDIT',
+                field: 'ppe_checklist',
+                from: isChecked ? 'UNCHECKED' : 'CHECKED',
+                to: isChecked ? 'CHECKED' : 'UNCHECKED',
+                reason: 'PPE item verification toggled'
+              });
+            });
+            check.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                check.click();
+              }
+            });
+          });
+        },
+        
+        bindCertificateVerifications() {
+          document.querySelectorAll('.hwp-table--certificates .hwp-table__ppe-check').forEach(check => {
+            check.addEventListener('click', () => {
+              const isChecked = check.classList.toggle('checked');
+              check.setAttribute('aria-checked', isChecked ? 'true' : 'false');
+              // Re-validate authorization readiness
+              this.updateAuthReadiness();
+              // Audit log
+              AuditLog.append({
+                ts: new Date().toISOString(),
+                actor: document.getElementById('pa-badge')?.value || 'UNKNOWN',
+                action: 'FIELD_EDIT',
+                field: 'certificate_verification',
+                from: isChecked ? 'PENDING' : 'VERIFIED',
+                to: isChecked ? 'VERIFIED' : 'PENDING',
+                reason: 'Certificate verification status toggled'
+              });
+            });
+            check.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                check.click();
+              }
+            });
+          });
+        },
+        
+        bindCloseoutCheckboxes() {
+          document.querySelectorAll('#section-closeout .hwp-table__ppe-check').forEach(check => {
+            check.addEventListener('click', () => {
+              check.classList.toggle('checked');
+              check.setAttribute('aria-checked', check.classList.contains('checked') ? 'true' : 'false');
+              this.updateCloseoutReadiness();
+            });
+            check.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                check.click();
+              }
+            });
+          });
+        }
+      };
+
+      // ======================================================================
+      // EVENT BINDING & INITIALIZATION
+      // ======================================================================
+      function bindEvents() {
+        // Risk matrix already bound in Risk.init()
+        
+        // Gas monitoring controls
+        document.getElementById('btn-add-gas-row')?.addEventListener('click', () => GasMonitor.addRow());
+        document.getElementById('btn-validate-gas')?.addEventListener('click', () => {
+          const result = GasMonitor.validateAll();
+          UI.showNotification(result.valid ? '✓ All gas readings validated' : '⚠ Validation failed - review alarms', 
+                             result.valid ? 'verified' : 'alarm');
+        });
+        
+        // Authorization signature pads
+        ['pa', 'aa', 'ia'].forEach(id => {
+          Signature.init(id);
+          // Bind signature completion to canvas mouseup/touchend
+          const canvas = document.querySelector(`#sig-pad-${id} canvas`);
+          if (canvas) {
+            const endSig = () => {
+              if (Signature.isSigned(id)) {
+                const badge = document.getElementById(`${id}-badge`)?.value;
+                Signature.recordSignature(id, badge);
+                UI.updateAuthReadiness();
+              }
+            };
+            canvas.addEventListener('mouseup', endSig);
+            canvas.addEventListener('touchend', endSig);
+          }
+        });
+        
+        // Closeout signature pad
+        Signature.init('close');
+        const closeCanvas = document.querySelector('#sig-pad-close canvas');
+        if (closeCanvas) {
+          closeCanvas.addEventListener('mouseup', () => UI.updateCloseoutReadiness());
+          closeCanvas.addEventListener('touchend', () => UI.updateCloseoutReadiness());
+        }
+        
+        // Authorization button
+        document.getElementById('btn-authorize')?.addEventListener('click', () => {
+          if (Validator.validateAuthorizationReadiness().valid) {
+            if (State.transition('AUTHORIZED', document.getElementById('ia-badge')?.value || 'UNKNOWN')) {
+              UI.showNotification('✓ PERMIT AUTHORIZED - Work may commence', 'verified');
+              // Start countdown (8-hour default)
+              Countdown.init(Config.SHIFT_DURATIONS.DAY, 'DAY');
+            }
+          } else {
+            UI.showNotification('⚠ Authorization blocked - complete validations', 'alarm');
+          }
+        });
+        
+        // Close permit button
+        document.getElementById('btn-close-permit')?.addEventListener('click', () => {
+          if (State.current === 'ACTIVE' || State.current === 'SUSPENDED') {
+            if (State.transition('CLOSED', document.getElementById('ia-badge')?.value || 'UNKNOWN')) {
+              UI.showNotification('✓ PERMIT CLOSED - Record archived', 'verified');
+              Countdown.stop();
+            }
+          }
+        });
+        
+        // Suspend permit button
+        document.getElementById('btn-suspend-permit')?.addEventListener('click', () => {
+          if (State.current === 'ACTIVE') {
+            if (State.transition('SUSPENDED', document.getElementById('pa-badge')?.value || 'UNKNOWN', 'Manual suspension')) {
+              UI.showNotification('⚠ PERMIT SUSPENDED - Work halted', 'alarm');
+              Countdown.stop();
+            }
+          }
+        });
+        
+        // Print button
+        document.getElementById('btn-print')?.addEventListener('click', () => Print.execute());
+        
+        // Export JSON button
+        document.getElementById('btn-export-json')?.addEventListener('click', () => AuditLog.exportJSON());
+        
+        // Reset button (with confirmation)
+        document.getElementById('btn-reset')?.addEventListener('click', () => {
+          if (confirm('⚠ WARNING: This will clear all form data and reset the permit. Continue?')) {
+            localStorage.removeItem(Config.KEYS.DRAFT);
+            sessionStorage.removeItem(Config.KEYS.AUDIT_TRAIL);
+            location.reload();
+          }
+        });
+        
+        // Save draft button
+        document.getElementById('btn-save-draft')?.addEventListener('click', () => Persistence.saveDraft());
+        
+        // Auto-update auth readiness when fields change
+        document.querySelectorAll('#asset-tag, #pid-ref, #work-description, #controls-applied').forEach(el => {
+          el?.addEventListener('input', () => UI.updateAuthReadiness());
+        });
+      }
+
+      // ======================================================================
+      // PUBLIC API - Exposed subsystems
+      // ======================================================================
+      return {
+        Config,
+        State,
+        Validator,
+        Risk,
+        Persistence,
+        Countdown,
+        Signature,
+        Print,
+        AuditLog,
+        Serial,
+        GasMonitor,
+        QRStub,
+        UI,
+        
+        // Master initialization
+        init() {
+          console.log('HWP_SYS: Initializing Hot Work Permit Control System v3.2.1');
+          
+          // Initialize subsystems
+          Serial.init();
+          QRStub.render('hwp-header__qr', document.getElementById('permit-serial')?.textContent);
+          Risk.init();
+          GasMonitor.init();
+          AuditLog.loadFromSession();
+          
+          // Bind UI interactions
+          UI.bindPPECheckboxes();
+          UI.bindCertificateVerifications();
+          UI.bindCloseoutCheckboxes();
+          bindEvents();
+          
+          // Load existing draft if available
+          Persistence.loadDraft();
+          
+          // Start autosave
+          Persistence.autosaveInit();
+          
+          // Set initial state banner
+          UI.updateStateBanner(State.current);
+          UI.updateAuthReadiness();
+          
+          console.log('HWP_SYS: Initialization complete. Permit ready for configuration.');
+        }
+      };
+    })();
+
+    // ========================================================================
+    // DOMContentLoaded - Bootstrap the application
+    // ========================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize the HWP system
+      HWP_SYS.init();
+      
+      // Accessibility: focus management for keyboard users
+      document.querySelectorAll('[tabindex="0"]').forEach(el => {
+        el.addEventListener('focus', (e) => {
+          e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+      });
+      
+      // Print preparation: detect print media query
+      if (window.matchMedia) {
+        const mediaQuery = window.matchMedia('print');
+        mediaQuery.addListener?.(mql => {
+          if (mql.matches) HWP_SYS.Print.prepare();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

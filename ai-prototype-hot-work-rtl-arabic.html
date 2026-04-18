@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOT Work Permit - تصريح عمل ساخن</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid #c0392b;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header-arabic {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .section {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: -15px -15px 15px -15px;
+            font-weight: bold;
+            font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-number {
+            background: #e74c3c;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+            margin: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+
+        .label-arabic {
+            color: #7f8c8d;
+            font-size: 0.85em;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: #ecf0f1;
+            transform: translateX(-5px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-left: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .signature-box {
+            border: 2px dashed #bdc3c7;
+            padding: 20px;
+            text-align: center;
+            margin-top: 10px;
+            border-radius: 5px;
+            background: white;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .signature-line {
+            border-bottom: 2px solid #2c3e50;
+            width: 200px;
+            margin: 10px auto;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border-right: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-box::before {
+            content: "ℹ️";
+            margin-left: 10px;
+            font-size: 1.5em;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: right;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .section {
+                break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .header-arabic {
+                font-size: 1.3em;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .status-active {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .status-pending {
+            background: #f39c12;
+            color: white;
+        }
+
+        .status-completed {
+            background: #3498db;
+            color: white;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>HOT Work Permit</h1>
+            <div class="header-arabic">تصريح عمل ساخن</div>
+        </div>
+
+        <div class="info-box">
+            يرجى التأكد من تعبئة جميع الحقول المطلوبة والتوقيع في الأماكن المخصصة قبل البدء في العمل
+        </div>
+
+        <div class="form-grid">
+            <!-- Header Information -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <div class="section-title">
+                    <span>معلومات التصريح الرئيسية</span>
+                    <span class="section-number">Main Info</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Main Permit Number <span class="label-arabic">(رقم التصريح الرئيسي)</span></label>
+                        <input type="text" placeholder="Enter permit number">
+                    </div>
+                    <div class="form-group">
+                        <label>SCE</label>
+                        <select>
+                            <option value="">Select</option>
+                            <option value="Y">Y</option>
+                            <option value="N">N</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Category of Risk <span class="label-arabic">(فئة الخطر)</span></label>
+                        <select>
+                            <option value="">Select</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Work Order N <span class="label-arabic">(رقم أمر العمل)</span></label>
+                        <input type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>Contractor <span class="label-arabic">(المقاول)</span></label>
+                        <input type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>Work to be done by <span class="label-arabic">(ينفذ العمل بواسطة)</span></label>
+                        <input type="text">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 1: Description of Work -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <div class="section-title">
+                    <span>1-DESCRIPTION OF THE WORK TO BE PERFORMED / وصف العمل المراد القيام به</span>
+                    <span class="section-number">1</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Work site / موقع العمل <span class="required">*</span></label>
+                        <input type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date / التاريخ <span class="required">*</span></label>
+                        <input type="date" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Equipment Name / اسم المعدة</label>
+                        <input type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>Work location / مكان العمل</label>
+                        <input type="text">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Vehicle plate Number / رقم لوحة السيارة</label>
+                        <input type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>Status / الحالة</label>
+                        <select>
+                            <option value="">Select</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Equipment Number / رقم المعدة</label>
+                        <input type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>People Number / عدد العمال</label>
+                        <input type="number" min="1">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label>Tools and equipment required / الأدوات والمعدات المطلوبة</label>
+                        <textarea rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Hazards Identification -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <div class="section-title">
+                    <span>2-HAZARDS IDENTIFICATION (PA) / بيان المخاطر</span>
+                    <span class="section-number">2</span>
+                </div>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h1">
+                        <label for="h1">Liquid or gas under pressure / سائل أو غاز مضغوط</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h2">
+                        <label for="h2">Toxic materials / مواد سامة</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h3">
+                        <label for="h3">Corrosive materials / مواد آكلة</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h4">
+                        <label for="h4">Flammable Materials / مواد قابلة للاشتعال</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h5">
+                        <label for="h5">Hot Materials / مواد ساخنة</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h6">
+                        <label for="h6">O₂ deficiency / نقص الأكسجين</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h7">
+                        <label for="h7">Possible H₂S area / منطقة يحتمل بها وجود كبريتيد الهيدروجين</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h8">
+                        <label for="h8">Flying Particles / الجسيمات الطائرة</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h9">
+                        <label for="h9">Electricity / كهرباء</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h10">
+                        <label for="h10">Radioactivity / النشاط الإشعاعي</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h11">
+                        <label for="h11">Rotating Machinery / الماكينات الدوارة</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h12">
+                        <label for="h12">Noise area (85db) / منطقة ضوضاء (85 ديسيبل)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h13">
+                        <label for="h13">Scaffolding to install / نصب السقالات</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h14">
+                        <label for="h14">Wind, Weather status / الرياح / حالة الطقس</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h15">
+                        <label for="h15">Confined space Entry / دخول الأماكن المحصورة</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="h16">
+                        <label for="h16">Others / أخرى</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Safe Working Conditions -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <div class="section-title">
+                    <span>3-REQUIREMENT FOR SAFE WORKING CONDITIONS / شروط ظروف العمل الآمنة</span>
+                    <span class="section-number">3</span>
+                </div>
+                <div class="two-columns">
+                    <div>
+                        <h4 style="margin-bottom: 10px; color: #2c3e50;">STATUS / الحالة</h4>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s1">
+                                <label for="s1">In service / في الخدمة</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s2">
+                                <label for="s2">Shut down / قُف الإيقاف</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s3">
+                                <label for="s3">Depressurized / مضغوط غير</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s4">
+                                <label for="s4">Drained / تم صرفه</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s5">
+                                <label for="s5">Water flushed / مغسول بالماء</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s6">
+                                <label for="s6">Inerted with / معمل بـ</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s7">
+                                <label for="s7">Pressurized with / مضغوط بـ</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s8">
+                                <label for="s8">Blanketed with / مغطى بـ</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s9">
+                                <label for="s9">Full of (specify) / (حدد) ممتلئ بـ</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s10">
+                                <label for="s10">Empty / فارغ</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s11">
+                                <label for="s11">Open / مفتوح</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s12">
+                                <label for="s12">Gas Free / خالي من الغاز</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s13">
+                                <label for="s13">Steamed / بالبخار</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="s14">
+                                <label for="s14">Ventilated / مزود بتهوية</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 10px; color: #2c3e50;">Complementary Certificates / الشهادات التكميلية</h4>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="c1">
+                                <label for="c1">Confined space Certificate / شهادة الأماكن المحصورة</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="c2">
+                                <label for="c2">Mechanical Isolation Certificate / شهادة العزل الميكانيكي</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="c3">
+                                <label for="c3">Electrical Isolation Certificate / شهادة العزل الكهربائي</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="c4">
+                                <label for="c4">Radiation Certificate / شهادة الإشعاع</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="c5">
+                                <label for="c5">Hot Tapping / توصيل ساخن</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="c6">
+                                <label for="c6">Excavation Certificate / شهادة الحفر</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="c7">
+                                <label for="c7">Over Ride Certificate / شهادة التجاوز</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="c8">
+                                <label for="c8">De-Isolation Certificate / شهادة إزالة العزل</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="c9">
+                                <label for="c9">Scaffolding Certificate / شهادة السقالات</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: HSE Requirements -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <div class="section-title">
+                    <span>4-HSE REQUIREMENTS FOR IMPLEMENTATION BY PERFORMING AUTHORITY / متطلبات الصحة والسلامة والبيئة</span>
+                    <span class="section-number">4</span>
+                </div>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse1">
+                        <label for="hse1">Appropriate Protective Clothing / الملابس الواقية المناسبة</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse2">
+                        <label for="hse2">Goggles/ Face shield / النظارات/واق الوجه</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse3">
+                        <label for="hse3">Ear Muffs/Plugs / واقي الأذن</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse4">
+                        <label for="hse4">Hands protection/القفازات</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse5">
+                        <label for="hse5">Safety Harness / Line Lines / أحزمة الأمان / حبال النجاة</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse6">
+                        <label for="hse6">Combustible material cleared / إزالة المواد القابلة للاشتعال</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse7">
+                        <label for="hse7">Access / Escape Route Cleared/provided / طرق الوصول/الهروب مهيأة/تم توفيرها</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse8">
+                        <label for="hse8">SCBA to be worn / يجب ارتداء جهاز تنفس مستقل</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse9">
+                        <label for="hse9">Dust Mask/قناع الغبار</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse10">
+                        <label for="hse10">Fire watch required/يتطلب مراقبة الحريق</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse11">
+                        <label for="hse11">Flame Arrestor/واقي اللهب</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse12">
+                        <label for="hse12">Tool Box Talk Required/يتطلب مناقشة قبلية</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="hse13">
+                        <label for="hse13">Barriers & Warning signs/الحواجز وعلامات التحذير</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Authorization -->
+            <div class="section">
+                <div class="section-title">
+                    <span>5-AUTHORISATION FOR WORKER BY AREA AUTHORITY</span>
+                    <span class="section-number">5</span>
+                </div>
+                <p style="margin-bottom: 15px; font-size: 0.9em;">I have reviewed the hazard and risks for the work described. I agree that precautions & controls are correct.</p>
+                <div class="signature-box">
+                    <div class="form-group" style="width: 100%;">
+                        <label>Area Authority (1) / مسؤول المنطقة (1)</label>
+                        <div class="signature-line"></div>
+                        <input type="text" placeholder="Name / الاسم" style="margin-top: 10px;">
+                    </div>
+                    <div class="form-row" style="margin-top: 10px;">
+                        <div class="form-group">
+                            <label>Date / التاريخ</label>
+                            <input type="date">
+                        </div>
+                        <div class="form-group">
+                            <label>Time / الوقت</label>
+                            <input type="time">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 6: Gas Tests -->
+            <div class="section">
+                <div class="section-title">
+                    <span>6-GAS TESTS / اختبارات الغاز</span>
+                    <span class="section-number">6</span>
+                </div>
+                <p style="margin-bottom: 10px; font-size: 0.9em;">Gas test to be carried out before starting the activity by authorised person.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>LEL</th>
+                            <th>H₂S</th>
+                            <th>O₂</th>
+                            <th>Other / أخرى</th>
+                            <th>Name / الاسم</th>
+                            <th>Signature / التوقيع</th>
+                            <th>Date / التاريخ</th>
+                            <th>Time / الوقت</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="date" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="time" style="width: 100%; border: none; background: transparent;"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="text" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="date" style="width: 100%; border: none; background: transparent;"></td>
+                            <td><input type="time" style="width: 100%; border: none; background: transparent;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 7: Performer -->
+            <div class="section">
+                <div class="section-title">
+                    <span>7-PERFORMER(P) / المنفذ</span>
+                    <span class="section-number">7</span>
+                </div>
+                <p style="margin-bottom: 15px; font-size: 0.9em;">I declare that I am aware of the work to be executed and ensure we will not perform any other activity.</p>
+                <div class="signature-box">
+                    <div class="form-group" style="width: 100%;">
+                        <label>Performer (P) / المنفذ</label>
+                        <div class="signature-line"></div>
+                        <input type="text" placeholder="Name / الاسم" style="margin-top: 10px;">
+                    </div>
+                    <div class="form-row" style="margin-top: 10px;">
+                        <div class="form-group">
+                            <label>Date / التاريخ</label>
+                            <input type="date">
+                        </div>
+                        <div class="form-group">
+                            <label>Time / الوقت</label>
+                            <input type="time">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 8: Site Supervisor -->
+            <div class="section">
+                <div class="section-title">
+                    <span>8-SITE SUPERVISOR (PRA) / مشرف الموقع</span>
+                    <span class="section-number">8</span>
+                </div>
+                <p style="margin-bottom: 15px; font-size: 0.9em;">I have checked the work site and found the preparation completed.</p>
+                <div class="signature-box">
+                    <div class="form-group" style="width: 100%;">
+                        <label>Site Supervisor (PRA) / مشرف الموقع</label>
+                        <div class="signature-line"></div>
+                        <input type="text" placeholder="Name / الاسم" style="margin-top: 10px;">
+                    </div>
+                    <div class="form-row" style="margin-top: 10px;">
+                        <div class="form-group">
+                            <label>Date / التاريخ</label>
+                            <input type="date">
+                        </div>
+                        <div class="form-group">
+                            <label>Time / الوقت</label>
+                            <input type="time">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 9: Validation on Site -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <div class="section-title">
+                    <span>9-VALIDATION ON SITE: HSE Supervisor sign only for critical activities</span>
+                    <span class="section-number">9</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Open Date<br>تاريخ الفتح</th>
+                            <th>Time<br>الوقت</th>
+                            <th>Shift<br>الوردية</th>
+                            <th>Performer (P)<br>المنفذ</th>
+                            <th>Site Supervisor (PRA)<br>مشرف الموقع</th>
+                            <th>HSER<br>مسؤول الصحة والسلامة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="date" style="width: 100%; border: none;"></td>
+                            <td><input type="time" style="width: 100%; border: none;"></td>
+                            <td>
+                                <select style="width: 100%; border: none;">
+                                    <option>Day / نهار</option>
+                                    <option>Night / ليل</option>
+                                </select>
+                            </td>
+                            <td><input type="text" style="width: 100%; border: none;"></td>
+                            <td><input type="text" style="width: 100%; border: none;"></td>
+                            <td><input type="text" style="width: 100%; border: none;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 10: Suspension & Re-issue -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <div class="section-title">
+                    <span>10-SUSPENSION & RE-ISSUE / التعليق وإعادة الإصدار</span>
+                    <span class="section-number">10</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Permit suspended by / تم تعليق التصريح بواسطة:</label>
+                        <input type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>Date / التاريخ</label>
+                        <input type="date">
+                    </div>
+                    <div class="form-group">
+                        <label>Time / الوقت</label>
+                        <input type="time">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Normal Operation have been resumed / استؤنف التشغيل العادي</label>
+                        <select>
+                            <option value="">Select</option>
+                            <option value="Yes">Yes / نعم</option>
+                            <option value="No">No / لا</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Site Supervisor (PRA) / مشرف الموقع</label>
+                        <input type="text">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 11: Work Completion -->
+            <div class="section" style="grid-column: 1 / -1;">
+                <div class="section-title">
+                    <span>11-WORK COMPLETION/ CLEARANCE / اكتمال الأعمال/الإنهاء</span>
+                    <span class="section-number">11</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Work is to CONTINUE under new PTW / سيتابع العمل بموجب تصريح عمل جديد</label>
+                        <select>
+                            <option value="">Select</option>
+                            <option value="Yes">Yes / نعم</option>
+                            <option value="No">No / لا</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Performing Authority (PA) / الجهة المنفذة</label>
+                        <input type="text">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Site Supervisor (PRA) / مشرف الموقع</label>
+                        <input type="text">
+                    </div>
+                    <div class="form-group">
+                        <label>Date / التاريخ</label>
+                        <input type="date">
+                    </div>
+                    <div class="form-group">
+                        <label>Time / الوقت</label>
+                        <input type="time">
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: #e8f5e9; border-radius: 5px; text-align: center;">
+                    <strong>This Permit is now CLOSED / تم إغلاق هذا التصريح الآن</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="text-align: center; padding: 20px; background: #f5f5f5; border-top: 2px solid #ddd;" class="no-print">
+            <button class="btn btn-save" onclick="saveForm()">💾 حفظ النموذج</button>
+            <button class="btn btn-print" onclick="window.print()">🖨️ طباعة النموذج</button>
+            <button class="btn btn-reset" onclick="resetForm()">🔄 إعادة تعيين</button>
+        </div>
+    </div>
+
+    <script>
+        // Save form data to localStorage
+        function saveForm() {
+            const formData = new FormData(document.querySelector('form') || document.querySelector('.container'));
+            const data = {};
+            document.querySelectorAll('input, select, textarea').forEach((element, index) => {
+                if (element.type === 'checkbox') {
+                    data[element.id || index] = element.checked;
+                } else {
+                    data[element.id || index] = element.value;
+                }
+            });
+            localStorage.setItem('hotWorkPermit', JSON.stringify(data));
+            alert('تم حفظ البيانات بنجاح! / Form saved successfully!');
+        }
+
+        // Load form data from localStorage
+        function loadForm() {
+            const saved = localStorage.getItem('hotWorkPermit');
+            if (saved) {
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    const element = document.getElementById(key) || document.querySelector(`[data-index="${key}"]`);
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = data[key];
+                        } else {
+                            element.value = data[key];
+                        }
+                    }
+                });
+            }
+        }
+
+        // Reset form
+        function resetForm() {
+            if (confirm('هل أنت متأكد من إعادة تعيين النموذج؟ / Are you sure you want to reset the form?')) {
+                document.querySelectorAll('input[type="text"], input[type="date"], input[type="time"], input[type="number"], textarea').forEach(el => el.value = '');
+                document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+                document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+                localStorage.removeItem('hotWorkPermit');
+            }
+        }
+
+        // Auto-save on input change
+        document.addEventListener('input', function(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') {
+                clearTimeout(window.saveTimeout);
+                window.saveTimeout = setTimeout(saveForm, 2000);
+            }
+        });
+
+        // Load saved data on page load
+        window.addEventListener('load', loadForm);
+
+        // Add index to form elements for saving
+        document.querySelectorAll('input, select, textarea').forEach((el, index) => {
+            if (!el.id) {
+                el.setAttribute('data-index', index);
+            }
+        });
+    </script>
+</body>
+</html>

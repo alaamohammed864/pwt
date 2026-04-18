@@ -1,0 +1,3070 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZFD Cold Work Permit Pro | نظام تصاريح العمل البارد</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        /* =========================================
+           CSS VARIABLES & THEME CONFIGURATION
+           ========================================= */
+        :root {
+            /* Brand Colors - Easily Customizable */
+            --primary-color: #0056b3;
+            --primary-light: #e6f2ff;
+            --primary-dark: #003d82;
+            --secondary-color: #00a8cc;
+            --accent-color: #ff9f43;
+            
+            /* Status Colors */
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            
+            /* UI Colors */
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --text-muted: #95a5a6;
+            --bg-body: #f4f7f6;
+            --bg-card: #ffffff;
+            --bg-sidebar: #1a252f;
+            --border-color: #dfe6e9;
+            --border-light: #ecf0f1;
+            
+            /* Shadows & Radius */
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
+            --shadow-md: 0 5px 15px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.15);
+            --radius: 8px;
+            --radius-lg: 16px;
+            
+            /* Transitions */
+            --transition: all 0.3s ease;
+            --transition-fast: all 0.15s ease;
+            
+            /* Layout */
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --spacing-sm: 10px;
+            --spacing-md: 20px;
+            --spacing-lg: 30px;
+        }
+
+        /* Dark Theme */
+        [data-theme="dark"] {
+            --primary-color: #4a90e2;
+            --primary-light: #1e3a5f;
+            --primary-dark: #2563eb;
+            --text-dark: #ecf0f1;
+            --text-light: #bdc3c7;
+            --text-muted: #7f8c8d;
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-sidebar: #020617;
+            --border-color: #334155;
+            --border-light: #1e293b;
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.3);
+            --shadow-md: 0 5px 15px rgba(0,0,0,0.4);
+        }
+
+        /* RTL Support */
+        [dir="rtl"] {
+            --sidebar-left: auto;
+            --sidebar-right: 0;
+            --margin-rtl-start: 0;
+            --margin-rtl-end: var(--sidebar-width);
+        }
+        [dir="ltr"] {
+            --sidebar-left: 0;
+            --sidebar-right: auto;
+            --margin-rtl-start: var(--sidebar-width);
+            --margin-rtl-end: 0;
+        }
+
+        /* =========================================
+           GLOBAL STYLES & RESET
+           ========================================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Roboto', 'Cairo', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            line-height: 1.6;
+            font-size: 14px;
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: var(--transition);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--text-light); 
+            border-radius: 4px;
+            transition: var(--transition-fast);
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+
+        /* Focus Visible for Accessibility */
+        :focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* =========================================
+           SIDEBAR NAVIGATION
+           ========================================= */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-left, 0);
+            right: var(--sidebar-right, auto);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-header {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            background: white;
+            padding: 2px;
+        }
+
+        .brand-text h2 { 
+            font-size: 17px; 
+            margin-bottom: 2px;
+            font-weight: 700;
+        }
+        .brand-text span { 
+            font-size: 11px; 
+            color: rgba(255,255,255,0.7);
+            display: block;
+        }
+
+        .nav-section {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-title {
+            padding: 10px 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+        }
+
+        .nav-links {
+            padding: 5px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            color: rgba(255,255,255,0.85);
+            transition: var(--transition-fast);
+            border-left: 3px solid transparent;
+            font-size: 13px;
+            gap: 10px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            border-left-color: var(--accent-color);
+            background: rgba(255,159,67,0.15);
+        }
+
+        .nav-item i { 
+            width: 22px; 
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--danger-color);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: var(--spacing-md);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: auto;
+        }
+
+        .theme-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 13px;
+            transition: var(--transition-fast);
+        }
+        .theme-toggle:hover { background: rgba(255,255,255,0.2); }
+
+        /* =========================================
+           MAIN CONTENT AREA
+           ========================================= */
+        .main-wrapper {
+            margin-left: var(--margin-rtl-start, var(--sidebar-width));
+            margin-right: var(--margin-rtl-end, 0);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        /* Top Header */
+        .top-header {
+            height: var(--header-height);
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-lg);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-dark);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--radius);
+            transition: var(--transition-fast);
+        }
+        .menu-toggle:hover { background: var(--primary-light); }
+
+        .page-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            background: var(--primary-light);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .lang-toggle:hover { background: var(--primary-color); color: white; }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 10px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .user-profile:hover { background: var(--primary-light); }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 20px;
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .progress-bar-bg {
+            height: 10px;
+            background: var(--border-light);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-fast);
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.2);
+            opacity: 0;
+            transition: var(--transition-fast);
+        }
+        .btn:hover::after { opacity: 1; }
+
+        .btn-primary { 
+            background: var(--primary-color); 
+            color: white; 
+            box-shadow: 0 2px 5px rgba(0,86,179,0.3);
+        }
+        .btn-primary:hover { 
+            background: var(--primary-dark); 
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,86,179,0.4);
+        }
+        
+        .btn-secondary { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            color: var(--text-dark); 
+        }
+        .btn-secondary:hover { 
+            background: var(--primary-light); 
+            border-color: var(--primary-color);
+        }
+
+        .btn-success { background: var(--success-color); color: white; }
+        .btn-success:hover { background: #27ae60; transform: translateY(-1px); }
+        
+        .btn-warning { background: var(--warning-color); color: white; }
+        .btn-danger { background: var(--danger-color); color: white; }
+
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-icon { padding: 10px; width: 40px; height: 40px; justify-content: center; }
+
+        /* =========================================
+           DASHBOARD VIEW
+           ========================================= */
+        .dashboard {
+            padding: var(--spacing-lg);
+            display: none;
+        }
+        .dashboard.active { display: block; }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: var(--spacing-md);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .stat-card.draft { border-left-color: var(--text-muted); }
+        .stat-card.active { border-left-color: var(--success-color); }
+        .stat-card.closed { border-left-color: var(--danger-color); }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+        .stat-card.active .stat-icon { background: #d4edda; color: var(--success-color); }
+        .stat-card.closed .stat-icon { background: #f8d7da; color: var(--danger-color); }
+
+        .stat-info h3 { font-size: 24px; font-weight: 700; margin-bottom: 2px; }
+        .stat-info p { font-size: 12px; color: var(--text-light); }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+        }
+        .search-box input {
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            color: var(--text-dark);
+            width: 250px;
+            font-size: 13px;
+        }
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            color: var(--text-dark);
+            font-size: 13px;
+            min-width: 150px;
+        }
+
+        /* Permits Table */
+        .permits-table-container {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-light);
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-body);
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover { background: var(--primary-light); }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-draft { background: #e0e0e0; color: #555; }
+        .status-issued { background: #cce5ff; color: #0056b3; }
+        .status-active { background: #d4edda; color: #155724; }
+        .status-closed { background: #f8d7da; color: #721c24; }
+        .status-cancelled { background: #f5c6cb; color: #721c24; }
+
+        .action-cell {
+            display: flex;
+            gap: 5px;
+        }
+
+        .qr-cell {
+            text-align: center;
+        }
+        .qr-code {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+        }
+
+        /* =========================================
+           FORM SECTIONS & CARDS
+           ========================================= */
+        .form-container {
+            padding: var(--spacing-lg);
+            display: none;
+        }
+        .form-container.active { display: block; }
+
+        .section-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: var(--spacing-md);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .section-card:hover { box-shadow: var(--shadow-md); }
+
+        .section-card.collapsed .section-body {
+            display: none;
+        }
+
+        .section-header {
+            padding: 15px 20px;
+            background: var(--primary-light);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        .section-header:hover { background: var(--primary-light); }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title .step-num {
+            background: var(--primary-color);
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .toggle-section {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition-fast);
+        }
+        .toggle-section:hover { background: rgba(0,86,179,0.1); }
+        .toggle-section i { transition: transform 0.3s; }
+        .section-card.collapsed .toggle-section i { transform: rotate(-90deg); }
+
+        .section-body {
+            padding: 20px;
+        }
+
+        /* Form Grid System */
+        .form-grid {
+            display: grid;
+            gap: var(--spacing-md);
+        }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+        /* Form Inputs */
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-group label .ar {
+            font-family: 'Cairo', sans-serif;
+            font-weight: 400;
+            color: var(--text-light);
+            margin-left: 5px;
+            direction: rtl;
+            display: inline-block;
+        }
+
+        .form-group label .tooltip {
+            margin-left: auto;
+            color: var(--text-muted);
+            cursor: help;
+            position: relative;
+        }
+        .form-group label .tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-dark);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: nowrap;
+            z-index: 100;
+            width: max-content;
+            max-width: 250px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+        .form-group label .tooltip:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            border: 6px solid transparent;
+            border-top-color: var(--text-dark);
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--bg-body);
+            color: var(--text-dark);
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        .input-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.15);
+            background: var(--bg-card);
+        }
+
+        .input-control:disabled, .input-control[readonly] {
+            background: var(--border-light);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .input-control.invalid {
+            border-color: var(--danger-color);
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 11px;
+            margin-top: 4px;
+            display: none;
+        }
+        .input-control.invalid + .error-message { display: block; }
+
+        /* Custom Checkbox & Radio */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 8px;
+        }
+
+        .custom-check {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            background: var(--bg-body);
+            font-size: 13px;
+        }
+
+        .custom-check:hover { 
+            background: var(--primary-light); 
+            border-color: var(--primary-color);
+        }
+        
+        .custom-check input[type="checkbox"], 
+        .custom-check input[type="radio"] {
+            margin-right: 10px;
+            accent-color: var(--primary-color);
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        
+        .custom-check.checked {
+            background: var(--primary-light);
+            border-color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* Risk Matrix */
+        .risk-matrix {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .matrix-select {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .matrix-select label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .risk-level-display {
+            text-align: center;
+            padding: 15px;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .risk-low { background: #d4edda; color: #155724; }
+        .risk-medium { background: #fff3cd; color: #856404; }
+        .risk-high { background: #f8d7da; color: #721c24; }
+
+        /* Signature Pad */
+        .signature-container {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 10px;
+            background: var(--bg-body);
+            margin-bottom: 10px;
+        }
+
+        .signature-canvas {
+            width: 100%;
+            height: 120px;
+            background: white;
+            border-radius: 4px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .signature-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* Quick Info Panel */
+        .quick-info {
+            background: linear-gradient(135deg, var(--primary-light), var(--bg-card));
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            margin-bottom: var(--spacing-md);
+            display: none;
+        }
+        .quick-info.show { display: block; animation: slideIn 0.3s; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .quick-info h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-info ul {
+            list-style: none;
+            padding-left: 0;
+            font-size: 13px;
+        }
+        .quick-info li {
+            padding: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .quick-info li i {
+            color: var(--accent-color);
+            font-size: 12px;
+        }
+
+        /* Tables */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 10px 12px; border: 1px solid var(--border-color); text-align: left; }
+        th { 
+            background: var(--bg-body); 
+            font-weight: 600; 
+            color: var(--text-light);
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        td input { 
+            width: 100%; 
+            border: none; 
+            background: transparent; 
+            padding: 5px;
+            font-size: 13px;
+        }
+        td input:focus { 
+            background: var(--bg-body); 
+            border-radius: 4px;
+        }
+
+        /* Audit Log */
+        .audit-log {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
+            background: var(--bg-body);
+            border-radius: var(--radius);
+            padding: 10px;
+        }
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            gap: 10px;
+        }
+        .log-entry:last-child { border-bottom: none; }
+        .log-time { 
+            font-weight: 600; 
+            color: var(--primary-color);
+            min-width: 120px;
+        }
+        .log-action { flex: 1; }
+        .log-user { 
+            color: var(--text-light);
+            font-size: 11px;
+        }
+
+        /* QR Code Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; animation: fadeIn 0.2s; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            max-width: 500px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-light);
+            padding: 5px;
+        }
+
+        .qr-display {
+            text-align: center;
+            padding: 20px;
+        }
+        #qrCode {
+            margin: 0 auto 15px;
+        }
+        .qr-text {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 10px;
+        }
+
+        /* Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--warning-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            box-shadow: var(--shadow-md);
+            z-index: 1500;
+            animation: slideUp 0.3s;
+        }
+        .offline-indicator.show { display: flex; }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .toast {
+            background: var(--bg-card);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: slideInRight 0.3s;
+        }
+        .toast.success { border-left-color: var(--success-color); }
+        .toast.error { border-left-color: var(--danger-color); }
+        .toast.warning { border-left-color: var(--warning-color); }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast-icon {
+            font-size: 18px;
+        }
+        .toast.success .toast-icon { color: var(--success-color); }
+        .toast.error .toast-icon { color: var(--danger-color); }
+        .toast.warning .toast-icon { color: var(--warning-color); }
+
+        .toast-content { flex: 1; }
+        .toast-title { font-weight: 600; margin-bottom: 2px; }
+        .toast-message { font-size: 13px; color: var(--text-light); }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        /* =========================================
+           PRINT STYLES
+           ========================================= */
+        @media print {
+            .sidebar, 
+            .top-header, 
+            .action-buttons,
+            .nav-item,
+            .quick-info,
+            .signature-actions,
+            .toggle-section,
+            .offline-indicator,
+            .toast-container { 
+                display: none !important; 
+            }
+            
+            .main-wrapper { 
+                margin: 0 !important; 
+                padding: 0 !important;
+            }
+            
+            body { 
+                background: white !important; 
+                color: black !important;
+                font-size: 12px !important;
+            }
+            
+            .section-card { 
+                box-shadow: none !important; 
+                border: 1px solid #000 !important; 
+                break-inside: avoid; 
+                margin-bottom: 10px !important;
+                page-break-inside: avoid;
+            }
+            
+            .section-header { 
+                background: #f0f0f0 !important; 
+                color: black !important; 
+                border-bottom: 1px solid #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .input-control { 
+                border: 1px solid #ccc !important;
+                background: white !important;
+            }
+            
+            /* Hide canvas signature, show print area */
+            .signature-canvas { display: none !important; }
+            .signature-print-area {
+                display: block !important;
+                border: 1px solid #000;
+                height: 80px;
+                margin: 10px 0;
+            }
+            
+            /* Compact table for print */
+            table { font-size: 10px !important; }
+            th, td { padding: 5px !important; }
+            
+            /* QR Code for print */
+            .qr-print {
+                display: block !important;
+                text-align: center;
+                margin: 10px 0;
+            }
+        }
+
+        /* Show signature print area only in print */
+        .signature-print-area { display: none; }
+
+        /* =========================================
+           RESPONSIVE DESIGN
+           ========================================= */
+        @media (max-width: 1024px) {
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .grid-6 { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 260px;
+            }
+            
+            .sidebar { 
+                transform: translateX(calc(var(--sidebar-left, 0) * -1));
+            }
+            [dir="rtl"] .sidebar {
+                transform: translateX(var(--sidebar-width));
+            }
+            .sidebar.open { transform: translateX(0); }
+            
+            .main-wrapper { 
+                margin-left: 0 !important; 
+                margin-right: 0 !important;
+            }
+            
+            .menu-toggle { display: block; }
+            
+            .top-header { padding: 0 15px; }
+            .progress-container { display: none; }
+            
+            .grid-2, .grid-3, .grid-4, .grid-6 { 
+                grid-template-columns: 1fr !important; 
+            }
+            
+            .checkbox-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-filter {
+                width: 100%;
+            }
+            
+            .search-box input {
+                width: 100%;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+            }
+            
+            /* Mobile table optimization */
+            .table-responsive {
+                border: 1px solid var(--border-color);
+                border-radius: var(--radius);
+            }
+            
+            table {
+                min-width: 600px; /* Force horizontal scroll */
+            }
+            
+            /* Better touch targets */
+            .btn { padding: 12px 20px; }
+            .input-control { padding: 12px; font-size: 14px; }
+            
+            /* Numeric input mode hint */
+            input[type="number"] { -moz-appearance: textfield; }
+            input[type="number"]::-webkit-outer-spin-button,
+            input[type="number"]::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            :root {
+                --border-color: #000;
+                --text-light: #333;
+            }
+            .input-control:focus {
+                outline: 3px solid var(--primary-color);
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-logo" id="brandLogo">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="brand-text">
+                <h2 data-i18n="appTitle">ZFD Permit Pro</h2>
+                <span data-i18n="appSubtitle">Work Management System</span>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title" data-i18n="navigation">Navigation</div>
+            <div class="nav-links">
+                <div class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-home"></i> <span data-i18n="dashboard">Dashboard</span>
+                    <span class="badge" id="pendingBadge">3</span>
+                </div>
+                <div class="nav-item" data-view="new-permit">
+                    <i class="fas fa-plus-circle"></i> <span data-i18n="newPermit">New Permit</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title" data-i18n="permitSections">Permit Sections</div>
+            <div class="nav-links">
+                <div class="nav-item" data-section="header-info">
+                    <i class="fas fa-info-circle"></i> <span data-i18n="headerInfo">Header Info</span>
+                </div>
+                <div class="nav-item" data-section="description">
+                    <i class="fas fa-clipboard-list"></i> <span data-i18n="workDesc">Work Description</span>
+                </div>
+                <div class="nav-item" data-section="hazards">
+                    <i class="fas fa-exclamation-triangle"></i> <span data-i18n="hazards">Hazards</span>
+                </div>
+                <div class="nav-item" data-section="risk-matrix">
+                    <i class="fas fa-chart-pie"></i> <span data-i18n="riskMatrix">Risk Matrix</span>
+                </div>
+                <div class="nav-item" data-section="safe-conditions">
+                    <i class="fas fa-shield-alt"></i> <span data-i18n="safeConditions">Safe Conditions</span>
+                </div>
+                <div class="nav-item" data-section="hse-req">
+                    <i class="fas fa-hard-hat"></i> <span data-i18n="hseReq">HSE Requirements</span>
+                </div>
+                <div class="nav-item" data-section="gas-tests">
+                    <i class="fas fa-wind"></i> <span data-i18n="gasTests">Gas Tests</span>
+                </div>
+                <div class="nav-item" data-section="signatures">
+                    <i class="fas fa-signature"></i> <span data-i18n="signatures">Signatures</span>
+                </div>
+                <div class="nav-item" data-section="audit-log">
+                    <i class="fas fa-history"></i> <span data-i18n="auditLog">Audit Log</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="theme-toggle" id="themeToggle">
+                <span><i class="fas fa-moon"></i> <span data-i18n="darkMode">Dark Mode</span></span>
+                <i class="fas fa-toggle-off" id="themeIcon"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="main-wrapper">
+        
+        <!-- TOP HEADER -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title" data-i18n="coldWorkPermit">Cold Work Permit</h1>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span data-i18n="completion">Completion</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="lang-toggle" id="langToggle">
+                    <i class="fas fa-globe"></i>
+                    <span id="currentLang">EN</span>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary btn-icon" onclick="window.print()" title="Print / طباعة" aria-label="Print">
+                        <i class="fas fa-print"></i>
+                    </button>
+                    <button class="btn btn-primary" id="saveBtn">
+                        <i class="fas fa-save"></i> <span data-i18n="save">Save</span>
+                    </button>
+                    <button class="btn btn-success" id="issueBtn" style="display:none;">
+                        <i class="fas fa-paper-plane"></i> <span data-i18n="issue">Issue</span>
+                    </button>
+                </div>
+                
+                <div class="user-profile">
+                    <div class="user-avatar">A</div>
+                    <span style="font-size:13px;font-weight:500;">Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD VIEW -->
+        <main class="dashboard active" id="dashboardView">
+            <div class="stats-grid">
+                <div class="stat-card draft">
+                    <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                    <div class="stat-info">
+                        <h3 id="countDraft">0</h3>
+                        <p data-i18n="drafts">Drafts</p>
+                    </div>
+                </div>
+                <div class="stat-card active">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="countActive">0</h3>
+                        <p data-i18n="active">Active</p>
+                    </div>
+                </div>
+                <div class="stat-card closed">
+                    <div class="stat-icon"><i class="fas fa-times-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="countClosed">0</h3>
+                        <p data-i18n="closed">Closed</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-info">
+                        <h3>94%</h3>
+                        <p data-i18n="compliance">Compliance</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-header">
+                <h2 data-i18n="permitsList">Permits List</h2>
+                <div class="search-filter">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchPermits" placeholder="Search permits..." data-i18n-placeholder="searchPermits">
+                    </div>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="draft">Draft</option>
+                        <option value="issued">Issued</option>
+                        <option value="active">Active</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                    <button class="btn btn-secondary btn-sm" id="newPermitBtn">
+                        <i class="fas fa-plus"></i> <span data-i18n="newPermit">New Permit</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="permits-table-container">
+                <div class="table-header">
+                    <span data-i18n="recentPermits">Recent Permits</span>
+                    <span style="font-size:12px;color:var(--text-light)" id="permitsCount">0 permits</span>
+                </div>
+                <div class="table-responsive">
+                    <table id="permitsTable">
+                        <thead>
+                            <tr>
+                                <th data-i18n="permitNo">Permit No.</th>
+                                <th data-i18n="workSite">Work Site</th>
+                                <th data-i18n="date">Date</th>
+                                <th data-i18n="risk">Risk</th>
+                                <th data-i18n="status">Status</th>
+                                <th data-i18n="qr">QR</th>
+                                <th data-i18n="actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="permitsTableBody">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- FORM CONTAINER -->
+        <main class="form-container" id="formView">
+            
+            <!-- Quick Info Panel -->
+            <div class="quick-info" id="quickInfo">
+                <h4><i class="fas fa-lightbulb"></i> <span data-i18n="quickActions">Quick Actions Required</span></h4>
+                <ul id="quickActionsList">
+                    <!-- Dynamic alerts -->
+                </ul>
+            </div>
+
+            <form id="permitForm" novalidate>
+                
+                <!-- 1. HEADER INFO -->
+                <section id="header-info" class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span class="step-num">1</span>
+                            <span data-i18n="headerInfo">General Information</span>
+                        </div>
+                        <div class="section-actions">
+                            <button type="button" class="toggle-section" aria-label="Toggle section">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-grid grid-4">
+                            <div class="form-group">
+                                <label>
+                                    Main Permit No. <span class="ar">رقم التصريح الرئيسي</span>
+                                    <span class="tooltip" data-tip="Unique identifier for this permit">ⓘ</span>
+                                </label>
+                                <input type="text" class="input-control" name="main_permit_no" required 
+                                       pattern="^[A-Z0-9\-]{5,20}$" 
+                                       placeholder="PTW-2024-001"
+                                       aria-required="true">
+                                <span class="error-message" data-i18n="invalidPermitNo">Please enter valid permit number</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Work Order No. <span class="ar">رقم أمر العمل</span></label>
+                                <input type="text" class="input-control" name="work_order_no">
+                            </div>
+                            <div class="form-group">
+                                <label>Date <span class="ar">التاريخ</span></label>
+                                <input type="date" class="input-control" name="permit_date" required aria-required="true">
+                            </div>
+                            <div class="form-group">
+                                <label>Category of Risk <span class="ar">فئة الخطر</span></label>
+                                <select class="input-control" name="risk_category" required aria-required="true">
+                                    <option value="">Select...</option>
+                                    <option value="H">High (H)</option>
+                                    <option value="M">Medium (M)</option>
+                                    <option value="L">Low (L)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-grid grid-2" style="margin-top: 15px;">
+                            <div class="form-group">
+                                <label>Work to be done by <span class="ar">الجهة المنفذة</span></label>
+                                <div style="display: flex; gap: 15px; padding-top: 5px;">
+                                    <label><input type="radio" name="work_by" value="zfod" required> ZFOD</label>
+                                    <label><input type="radio" name="work_by" value="contractor"> Contractor</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Contractor Name <span class="ar">اسم المقاول</span></label>
+                                <input type="text" class="input-control" name="contractor_name" id="contractorName" disabled>
+                            </div>
+                        </div>
+                        
+                        <!-- Brand Customization -->
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                            <label style="font-weight:600;margin-bottom:10px;display:block;">
+                                <i class="fas fa-palette"></i> Brand Customization
+                            </label>
+                            <div class="form-grid grid-3">
+                                <div class="form-group">
+                                    <label>Company Logo</label>
+                                    <input type="file" class="input-control" id="logoUpload" accept="image/*">
+                                </div>
+                                <div class="form-group">
+                                    <label>Primary Color</label>
+                                    <input type="color" class="input-control" id="primaryColor" value="#0056b3" style="height:40px;padding:2px;">
+                                </div>
+                                <div class="form-group">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn btn-secondary" id="applyBranding">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. WORK DESCRIPTION -->
+                <section id="description" class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span class="step-num">2</span>
+                            <span data-i18n="workDesc">Description of Work</span>
+                        </div>
+                        <button type="button" class="toggle-section"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-grid grid-2">
+                            <div class="form-group">
+                                <label>Work Site <span class="ar">مكان العمل</span></label>
+                                <input type="text" class="input-control" name="work_site" required aria-required="true">
+                            </div>
+                            <div class="form-group">
+                                <label>Specific Location <span class="ar">الموقع المحدد</span></label>
+                                <input type="text" class="input-control" name="work_location">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Equipment Name / Tag No. <span class="ar">اسم المعدة</span></label>
+                            <input type="text" class="input-control" name="equipment_name">
+                        </div>
+                        <div class="form-group" style="margin-top: 10px;">
+                            <label>Detailed Description <span class="ar">وصف مفصل للعمل</span></label>
+                            <textarea class="input-control" name="work_desc" rows="4" required aria-required="true"
+                                      placeholder="Describe the work in detail..."></textarea>
+                        </div>
+                        
+                        <!-- LOTO Checklist -->
+                        <div style="margin-top: 20px; padding: 15px; background: var(--primary-light); border-radius: var(--radius);">
+                            <label style="font-weight:600;margin-bottom:10px;display:block;">
+                                <i class="fas fa-lock"></i> Lockout/Tagout (LOTO) Verification
+                            </label>
+                            <div class="checkbox-grid">
+                                <label class="custom-check">
+                                    <input type="checkbox" name="loto_energy_isolated"> 
+                                    Energy sources isolated / مصادر الطاقة معزولة
+                                </label>
+                                <label class="custom-check">
+                                    <input type="checkbox" name="loto_tags_applied"> 
+                                    Tags applied & visible / العلامات مطبقة وواضحة
+                                </label>
+                                <label class="custom-check">
+                                    <input type="checkbox" name="loto_verified"> 
+                                    Isolation verified by test / تم التحقق من العزل
+                                </label>
+                                <label class="custom-check">
+                                    <input type="checkbox" name="loto_keys_controlled"> 
+                                    Keys under controlled access / المفاتيح تحت سيطرة
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. HAZARDS IDENTIFICATION -->
+                <section id="hazards" class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span class="step-num">3</span>
+                            <span data-i18n="hazards">Hazards Identification</span>
+                        </div>
+                        <button type="button" class="toggle-section"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="section-body">
+                        <div class="checkbox-grid">
+                            <label class="custom-check">
+                                <input type="checkbox" name="hazard_liquid_gas" data-control="pressure_relief"> 
+                                Liquid/gas under pressure / سائل او غاز مضغوط
+                            </label>
+                            <label class="custom-check">
+                                <input type="checkbox" name="hazard_h2s" data-control="h2s_monitoring"> 
+                                Possible H2S Area / احتمال وجود غاز H2S
+                            </label>
+                            <label class="custom-check">
+                                <input type="checkbox" name="hazard_confined" data-control="confined_space_cert"> 
+                                Confined Space Entry / دخول اماكن محصورة
+                            </label>
+                            <label class="custom-check">
+                                <input type="checkbox" name="hazard_electricity" data-control="electrical_isolation"> 
+                                Electricity / كهرباء
+                            </label>
+                            <label class="custom-check">
+                                <input type="checkbox" name="hazard_height" data-control="fall_protection"> 
+                                Danger of Falling / خطر السقوط
+                            </label>
+                            <label class="custom-check">
+                                <input type="checkbox" name="hazard_flammable" data-control="fire_prevention"> 
+                                Flammable Materials / مواد قابلة للاشتعال
+                            </label>
+                        </div>
+                        
+                        <!-- Weather Integration Mockup -->
+                        <div style="margin-top: 15px; padding: 12px; background: #e3f2fd; border-radius: var(--radius); display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-cloud-sun" style="color: var(--primary-color); font-size: 18px;"></i>
+                            <div>
+                                <strong>Weather Check:</strong> 
+                                <span id="weatherStatus">Loading...</span>
+                                <span style="font-size:11px;color:var(--text-light);display:block;">Auto-fetched for work site</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. RISK MATRIX -->
+                <section id="risk-matrix" class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span class="step-num">4</span>
+                            <span data-i18n="riskMatrix">Risk Assessment Matrix</span>
+                        </div>
+                        <button type="button" class="toggle-section"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="section-body">
+                        <div class="risk-matrix">
+                            <div class="matrix-select">
+                                <label>Probability / الاحتمالية</label>
+                                <select class="input-control" id="riskProbability">
+                                    <option value="1">1 - Rare</option>
+                                    <option value="2">2 - Unlikely</option>
+                                    <option value="3" selected>3 - Possible</option>
+                                    <option value="4">4 - Likely</option>
+                                    <option value="5">5 - Almost Certain</option>
+                                </select>
+                            </div>
+                            <div class="matrix-select">
+                                <label>Severity / الشدة</label>
+                                <select class="input-control" id="riskSeverity">
+                                    <option value="1">1 - Minor</option>
+                                    <option value="2">2 - Moderate</option>
+                                    <option value="3" selected>3 - Major</option>
+                                    <option value="4">4 - Severe</option>
+                                    <option value="5">5 - Catastrophic</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-level-display risk-medium" id="riskLevelDisplay">
+                            Risk Level: MEDIUM (Score: 9)
+                        </div>
+                        
+                        <div style="margin-top: 15px;">
+                            <label style="font-weight:600;">Recommended Controls:</label>
+                            <div id="recommendedControls" style="margin-top: 8px; font-size: 13px; color: var(--text-light);">
+                                • Enhanced supervision required<br>
+                                • Additional PPE: Face shield, hearing protection<br>
+                                • Pre-work safety briefing mandatory
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. SAFE WORKING CONDITIONS -->
+                <section id="safe-conditions" class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span class="step-num">5</span>
+                            <span data-i18n="safeConditions">Safe Working Conditions</span>
+                        </div>
+                        <button type="button" class="toggle-section"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-grid grid-3">
+                            <div>
+                                <label style="font-weight:bold;margin-bottom:10px;">System Status</label>
+                                <div class="checkbox-grid" style="grid-template-columns:1fr;">
+                                    <label class="custom-check"><input type="checkbox" name="status_shutdown"> Shut Down / متوقف</label>
+                                    <label class="custom-check"><input type="checkbox" name="status_depressurized"> Depressurized / غير مضغوط</label>
+                                    <label class="custom-check"><input type="checkbox" name="status_drained"> Drained / مصفى</label>
+                                    <label class="custom-check"><input type="checkbox" name="status_gas_free"> Gas Free / خالي من الغاز</label>
+                                </div>
+                            </div>
+                            <div>
+                                <label style="font-weight:bold;margin-bottom:10px;">Precautions</label>
+                                <div class="checkbox-grid" style="grid-template-columns:1fr;">
+                                    <label class="custom-check"><input type="checkbox" name="precaution_electrical_iso"> Electrical Isolation</label>
+                                    <label class="custom-check"><input type="checkbox" name="precaution_mechanical_iso"> Mechanical Isolation</label>
+                                    <label class="custom-check"><input type="checkbox" name="precaution_fire_ext"> Fire Extinguisher Available</label>
+                                    <label class="custom-check"><input type="checkbox" name="precaution_barricades"> Barricades & Signs</label>
+                                </div>
+                            </div>
+                            <div>
+                                <label style="font-weight:bold;margin-bottom:10px;">Certificates</label>
+                                <div class="checkbox-grid" style="grid-template-columns:1fr;">
+                                    <label class="custom-check"><input type="checkbox" name="cert_confined"> Confined Space Cert.</label>
+                                    <label class="custom-check"><input type="checkbox" name="cert_excavation"> Excavation Cert.</label>
+                                    <label class="custom-check"><input type="checkbox" name="cert_scaffolding"> Scaffolding Tag</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tools Checklist -->
+                        <div style="margin-top: 20px;">
+                            <label style="font-weight:600;margin-bottom:10px;display:block;">
+                                <i class="fas fa-tools"></i> Tools & Equipment Check
+                            </label>
+                            <div class="checkbox-grid">
+                                <label class="custom-check"><input type="checkbox" name="tool_hand_inspected"> Hand tools inspected</label>
+                                <label class="custom-check"><input type="checkbox" name="tool_electrical_tested"> Electrical tools tested</label>
+                                <label class="custom-check"><input type="checkbox" name="tool_grounding"> Proper grounding verified</label>
+                                <label class="custom-check"><input type="checkbox" name="tool_calibration"> Calibration certificates valid</label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. HSE REQUIREMENTS -->
+                <section id="hse-req" class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span class="step-num">6</span>
+                            <span data-i18n="hseReq">PPE & HSE Requirements</span>
+                        </div>
+                        <button type="button" class="toggle-section"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="section-body">
+                        <div class="checkbox-grid">
+                            <label class="custom-check"><input type="checkbox" name="ppe_helmet" required> Safety Helmet / خوذة</label>
+                            <label class="custom-check"><input type="checkbox" name="ppe_shoes" required> Safety Shoes / حذاء امان</label>
+                            <label class="custom-check"><input type="checkbox" name="ppe_glasses" required> Safety Glasses / نظارة امان</label>
+                            <label class="custom-check"><input type="checkbox" name="ppe_gloves"> Gloves / قفازات</label>
+                            <label class="custom-check"><input type="checkbox" name="ppe_vest" required> High-Vis Vest / سترة عاكسة</label>
+                            <label class="custom-check"><input type="checkbox" name="ppe_ears"> Ear Protection / واقي اذن</label>
+                            <label class="custom-check"><input type="checkbox" name="ppe_face"> Face Shield / واقي وجه</label>
+                            <label class="custom-check"><input type="checkbox" name="ppe_respirator"> Respirator / كمامة تنفس</label>
+                            <label class="custom-check"><input type="checkbox" name="ppe_harness"> Harness (Work at Height)</label>
+                            <label class="custom-check"><input type="checkbox" name="ppe_firewatch"> Fire Watch / مراقب حريق</label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. GAS TESTS -->
+                <section id="gas-tests" class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span class="step-num">7</span>
+                            <span data-i18n="gasTests">Gas Tests</span>
+                        </div>
+                        <button type="button" class="toggle-section"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>LEL (%) <small>0-100</small></th>
+                                        <th>O₂ (%) <small>19-23</small></th>
+                                        <th>H₂S (ppm) <small>0-10</small></th>
+                                        <th>CO (ppm) <small>0-35</small></th>
+                                        <th>Tester</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="gasTestsBody">
+                                    <tr>
+                                        <td><input type="time" class="input-control gas-time" required></td>
+                                        <td><input type="number" class="input-control gas-lel" min="0" max="100" step="0.1"></td>
+                                        <td><input type="number" class="input-control gas-o2" min="19" max="23" step="0.1" required></td>
+                                        <td><input type="number" class="input-control gas-h2s" min="0" max="10" step="0.1"></td>
+                                        <td><input type="number" class="input-control gas-co" min="0" max="35" step="0.1"></td>
+                                        <td><input type="text" class="input-control gas-tester" required></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="time" class="input-control gas-time"></td>
+                                        <td><input type="number" class="input-control gas-lel" min="0" max="100" step="0.1"></td>
+                                        <td><input type="number" class="input-control gas-o2" min="19" max="23" step="0.1"></td>
+                                        <td><input type="number" class="input-control gas-h2s" min="0" max="10" step="0.1"></td>
+                                        <td><input type="number" class="input-control gas-co" min="0" max="35" step="0.1"></td>
+                                        <td><input type="text" class="input-control gas-tester"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" id="addGasTestRow" style="margin-top:10px;">
+                            <i class="fas fa-plus"></i> Add Test Row
+                        </button>
+                    </div>
+                </section>
+
+                <!-- 8. SIGNATURES -->
+                <section id="signatures" class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span class="step-num">8</span>
+                            <span data-i18n="signatures">Authorizations</span>
+                        </div>
+                        <button type="button" class="toggle-section"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="section-body">
+                        
+                        <!-- Performing Authority -->
+                        <div style="background: var(--primary-light); padding: 15px; border-radius: var(--radius); margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px; color: var(--primary-color);">
+                                <i class="fas fa-user-tie"></i> Performing Authority (PA)
+                            </h4>
+                            <div class="form-grid grid-3">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" class="input-control" name="pa_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Date/Time</label>
+                                    <input type="datetime-local" class="input-control" name="pa_datetime" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Role</label>
+                                    <select class="input-control" name="pa_role">
+                                        <option>Supervisor</option>
+                                        <option>Foreman</option>
+                                        <option>Technician</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="signature-container">
+                                <label style="font-size:12px;font-weight:600;margin-bottom:8px;display:block;">Digital Signature</label>
+                                <canvas class="signature-canvas" id="sigPA"></canvas>
+                                <div class="signature-print-area"></div>
+                                <div class="signature-actions">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="clearSignature('sigPA')">
+                                        <i class="fas fa-eraser"></i> Clear
+                                    </button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="undoSignature('sigPA')">
+                                        <i class="fas fa-undo"></i> Undo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Area Authority -->
+                        <div style="background: #fff3cd; padding: 15px; border-radius: var(--radius); margin-bottom: 20px;">
+                            <h4 style="margin-bottom: 10px; color: #856404;">
+                                <i class="fas fa-user-shield"></i> Area Authority (AA)
+                            </h4>
+                            <div class="form-grid grid-3">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" class="input-control" name="aa_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Date/Time</label>
+                                    <input type="datetime-local" class="input-control" name="aa_datetime" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Approval Status</label>
+                                    <select class="input-control" name="aa_status">
+                                        <option value="pending">Pending</option>
+                                        <option value="approved">Approved</option>
+                                        <option value="rejected">Rejected</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="signature-container">
+                                <canvas class="signature-canvas" id="sigAA"></canvas>
+                                <div class="signature-print-area"></div>
+                                <div class="signature-actions">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="clearSignature('sigAA')">
+                                        <i class="fas fa-eraser"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Site Supervisor -->
+                        <div style="background: #d1ecf1; padding: 15px; border-radius: var(--radius);">
+                            <h4 style="margin-bottom: 10px; color: #0c5460;">
+                                <i class="fas fa-hard-hat"></i> Site Supervisor (PRA)
+                            </h4>
+                            <div class="form-grid grid-3">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" class="input-control" name="ss_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Date/Time</label>
+                                    <input type="datetime-local" class="input-control" name="ss_datetime" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Safety Clearance</label>
+                                    <select class="input-control" name="ss_clearance">
+                                        <option value="cleared">Cleared</option>
+                                        <option value="conditional">Conditional</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="signature-container">
+                                <canvas class="signature-canvas" id="sigSS"></canvas>
+                                <div class="signature-print-area"></div>
+                                <div class="signature-actions">
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="clearSignature('sigSS')">
+                                        <i class="fas fa-eraser"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 9. AUDIT LOG -->
+                <section id="audit-log" class="section-card">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span class="step-num">9</span>
+                            <span data-i18n="auditLog">Audit Log</span>
+                        </div>
+                        <button type="button" class="toggle-section"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="section-body">
+                        <div class="audit-log" id="auditLogContainer">
+                            <div class="log-entry">
+                                <div class="log-time">--:--</div>
+                                <div class="log-action">No changes recorded yet</div>
+                                <div class="log-user">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </form>
+        </main>
+    </div>
+
+    <!-- QR CODE MODAL -->
+    <div class="modal" id="qrModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeQRModal()">&times;</button>
+            <h3 style="margin-bottom: 20px; text-align: center;">Permit QR Code</h3>
+            <div class="qr-display">
+                <div id="qrcode"></div>
+                <p class="qr-text">Scan to view permit details</p>
+                <button class="btn btn-primary btn-sm" onclick="downloadQR()" style="margin-top: 15px;">
+                    <i class="fas fa-download"></i> Download QR
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OFFLINE INDICATOR -->
+    <div class="offline-indicator" id="offlineIndicator">
+        <i class="fas fa-wifi-slash"></i>
+        <span>You are offline. Changes will sync when online.</span>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ==========================================
+        // TRANSLATIONS OBJECT
+        // ==========================================
+        const translations = {
+            en: {
+                appTitle: "ZFD Permit Pro",
+                appSubtitle: "Work Management System",
+                navigation: "Navigation",
+                dashboard: "Dashboard",
+                newPermit: "New Permit",
+                permitSections: "Permit Sections",
+                headerInfo: "Header Info",
+                workDesc: "Work Description",
+                hazards: "Hazards",
+                riskMatrix: "Risk Matrix",
+                safeConditions: "Safe Conditions",
+                hseReq: "HSE Requirements",
+                gasTests: "Gas Tests",
+                signatures: "Signatures",
+                auditLog: "Audit Log",
+                darkMode: "Dark Mode",
+                coldWorkPermit: "Cold Work Permit",
+                completion: "Completion",
+                save: "Save",
+                issue: "Issue",
+                drafts: "Drafts",
+                active: "Active",
+                closed: "Closed",
+                compliance: "Compliance",
+                permitsList: "Permits List",
+                searchPermits: "Search permits...",
+                recentPermits: "Recent Permits",
+                permitNo: "Permit No.",
+                workSite: "Work Site",
+                date: "Date",
+                risk: "Risk",
+                status: "Status",
+                qr: "QR",
+                actions: "Actions",
+                quickActions: "Quick Actions Required",
+                invalidPermitNo: "Please enter valid permit number",
+                draft: "Draft",
+                issued: "Issued",
+                cancelled: "Cancelled"
+            },
+            ar: {
+                appTitle: "نظام ZFD للتصاريح",
+                appSubtitle: "نظام إدارة العمل",
+                navigation: "التنقل",
+                dashboard: "لوحة التحكم",
+                newPermit: "تصريح جديد",
+                permitSections: "أقسام التصريح",
+                headerInfo: "البيانات الرئيسية",
+                workDesc: "وصف العمل",
+                hazards: "المخاطر",
+                riskMatrix: "مصفوفة المخاطر",
+                safeConditions: "شروط السلامة",
+                hseReq: "متطلبات الصحة والسلامة",
+                gasTests: "اختبارات الغاز",
+                signatures: "التوقيعات",
+                auditLog: "سجل التدقيق",
+                darkMode: "الوضع الداكن",
+                coldWorkPermit: "تصريح العمل البارد",
+                completion: "الاكتمال",
+                save: "حفظ",
+                issue: "إصدار",
+                drafts: "المسودات",
+                active: "نشط",
+                closed: "مغلق",
+                compliance: "الامتثال",
+                permitsList: "قائمة التصاريح",
+                searchPermits: "البحث في التصاريح...",
+                recentPermits: "التصاريح الحديثة",
+                permitNo: "رقم التصريح",
+                workSite: "مكان العمل",
+                date: "التاريخ",
+                risk: "الخطر",
+                status: "الحالة",
+                qr: "الرمز",
+                actions: "الإجراءات",
+                quickActions: "إجراءات سريعة مطلوبة",
+                invalidPermitNo: "يرجى إدخال رقم تصريح صحيح",
+                draft: "مسودة",
+                issued: "صادر",
+                cancelled: "ملغي"
+            }
+        };
+
+        // ==========================================
+        // STATE MANAGEMENT
+        // ==========================================
+        let currentLang = localStorage.getItem('lang') || 'en';
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        let permits = JSON.parse(localStorage.getItem('permits') || '[]');
+        let currentPermitId = null;
+        let auditLogs = [];
+        let signaturePads = {};
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeApp();
+            setupEventListeners();
+            loadDashboard();
+            simulateWeatherCheck();
+        });
+
+        function initializeApp() {
+            // Set language
+            setLanguage(currentLang);
+            
+            // Set theme
+            if (currentTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                document.getElementById('themeIcon').classList.replace('fa-toggle-off', 'fa-toggle-on');
+            }
+            
+            // Set today's date
+            const dateInput = document.querySelector('input[name="permit_date"]');
+            if (dateInput && !dateInput.value) {
+                dateInput.valueAsDate = new Date();
+            }
+            
+            // Initialize signature pads
+            initSignaturePads();
+            
+            // Check online status
+            updateOnlineStatus();
+        }
+
+        // ==========================================
+        // EVENT LISTENERS SETUP
+        // ==========================================
+        function setupEventListeners() {
+            // Theme toggle
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            
+            // Language toggle
+            document.getElementById('langToggle').addEventListener('click', toggleLanguage);
+            
+            // Menu toggle (mobile)
+            document.getElementById('menuToggle').addEventListener('click', toggleSidebar);
+            
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', handleNavigation);
+            });
+            
+            // Form sections toggle
+            document.querySelectorAll('.toggle-section').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const card = e.target.closest('.section-card');
+                    card.classList.toggle('collapsed');
+                });
+            });
+            
+            // Save button
+            document.getElementById('saveBtn').addEventListener('click', savePermit);
+            
+            // Issue button
+            document.getElementById('issueBtn').addEventListener('click', issuePermit);
+            
+            // New permit button
+            document.getElementById('newPermitBtn').addEventListener('click', () => {
+                switchView('new-permit');
+                resetForm();
+            });
+            
+            // Search and filter
+            document.getElementById('searchPermits').addEventListener('input', filterPermits);
+            document.getElementById('statusFilter').addEventListener('change', filterPermits);
+            
+            // Risk matrix calculation
+            document.getElementById('riskProbability').addEventListener('change', calculateRisk);
+            document.getElementById('riskSeverity').addEventListener('change', calculateRisk);
+            
+            // Add gas test row
+            document.getElementById('addGasTestRow').addEventListener('click', addGasTestRow);
+            
+            // Contractor radio buttons
+            document.querySelectorAll('input[name="work_by"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    document.getElementById('contractorName').disabled = e.target.value !== 'contractor';
+                });
+            });
+            
+            // Form auto-save
+            document.getElementById('permitForm').addEventListener('input', debounce(autoSave, 1000));
+            
+            // Online/offline detection
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            
+            // Branding
+            document.getElementById('applyBranding').addEventListener('click', applyBranding);
+            document.getElementById('logoUpload').addEventListener('change', handleLogoUpload);
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+        }
+
+        // ==========================================
+        // NAVIGATION & VIEW MANAGEMENT
+        // ==========================================
+        function handleNavigation(e) {
+            const view = e.currentTarget.dataset.view;
+            const section = e.currentTarget.dataset.section;
+            
+            // Update active nav
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            
+            if (view) {
+                switchView(view);
+            } else if (section) {
+                // Scroll to section
+                const element = document.getElementById(section);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    element.classList.add('highlight');
+                    setTimeout(() => element.classList.remove('highlight'), 2000);
+                }
+                
+                // Close sidebar on mobile
+                if (window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            }
+        }
+
+        function switchView(viewName) {
+            const dashboard = document.getElementById('dashboardView');
+            const form = document.getElementById('formView');
+            
+            if (viewName === 'dashboard') {
+                dashboard.classList.add('active');
+                form.classList.remove('active');
+                loadDashboard();
+            } else {
+                dashboard.classList.remove('active');
+                form.classList.add('active');
+                updateProgressBar();
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ==========================================
+        // THEME & LANGUAGE
+        // ==========================================
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            
+            if (body.hasAttribute('data-theme')) {
+                body.removeAttribute('data-theme');
+                icon.classList.replace('fa-toggle-on', 'fa-toggle-off');
+                currentTheme = 'light';
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                icon.classList.replace('fa-toggle-off', 'fa-toggle-on');
+                currentTheme = 'dark';
+            }
+            
+            localStorage.setItem('theme', currentTheme);
+            showToast('Theme updated', 'success');
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            setLanguage(currentLang);
+            localStorage.setItem('lang', currentLang);
+            
+            // Update direction
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLang;
+        }
+
+        function setLanguage(lang) {
+            const t = translations[lang];
+            document.getElementById('currentLang').textContent = lang.toUpperCase();
+            
+            // Update all elements with data-i18n
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+            
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.dataset.i18nPlaceholder;
+                if (t[key]) {
+                    el.placeholder = t[key];
+                }
+            });
+        }
+
+        // ==========================================
+        // DASHBOARD & PERMITS MANAGEMENT
+        // ==========================================
+        function loadDashboard() {
+            // Calculate stats
+            const drafts = permits.filter(p => p.status === 'draft').length;
+            const active = permits.filter(p => p.status === 'active' || p.status === 'issued').length;
+            const closed = permits.filter(p => p.status === 'closed').length;
+            
+            document.getElementById('countDraft').textContent = drafts;
+            document.getElementById('countActive').textContent = active;
+            document.getElementById('countClosed').textContent = closed;
+            document.getElementById('pendingBadge').textContent = drafts;
+            
+            // Render table
+            renderPermitsTable(permits);
+            document.getElementById('permitsCount').textContent = `${permits.length} permits`;
+        }
+
+        function renderPermitsTable(permitsToRender) {
+            const tbody = document.getElementById('permitsTableBody');
+            tbody.innerHTML = '';
+            
+            if (permitsToRender.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center;padding:40px;color:var(--text-light)">
+                            <i class="fas fa-inbox" style="font-size:48px;margin-bottom:10px;display:block"></i>
+                            No permits found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            permitsToRender.forEach(permit => {
+                const row = document.createElement('tr');
+                const statusClass = `status-${permit.status}`;
+                const statusText = translations[currentLang][permit.status] || permit.status;
+                
+                row.innerHTML = `
+                    <td><strong>${permit.permitNo}</strong></td>
+                    <td>${permit.workSite || '-'}</td>
+                    <td>${formatDate(permit.date)}</td>
+                    <td><span class="status-badge ${permit.riskCategory === 'H' ? 'status-closed' : permit.riskCategory === 'M' ? 'status-issued' : 'status-active'}">${permit.riskCategory}</span></td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td class="qr-cell">
+                        <button class="btn btn-secondary btn-sm" onclick="showQRCode('${permit.permitNo}')">
+                            <i class="fas fa-qrcode"></i>
+                        </button>
+                    </td>
+                    <td class="action-cell">
+                        <button class="btn btn-secondary btn-sm" onclick="editPermit('${permit.permitNo}')" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="clonePermit('${permit.permitNo}')" title="Clone">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        ${permit.status === 'draft' ? `
+                            <button class="btn btn-danger btn-sm" onclick="deletePermit('${permit.permitNo}')" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterPermits() {
+            const search = document.getElementById('searchPermits').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            
+            let filtered = permits;
+            
+            if (search) {
+                filtered = filtered.filter(p => 
+                    p.permitNo.toLowerCase().includes(search) ||
+                    (p.workSite && p.workSite.toLowerCase().includes(search))
+                );
+            }
+            
+            if (status) {
+                filtered = filtered.filter(p => p.status === status);
+            }
+            
+            renderPermitsTable(filtered);
+        }
+
+        // ==========================================
+        // PERMIT CRUD OPERATIONS
+        // ==========================================
+        function savePermit() {
+            // Validate form
+            if (!validateForm()) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+            
+            // Validate gas tests
+            if (!validateGasTests()) {
+                showToast('Gas test values out of range', 'error');
+                return;
+            }
+            
+            const formData = new FormData(document.getElementById('permitForm'));
+            const permitData = {
+                permitNo: formData.get('main_permit_no'),
+                workOrderNo: formData.get('work_order_no'),
+                date: formData.get('permit_date'),
+                riskCategory: formData.get('risk_category'),
+                workBy: formData.get('work_by'),
+                contractorName: formData.get('contractor_name'),
+                workSite: formData.get('work_site'),
+                workLocation: formData.get('work_location'),
+                equipmentName: formData.get('equipment_name'),
+                workDesc: formData.get('work_desc'),
+                status: currentPermitId ? (permits.find(p => p.permitNo === currentPermitId)?.status || 'draft') : 'draft',
+                createdAt: currentPermitId ? (permits.find(p => p.permitNo === currentPermitId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                signatures: {
+                    pa: signaturePads['sigPA'] ? signaturePads['sigPA'].toDataURL() : null,
+                    aa: signaturePads['sigAA'] ? signaturePads['sigAA'].toDataURL() : null,
+                    ss: signaturePads['sigSS'] ? signaturePads['sigSS'].toDataURL() : null
+                },
+                gasTests: collectGasTests(),
+                auditLog: auditLogs
+            };
+            
+            // Collect checkboxes
+            formData.forEach((value, key) => {
+                if (key.startsWith('hazard_') || key.startsWith('ppe_') || key.startsWith('status_') || 
+                    key.startsWith('precaution_') || key.startsWith('cert_') || key.startsWith('tool_') ||
+                    key.startsWith('loto_')) {
+                    permitData[key] = true;
+                }
+            });
+            
+            // Update or create
+            const existingIndex = permits.findIndex(p => p.permitNo === permitData.permitNo);
+            if (existingIndex >= 0) {
+                permits[existingIndex] = permitData;
+                addAuditLog('Permit updated', 'System');
+            } else {
+                permits.push(permitData);
+                addAuditLog('Permit created', 'System');
+                currentPermitId = permitData.permitNo;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('permits', JSON.stringify(permits));
+            
+            // Show success
+            showToast('Permit saved successfully', 'success');
+            
+            // Update UI
+            document.getElementById('issueBtn').style.display = 'inline-flex';
+            updateProgressBar();
+        }
+
+        function issuePermit() {
+            if (!confirm('Are you sure you want to issue this permit?')) return;
+            
+            const permit = permits.find(p => p.permitNo === currentPermitId);
+            if (permit) {
+                permit.status = 'issued';
+                permit.issuedAt = new Date().toISOString();
+                localStorage.setItem('permits', JSON.stringify(permits));
+                addAuditLog('Permit issued', 'System');
+                
+                showToast('Permit issued successfully', 'success');
+                document.getElementById('issueBtn').style.display = 'none';
+                
+                // Lock form
+                document.querySelectorAll('.input-control').forEach(input => {
+                    input.disabled = true;
+                });
+            }
+        }
+
+        function editPermit(permitNo) {
+            const permit = permits.find(p => p.permitNo === permitNo);
+            if (!permit) return;
+            
+            currentPermitId = permitNo;
+            switchView('new-permit');
+            
+            // Fill form
+            Object.keys(permit).forEach(key => {
+                const input = document.querySelector(`[name="${key}"]`);
+                if (input && !key.startsWith('hazard_') && !key.startsWith('ppe_')) {
+                    input.value = permit[key];
+                }
+            });
+            
+            // Restore checkboxes
+            Object.keys(permit).forEach(key => {
+                if ((key.startsWith('hazard_') || key.startsWith('ppe_')) && permit[key] === true) {
+                    const checkbox = document.querySelector(`[name="${key}"]`);
+                    if (checkbox) checkbox.checked = true;
+                }
+            });
+            
+            showToast('Permit loaded for editing', 'success');
+        }
+
+        function clonePermit(permitNo) {
+            const permit = permits.find(p => p.permitNo === permitNo);
+            if (!permit) return;
+            
+            currentPermitId = null;
+            switchView('new-permit');
+            resetForm();
+            
+            // Copy data but generate new permit number
+            const newPermitNo = `PTW-${Date.now()}`;
+            document.querySelector('[name="main_permit_no"]').value = newPermitNo;
+            document.querySelector('[name="work_site"]').value = permit.workSite || '';
+            document.querySelector('[name="work_desc"]').value = permit.workDesc || '';
+            document.querySelector('[name="risk_category"]').value = permit.riskCategory || '';
+            
+            addAuditLog(`Permit cloned from ${permitNo}`, 'System');
+            showToast('Permit cloned. Please review and save.', 'success');
+        }
+
+        function deletePermit(permitNo) {
+            if (!confirm(`Are you sure you want to delete permit ${permitNo}?`)) return;
+            
+            permits = permits.filter(p => p.permitNo !== permitNo);
+            localStorage.setItem('permits', JSON.stringify(permits));
+            loadDashboard();
+            showToast('Permit deleted', 'success');
+        }
+
+        function resetForm() {
+            document.getElementById('permitForm').reset();
+            currentPermitId = null;
+            auditLogs = [];
+            document.getElementById('auditLogContainer').innerHTML = `
+                <div class="log-entry">
+                    <div class="log-time">--:--</div>
+                    <div class="log-action">No changes recorded yet</div>
+                    <div class="log-user">-</div>
+                </div>
+            `;
+            
+            // Clear signatures
+            Object.values(signaturePads).forEach(pad => pad.clear());
+            
+            // Enable all inputs
+            document.querySelectorAll('.input-control').forEach(input => {
+                input.disabled = false;
+            });
+            
+            document.getElementById('issueBtn').style.display = 'none';
+            updateProgressBar();
+        }
+
+        // ==========================================
+        // VALIDATION
+        // ==========================================
+        function validateForm() {
+            const form = document.getElementById('permitForm');
+            let isValid = true;
+            
+            // Required fields
+            const requiredFields = form.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add('invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('invalid');
+                }
+            });
+            
+            // Pattern validation
+            const permitNo = form.querySelector('[name="main_permit_no"]');
+            if (permitNo && permitNo.value) {
+                const pattern = /^[A-Z0-9\-]{5,20}$/;
+                if (!pattern.test(permitNo.value)) {
+                    permitNo.classList.add('invalid');
+                    isValid = false;
+                }
+            }
+            
+            return isValid;
+        }
+
+        function validateGasTests() {
+            const rows = document.querySelectorAll('#gasTestsBody tr');
+            let allValid = true;
+            
+            rows.forEach(row => {
+                const o2 = parseFloat(row.querySelector('.gas-o2').value);
+                const h2s = parseFloat(row.querySelector('.gas-h2s').value);
+                const co = parseFloat(row.querySelector('.gas-co').value);
+                const lel = parseFloat(row.querySelector('.gas-lel').value);
+                
+                // O2 must be between 19-23%
+                if (o2 && (o2 < 19 || o2 > 23)) {
+                    row.querySelector('.gas-o2').classList.add('invalid');
+                    allValid = false;
+                } else {
+                    row.querySelector('.gas-o2').classList.remove('invalid');
+                }
+                
+                // H2S must be 0-10 ppm
+                if (h2s && (h2s < 0 || h2s > 10)) {
+                    row.querySelector('.gas-h2s').classList.add('invalid');
+                    allValid = false;
+                } else {
+                    row.querySelector('.gas-h2s').classList.remove('invalid');
+                }
+                
+                // CO must be 0-35 ppm
+                if (co && (co < 0 || co > 35)) {
+                    row.querySelector('.gas-co').classList.add('invalid');
+                    allValid = false;
+                } else {
+                    row.querySelector('.gas-co').classList.remove('invalid');
+                }
+                
+                // LEL must be 0-100%
+                if (lel && (lel < 0 || lel > 100)) {
+                    row.querySelector('.gas-lel').classList.add('invalid');
+                    allValid = false;
+                } else {
+                    row.querySelector('.gas-lel').classList.remove('invalid');
+                }
+            });
+            
+            return allValid;
+        }
+
+        // ==========================================
+        // SIGNATURE PAD
+        // ==========================================
+        function initSignaturePads() {
+            const canvases = ['sigPA', 'sigAA', 'sigSS'];
+            
+            canvases.forEach(id => {
+                const canvas = document.getElementById(id);
+                if (!canvas) return;
+                
+                const ctx = canvas.getContext('2d');
+                
+                // Set canvas size
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                
+                // Setup context
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                let isDrawing = false;
+                let lastX = 0;
+                let lastY = 0;
+                
+                // Mouse events
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseout', stopDrawing);
+                
+                // Touch events
+                canvas.addEventListener('touchstart', handleTouch);
+                canvas.addEventListener('touchmove', handleTouch);
+                canvas.addEventListener('touchend', stopDrawing);
+                
+                function startDrawing(e) {
+                    isDrawing = true;
+                    [lastX, lastY] = [e.offsetX, e.offsetY];
+                }
+                
+                function draw(e) {
+                    if (!isDrawing) return;
+                    ctx.beginPath();
+                    ctx.moveTo(lastX, lastY);
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                    [lastX, lastY] = [e.offsetX, e.offsetY];
+                }
+                
+                function stopDrawing() {
+                    isDrawing = false;
+                }
+                
+                function handleTouch(e) {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    const x = touch.clientX - rect.left;
+                    const y = touch.clientY - rect.top;
+                    
+                    if (e.type === 'touchstart') {
+                        isDrawing = true;
+                        [lastX, lastY] = [x, y];
+                    } else if (e.type === 'touchmove' && isDrawing) {
+                        ctx.beginPath();
+                        ctx.moveTo(lastX, lastY);
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                        [lastX, lastY] = [x, y];
+                    }
+                }
+                
+                signaturePads[id] = {
+                    canvas: canvas,
+                    ctx: ctx,
+                    toDataURL: () => canvas.toDataURL(),
+                    clear: () => ctx.clearRect(0, 0, canvas.width, canvas.height)
+                };
+            });
+        }
+
+        function clearSignature(id) {
+            if (signaturePads[id]) {
+                signaturePads[id].clear();
+            }
+        }
+
+        function undoSignature(id) {
+            // Simple undo - clear entire signature
+            // For advanced undo, we'd need to store history
+            clearSignature(id);
+        }
+
+        // ==========================================
+        // GAS TESTS
+        // ==========================================
+        function addGasTestRow() {
+            const tbody = document.getElementById('gasTestsBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="time" class="input-control gas-time"></td>
+                <td><input type="number" class="input-control gas-lel" min="0" max="100" step="0.1"></td>
+                <td><input type="number" class="input-control gas-o2" min="19" max="23" step="0.1"></td>
+                <td><input type="number" class="input-control gas-h2s" min="0" max="10" step="0.1"></td>
+                <td><input type="number" class="input-control gas-co" min="0" max="35" step="0.1"></td>
+                <td><input type="text" class="input-control gas-tester"></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        function collectGasTests() {
+            const tests = [];
+            document.querySelectorAll('#gasTestsBody tr').forEach(row => {
+                tests.push({
+                    time: row.querySelector('.gas-time').value,
+                    lel: row.querySelector('.gas-lel').value,
+                    o2: row.querySelector('.gas-o2').value,
+                    h2s: row.querySelector('.gas-h2s').value,
+                    co: row.querySelector('.gas-co').value,
+                    tester: row.querySelector('.gas-tester').value
+                });
+            });
+            return tests;
+        }
+
+        // ==========================================
+        // RISK MATRIX
+        // ==========================================
+        function calculateRisk() {
+            const probability = parseInt(document.getElementById('riskProbability').value);
+            const severity = parseInt(document.getElementById('riskSeverity').value);
+            const score = probability * severity;
+            
+            const display = document.getElementById('riskLevelDisplay');
+            let level, className, controls;
+            
+            if (score <= 4) {
+                level = 'LOW';
+                className = 'risk-low';
+                controls = `
+                    • Standard work procedures<br>
+                    • Basic PPE required<br>
+                    • Routine supervision
+                `;
+            } else if (score <= 12) {
+                level = 'MEDIUM';
+                className = 'risk-medium';
+                controls = `
+                    • Enhanced supervision required<br>
+                    • Additional PPE: Face shield, hearing protection<br>
+                    • Pre-work safety briefing mandatory
+                `;
+            } else {
+                level = 'HIGH';
+                className = 'risk-high';
+                controls = `
+                    • Management approval required<br>
+                    • Full PPE including harness if needed<br>
+                    • Continuous monitoring<br>
+                    • Emergency response team on standby
+                `;
+            }
+            
+            display.textContent = `Risk Level: ${level} (Score: ${score})`;
+            display.className = `risk-level-display ${className}`;
+            document.getElementById('recommendedControls').innerHTML = controls;
+            
+            // Update quick info
+            if (score > 12) {
+                showQuickInfo([
+                    'High risk - Management approval required',
+                    'Emergency response team must be on standby',
+                    'Continuous gas monitoring required'
+                ]);
+            }
+        }
+
+        // ==========================================
+        // QUICK INFO PANEL
+        // ==========================================
+        function showQuickInfo(items) {
+            const panel = document.getElementById('quickInfo');
+            const list = document.getElementById('quickActionsList');
+            
+            list.innerHTML = items.map(item => `
+                <li><i class="fas fa-exclamation-circle"></i> ${item}</li>
+            `).join('');
+            
+            panel.classList.add('show');
+        }
+
+        // ==========================================
+        // AUDIT LOG
+        // ==========================================
+        function addAuditLog(action, user) {
+            const timestamp = new Date().toLocaleString();
+            auditLogs.push({ time: timestamp, action, user });
+            
+            const container = document.getElementById('auditLogContainer');
+            if (auditLogs.length === 1 && auditLogs[0].action === 'No changes') {
+                container.innerHTML = '';
+            }
+            
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <div class="log-time">${timestamp}</div>
+                <div class="log-action">${action}</div>
+                <div class="log-user">${user}</div>
+            `;
+            
+            container.insertBefore(entry, container.firstChild);
+        }
+
+        // ==========================================
+        // QR CODE
+        // ==========================================
+        function showQRCode(permitNo) {
+            const modal = document.getElementById('qrModal');
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            
+            // Generate QR with permit URL/data
+            const permitData = `PERMIT:${permitNo}|DATE:${new Date().toISOString().split('T')[0]}`;
+            new QRCode(qrContainer, {
+                text: permitData,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            
+            modal.classList.add('active');
+        }
+
+        function closeQRModal() {
+            document.getElementById('qrModal').classList.remove('active');
+        }
+
+        function downloadQR() {
+            const canvas = document.querySelector('#qrcode canvas');
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = 'permit-qr.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            }
+        }
+
+        // ==========================================
+        // UTILITIES
+        // ==========================================
+        function updateProgressBar() {
+            const form = document.getElementById('permitForm');
+            const inputs = form.querySelectorAll('input, select, textarea');
+            let filled = 0;
+            let total = 0;
+            
+            inputs.forEach(input => {
+                if (input.type !== 'hidden' && input.name) {
+                    total++;
+                    if (input.type === 'checkbox' || input.type === 'radio') {
+                        if (input.checked) filled++;
+                    } else if (input.value.trim() !== '') {
+                        filled++;
+                    }
+                }
+            });
+            
+            const percent = total === 0 ? 0 : Math.round((filled / total) * 100);
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = percent + '%';
+        }
+
+        function autoSave() {
+            // Debounced auto-save
+            if (this.autoSaveTimeout) clearTimeout(this.autoSaveTimeout);
+            this.autoSaveTimeout = setTimeout(() => {
+                const formData = new FormData(document.getElementById('permitForm'));
+                const tempData = {
+                    permitNo: formData.get('main_permit_no'),
+                    tempSave: new Date().toISOString()
+                };
+                localStorage.setItem('tempPermit', JSON.stringify(tempData));
+            }, 1000);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            return new Date(dateString).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            toast.innerHTML = `
+                <i class="fas ${icons[type]} toast-icon"></i>
+                <div class="toast-content">
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function updateOnlineStatus() {
+            const indicator = document.getElementById('offlineIndicator');
+            if (navigator.onLine) {
+                indicator.classList.remove('show');
+            } else {
+                indicator.classList.add('show');
+                showToast('You are offline. Changes will be saved locally.', 'warning');
+            }
+        }
+
+        function simulateWeatherCheck() {
+            // Simulate weather API call
+            const weatherStatus = document.getElementById('weatherStatus');
+            const conditions = [
+                'Clear, 25°C, Wind: 5 km/h ✓',
+                'Partly Cloudy, 22°C, Wind: 12 km/h ✓',
+                'Sunny, 28°C, Wind: 8 km/h ✓'
+            ];
+            const random = conditions[Math.floor(Math.random() * conditions.length)];
+            setTimeout(() => {
+                weatherStatus.textContent = random;
+            }, 1000);
+        }
+
+        function handleLogoUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const logoDiv = document.getElementById('brandLogo');
+                    logoDiv.innerHTML = `<img src="${event.target.result}" alt="Logo">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function applyBranding() {
+            const color = document.getElementById('primaryColor').value;
+            document.documentElement.style.setProperty('--primary-color', color);
+            localStorage.setItem('brandColor', color);
+            showToast('Branding applied', 'success');
+        }
+
+        function handleKeyboardShortcuts(e) {
+            // Ctrl+S to save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                savePermit();
+            }
+            
+            // Ctrl+P to print
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+            
+            // Escape to close modal
+            if (e.key === 'Escape') {
+                closeQRModal();
+            }
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('qrModal');
+            if (event.target === modal) {
+                closeQRModal();
+            }
+        }
+    </script>
+</body>
+</html>

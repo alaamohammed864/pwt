@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HOT WORK PERMIT — Industrial PTW System v4.0</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --primary: #c41e3a; --primary-dark: #8b0000;
+      --success: #228b22; --warning: #ffa500; --danger: #dc143c;
+      --bg: #f5f5f5; --surface: #ffffff; --border: #999;
+      --text: #000; --section-bg: #fff8dc; --header-bg: #ffe4b5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); font-size: 11px; line-height: 1.4; padding: 10px; }
+    
+    .permit-container { max-width: 1200px; margin: 0 auto; background: var(--surface); border: 3px solid var(--primary); box-shadow: 0 0 20px rgba(0,0,0,0.3); }
+    
+    .permit-header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 15px; text-align: center; border-bottom: 4px solid var(--primary-dark); }
+    .permit-header h1 { font-size: 28px; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; }
+    .permit-header .subtitle { font-size: 12px; opacity: 0.9; }
+    
+    .top-info-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 10px; background: var(--header-bg); border-bottom: 2px solid var(--border); }
+    .info-field { display: flex; flex-direction: column; gap: 3px; }
+    .info-field label { font-weight: bold; font-size: 10px; color: var(--primary-dark); }
+    .info-field input, .info-field select { padding: 6px; border: 1px solid var(--border); font-size: 11px; }
+    
+    .section { border: 2px solid var(--border); margin: 10px; padding: 10px; background: var(--surface); }
+    .section-header { background: var(--primary); color: white; padding: 6px 10px; font-weight: bold; font-size: 12px; margin: -10px -10px 10px -10px; display: flex; justify-content: space-between; align-items: center; }
+    .section-header.urgent { background: var(--danger); }
+    .section-number { background: white; color: var(--primary); width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 8px; }
+    
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    
+    .field { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
+    .field label { font-weight: 600; font-size: 10px; color: #333; }
+    .field input, .field select, .field textarea { padding: 6px; border: 1px solid var(--border); font-size: 11px; font-family: inherit; }
+    .field textarea { resize: vertical; min-height: 60px; }
+    
+    .checkbox-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 6px; margin: 8px 0; }
+    .checkbox-item { display: flex; align-items: flex-start; gap: 6px; padding: 4px; background: #f9f9f9; border-radius: 3px; }
+    .checkbox-item input[type="checkbox"] { margin-top: 2px; width: 14px; height: 14px; }
+    .checkbox-item label { font-size: 10px; cursor: pointer; flex: 1; }
+    
+    .table-container { overflow-x: auto; margin: 10px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 10px; }
+    th, td { border: 1px solid var(--border); padding: 6px; text-align: left; }
+    th { background: var(--header-bg); font-weight: bold; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    
+    .signature-box { border: 2px dashed var(--border); padding: 10px; margin: 8px 0; background: #fafafa; text-align: center; }
+    .signature-box canvas { border: 1px solid #ccc; background: white; cursor: crosshair; width: 100%; max-width: 300px; height: 80px; }
+    .signature-controls { display: flex; gap: 6px; justify-content: center; margin-top: 6px; }
+    .signature-controls button { padding: 4px 10px; font-size: 10px; cursor: pointer; }
+    
+    .file-upload-zone { border: 2px dashed var(--primary); padding: 15px; text-align: center; background: #fff8dc; cursor: pointer; margin: 8px 0; transition: all 0.3s; }
+    .file-upload-zone:hover { background: #ffecb3; border-color: var(--primary-dark); }
+    .file-upload-zone input { display: none; }
+    .file-list { max-height: 200px; overflow-y: auto; margin-top: 10px; }
+    .file-item { display: flex; justify-content: space-between; align-items: center; padding: 6px; background: #f5f5f5; margin: 4px 0; border-radius: 3px; font-size: 10px; }
+    .file-item .remove { color: var(--danger); cursor: pointer; font-weight: bold; }
+    
+    .certificates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+    .certificate-item { border: 1px solid var(--border); padding: 8px; background: #f9f9f9; border-radius: 4px; }
+    .certificate-item label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 10px; }
+    .certificate-item input[type="text"], .certificate-item input[type="date"] { width: 100%; padding: 4px; margin: 2px 0; font-size: 10px; }
+    
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-weight: bold; font-size: 10px; text-transform: uppercase; }
+    .status-active { background: #90ee90; color: #006400; }
+    .status-pending { background: #ffa500; color: #8b4500; }
+    .status-suspended { background: #ff6b6b; color: #8b0000; }
+    
+    .workflow-indicator { display: flex; justify-content: space-between; padding: 10px; background: var(--header-bg); margin: 10px 0; border-radius: 5px; }
+    .workflow-step { flex: 1; text-align: center; padding: 8px; margin: 0 4px; border-radius: 5px; background: #ddd; font-size: 10px; position: relative; }
+    .workflow-step.active { background: var(--primary); color: white; font-weight: bold; }
+    .workflow-step.completed { background: var(--success); color: white; }
+    .workflow-step::after { content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); font-size: 16px; }
+    .workflow-step:last-child::after { display: none; }
+    
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; margin: 4px; transition: all 0.3s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-warning { background: var(--warning); color: #000; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    
+    .toolbar { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #333; color: white; }
+    .toolbar-buttons { display: flex; gap: 8px; }
+    
+    .alert { padding: 10px; margin: 10px; border-radius: 4px; font-size: 11px; display: none; }
+    .alert-warning { background: #fff3cd; border-left: 4px solid var(--warning); color: #856404; }
+    .alert-danger { background: #f8d7da; border-left: 4px solid var(--danger); color: #721c24; }
+    
+    .gas-reading.safe { background: #90ee90; }
+    .gas-reading.warning { background: #ffa500; }
+    .gas-reading.danger { background: #ff6b6b; animation: pulse 1s infinite; }
+    
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    
+    .risk-matrix { display: inline-flex; gap: 2px; margin: 5px 0; }
+    .risk-cell { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; border: 1px solid #000; cursor: pointer; }
+    .risk-low { background: #90ee90; }
+    .risk-medium { background: #ffa500; }
+    .risk-high { background: #ff6b6b; }
+    .risk-critical { background: #8b0000; color: white; }
+    
+    .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    
+    @media print {
+      .toolbar, .btn, .file-upload-zone, .signature-controls { display: none !important; }
+      .section { break-inside: avoid; }
+      body { background: white; padding: 0; }
+      .permit-container { border: 2px solid #000; box-shadow: none; }
+    }
+    
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4, .two-column { grid-template-columns: 1fr; }
+      .checkbox-group { grid-template-columns: 1fr; }
+      .top-info-bar { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="permit-container" id="permitContent">
+  
+  <!-- HEADER -->
+  <div class="permit-header">
+    <h1>🔥 HOT WORK PERMIT</h1>
+    <div class="subtitle">Permit to Work — Oil & Gas Industrial System | ISO 45001:2018 Compliant</div>
+  </div>
+  
+  <!-- TOP INFO BAR -->
+  <div class="top-info-bar">
+    <div class="info-field">
+      <label>Main Permit Number / الرقم الرئيسي</label>
+      <input type="text" id="permitNo" value="PTW-HW-2026-0001">
+    </div>
+    <div class="info-field">
+      <label>Work Order No / رقم أمر العمل</label>
+      <input type="text" id="workOrder">
+    </div>
+    <div class="info-field">
+      <label>SCE / الشركة</label>
+      <select id="sce">
+        <option>-- Select --</option>
+        <option>Company / الشركة</option>
+        <option>Contractor / المقاول</option>
+      </select>
+    </div>
+    <div class="info-field">
+      <label>Category of Risk / فئة المخاطر</label>
+      <select id="riskCategory">
+        <option>-- Select --</option>
+        <option>HIGH RISK</option>
+        <option>MEDIUM RISK</option>
+        <option>LOW RISK</option>
+      </select>
+    </div>
+  </div>
+  
+  <!-- WORKFLOW INDICATOR -->
+  <div class="workflow-indicator">
+    <div class="workflow-step active" data-step="1">1-PA Initiation</div>
+    <div class="workflow-step" data-step="2">2-AA Review</div>
+    <div class="workflow-step" data-step="3">3-HSE Approval</div>
+    <div class="workflow-step" data-step="4">4-PRA Validation</div>
+    <div class="workflow-step" data-step="5">5-Active</div>
+  </div>
+  
+  <div id="expiryAlert" class="alert alert-warning">⚠️ Permit expires in 30 minutes!</div>
+  <div id="gasAlert" class="alert alert-danger">🚫 Unsafe gas readings detected!</div>
+  
+  <!-- SECTION 1: WORK DESCRIPTION -->
+  <div class="section">
+    <div class="section-header">
+      <span><span class="section-number">1</span>DESCRIPTION OF THE WORK TO BE PERFORMED / وصف العمل المقرر القيام به</span>
+    </div>
+    
+    <div class="grid-2">
+      <div class="field">
+        <label>Equipment Name / اسم المعدة</label>
+        <input type="text" id="equipName">
+      </div>
+      <div class="field">
+        <label>Equipment Number / رقم المعدة</label>
+        <input type="text" id="equipNo">
+      </div>
+    </div>
+    
+    <div class="grid-3">
+      <div class="field">
+        <label>Work Location / مكان العمل</label>
+        <input type="text" id="workLocation">
+      </div>
+      <div class="field">
+        <label>Vehicle Plate Number / رقم لوحة السيارة</label>
+        <input type="text" id="vehiclePlate">
+      </div>
+      <div class="field">
+        <label>Status / الحالة</label>
+        <select id="equipStatus">
+          <option>-- Select Status --</option>
+          <option>In Service</option>
+          <option>Shut Down</option>
+          <option>Isolated</option>
+          <option>Depressurized</option>
+          <option>Drained</option>
+          <option>Purged</option>
+          <option>Under Maintenance</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="field">
+      <label>Work Description / وصف العمل</label>
+      <textarea id="workDesc" rows="3"></textarea>
+    </div>
+    
+    <div class="grid-3">
+      <div class="field">
+        <label>Tools & Equipment Required / الأدوات والمعدات المطلوبة</label>
+        <textarea id="toolsRequired" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label>People Required - Day Shift / عدد العمال - نهار</label>
+        <input type="number" id="peopleDay" min="0">
+      </div>
+      <div class="field">
+        <label>People Required - Night Shift / عدد العمال - ليل</label>
+        <input type="number" id="peopleNight" min="0">
+      </div>
+    </div>
+    
+    <div class="grid-2">
+      <div class="field">
+        <label>Valid From / من تاريخ</label>
+        <input type="datetime-local" id="validFrom">
+      </div>
+      <div class="field">
+        <label>Valid Until / حتى تاريخ</label>
+        <input type="datetime-local" id="validUntil">
+      </div>
+    </div>
+    
+    <!-- FILE UPLOADS SECTION -->
+    <div class="section" style="border: 1px solid var(--primary); margin-top: 10px;">
+      <div class="section-header" style="background: var(--success);">
+        <span>📎 ATTACHMENTS & DOCUMENTS (Up to 100 files) / المرفقات والوثائق</span>
+      </div>
+      
+      <div class="file-upload-zone" onclick="document.getElementById('fileInput').click()">
+        <div style="font-size: 32px; margin-bottom: 8px;">📁</div>
+        <div style="font-weight: bold; margin-bottom: 4px;">Click to Upload Files / انقر لرفع الملفات</div>
+        <div style="font-size: 10px; color: #666;">Supports: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, DWG, P&ID (Max 100 files)</div>
+        <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.dwg,.dxf" onchange="app.handleFiles(this.files)">
+      </div>
+      
+      <div class="field">
+        <label>Document Category / فئة المستند</label>
+        <select id="docCategory">
+          <option>-- Select Category --</option>
+          <option>Risk Assessment (HIRA) / تقييم المخاطر</option>
+          <option>Method Statement / بيان الطريقة</option>
+          <option>Drawing / P&ID / الرسومات</option>
+          <option>Procedure / Std Instruction / الإجراءات القياسية</option>
+          <option>Safety Data Sheet / صحيفة بيانات السلامة</option>
+          <option>Inspection Report / تقرير التفتيش</option>
+          <option>Other / أخرى</option>
+        </select>
+      </div>
+      
+      <div class="file-list" id="fileList"></div>
+      <div style="text-align: right; font-size: 10px; color: #666;">
+        Total Files: <span id="fileCount">0</span> / 100
+      </div>
+    </div>
+  </div>
+  
+  <!-- SECTION 2: HAZARDS IDENTIFICATION -->
+  <div class="section">
+    <div class="section-header urgent">
+      <span><span class="section-number">2</span>HAZARDS IDENTIFICATION (PA) / بيان الأخطار</span>
+      <span style="font-size: 10px; font-weight: normal;">⚠️ CRITICAL — All applicable hazards must be identified</span>
+    </div>
+    
+    <div class="checkbox-group">
+      <div class="checkbox-item"><input type="checkbox" id="h1"><label for="h1">🔥 Liquid or gas under pressure / سائل/غاز مضغوط</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h2"><label for="h2">💨 Flying Particles / الجسيمات الطائرة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h3"><label for="h3">☠️ Toxic Materials / مواد سامة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h4"><label for="h4">⚡ Electricity / كهرباء</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h5"><label for="h5">🧪 Corrosive Materials / مواد تآكلية</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h6"><label for="h6">☢️ Radioactivity / النشاط الإشعاعي</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h7"><label for="h7">🔥 Flammable Materials / مواد قابلة للاشتعال</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h8"><label for="h8">⚙️ Rotating Machinery / الآلات الدوارة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h9"><label for="h9">🌡️ Hot Materials / مواد حارة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h10"><label for="h10">📢 Noisy Area (+85db) / منطقة صاخبة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h11"><label for="h11">💨 O₂ Deficiency / نقص الأكسجين</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h12"><label for="h12">🏗️ Process of Lifting Crane / رافعة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h13"><label for="h13">⚠️ Possible H₂S Area / منطقة كبريتيد الهيدروجين</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h14"><label for="h14">🏭 Adjacent Operations / عمليات مجاورة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h15"><label for="h15">☢️ Possible T-NORM / النشاط الإشعاعي الطبيعي</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h16"><label for="h16">⬇️ Danger of Falling / خطر السقوط</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h17"><label for="h17">🔩 Scaffolding to Install / سقالات</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h18"><label for="h18">🌩️ Wind/Weather Status / حالة الطقس</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h19"><label for="h19">🚪 Confined Space Entry / الأماكن المحصورة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="h20"><label for="h20">🧯 Add CO₂ Dry Chemical Powder</label></div>
+      <div class="checkbox-item" style="grid-column: 1/-1;">
+        <input type="checkbox" id="h21">
+        <label for="h21">📝 Others / أخرى: <input type="text" id="h21Text" style="width: 300px; margin-left: 8px;"></label>
+      </div>
+    </div>
+    
+    <div class="field" style="margin-top: 10px;">
+      <label>Performing Authority (PA) Name / اسم المنفذ المسؤول</label>
+      <input type="text" id="paName">
+    </div>
+  </div>
+  
+  <!-- SECTION 3: SAFE WORKING CONDITIONS -->
+  <div class="section">
+    <div class="section-header">
+      <span><span class="section-number">3</span>REQUIREMENT FOR SAFE WORKING CONDITIONS / شروط ظروف العمل الآمنة</span>
+    </div>
+    
+    <div class="two-column">
+      <div>
+        <h4 style="margin-bottom: 8px; color: var(--primary);">STATUS / الحالة</h4>
+        <div class="checkbox-group" style="grid-template-columns: 1fr;">
+          <div class="checkbox-item"><input type="checkbox" id="s1"><label for="s1">In service / في الخدمة</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s2"><label for="s2">Shut down / قـفـل</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s3"><label for="s3">Depressurized / مضغوط مع</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s4"><label for="s4">Drained / تم تصريف</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s5"><label for="s5">Water flushed / غسل بالماء</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s6"><label for="s6">Inerted with N₂ / معمل بـ</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s7"><label for="s7">Pressurized with / مضغوط بـ</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s8"><label for="s8">Blanketed with / مغطى بـ</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s9"><label for="s9">Full (Specify) / ممتلئ (حدد)</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s10"><label for="s10">Empty / فارغ</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s11"><label for="s11">Open / مفتوح</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s12"><label for="s12">Gas Free / خال من الغاز</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s13"><label for="s13">Steamed / بالبخار</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s14"><label for="s14">Ventilated / مهوى</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s15"><label for="s15">Continuity bonding /Earthing required / التأريض مطلوب</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s16"><label for="s16">Safety system(s) bypassed / inhibited / تم تجاوز نظام السلامة</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s17"><label for="s17">Continuous gas Monitoring / مراقبة مستمرة للغاز</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s18"><label for="s18">Fire fighting systems isolated / أنظمة مكافحة الحريق معزولة</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s19"><label for="s19">Fuel gas blinded / وقود الغاز معزول</label></div>
+          <div class="checkbox-item"><input type="checkbox" id="s20"><label for="s20">Elec. Circuits isolated & tagged / الدوائر الكهربائية معزولة ومعلمة</label></div>
+        </div>
+      </div>
+      
+      <div>
+        <h4 style="margin-bottom: 8px; color: var(--primary);">Complementary Certificates / الشهادات التكميلية</h4>
+        <div class="certificates-grid" id="certificatesGrid">
+          <div class="certificate-item">
+            <label>Confined Space Certificate / شهادة الأماكن المحصورة</label>
+            <input type="text" placeholder="Certificate No." id="cert1No">
+            <input type="date" id="cert1Date">
+            <input type="text" placeholder="Sr.No / المسلسل" id="cert1Sr">
+          </div>
+          <div class="certificate-item">
+            <label>Mechanical Isolation Certificate / شهادة العزل الميكانيكي</label>
+            <input type="text" placeholder="Certificate No." id="cert2No">
+            <input type="date" id="cert2Date">
+            <input type="text" placeholder="Sr.No / المسلسل" id="cert2Sr">
+          </div>
+          <div class="certificate-item">
+            <label>Electrical Isolation Certificate / شهادة العزل الكهربائي</label>
+            <input type="text" placeholder="Certificate No." id="cert3No">
+            <input type="date" id="cert3Date">
+            <input type="text" placeholder="Sr.No / المسلسل" id="cert3Sr">
+          </div>
+          <div class="certificate-item">
+            <label>Radiation Certificate / شهادة الإشعاع</label>
+            <input type="text" placeholder="Certificate No." id="cert4No">
+            <input type="date" id="cert4Date">
+            <input type="text" placeholder="Sr.No / المسلسل" id="cert4Sr">
+          </div>
+          <div class="certificate-item">
+            <label>Hot Tapping / توصيل ساخن</label>
+            <input type="text" placeholder="Certificate No." id="cert5No">
+            <input type="date" id="cert5Date">
+            <input type="text" placeholder="Sr.No / المسلسل" id="cert5Sr">
+          </div>
+          <div class="certificate-item">
+            <label>Excavation Certificate / شهادة الحفر</label>
+            <input type="text" placeholder="Certificate No." id="cert6No">
+            <input type="date" id="cert6Date">
+            <input type="text" placeholder="Sr.No / المسلسل" id="cert6Sr">
+          </div>
+          <div class="certificate-item">
+            <label>De-Isolator Certificate / شهادة إعادة التشغيل</label>
+            <input type="text" placeholder="Certificate No." id="cert7No">
+            <input type="date" id="cert7Date">
+            <input type="text" placeholder="Sr.No / المسلسل" id="cert7Sr">
+          </div>
+          <div class="certificate-item">
+            <label>Scaffolding Certificate / شهادة السقالات</label>
+            <input type="text" placeholder="Certificate No." id="cert8No">
+            <input type="date" id="cert8Date">
+            <input type="text" placeholder="Sr.No / المسلسل" id="cert8Sr">
+          </div>
+          <div class="certificate-item">
+            <label>Over Ride Certificate / شهادة التجاوز</label>
+            <input type="text" placeholder="Certificate No." id="cert9No">
+            <input type="date" id="cert9Date">
+            <input type="text" placeholder="Sr.No / المسلسل" id="cert9Sr">
+          </div>
+          <div class="certificate-item">
+            <label>F&G/ESD System Override / تجاوز نظام الكشف والحماية</label>
+            <input type="text" placeholder="Certificate No." id="cert10No">
+            <input type="date" id="cert10Date">
+            <input type="text" placeholder="Sr.No / المسلسل" id="cert10Sr">
+          </div>
+        </div>
+        
+        <div class="field" style="margin-top: 10px;">
+          <label>Additional Comments / تعليقات إضافية</label>
+          <textarea id="additionalComments" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <h4 style="margin: 15px 0 8px 0; color: var(--primary);">Fire Protection Requirements / متطلبات الحماية من الحريق</h4>
+    <div class="checkbox-group">
+      <div class="checkbox-item"><input type="checkbox" id="f1"><label for="f1">Equipment is Hot / المعدة ساخنة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="f2"><label for="f2">Gas check prior starting / فحص الغاز قبل البدء</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="f3"><label for="f3">Fire Network Pressurized / شبكة الإطفاء مضغوطة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="f4"><label for="f4">Fire Hose Lengthened / خرطوم الإطفاء ممدد</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="f5"><label for="f5">Foam Protection / حماية بالرغوة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="f6"><label for="f6">Mobile Fire Water Monitor / مدفع ماء متنقل</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="f7"><label for="f7">Fire Extinguisher at Site / طفاية حريق في الموقع</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="f8"><label for="f8">Fire Truck Required / شاحنة إطفاء مطلوبة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="f9"><label for="f9">Flame retardant partition / حاجز مقاوم للهب</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="f10"><label for="f10">Fire Watch Required / مراقب حريق مطلوب</label></div>
+    </div>
+  </div>
+  
+  <!-- SECTION 4: HSE REQUIREMENTS -->
+  <div class="section">
+    <div class="section-header">
+      <span><span class="section-number">4</span>HSE REQUIREMENTS FOR IMPLEMENTATION / متطلبات الصحة والسلامة</span>
+    </div>
+    
+    <h4 style="margin-bottom: 8px; color: var(--primary);">Personal Protective Equipment (PPE) / معدات الوقاية الشخصية</h4>
+    <div class="checkbox-group">
+      <div class="checkbox-item"><input type="checkbox" id="ppe1"><label for="ppe1">🪖 Safety Helmet / خوذة السلامة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe2"><label for="ppe2">🥊 Gloves / قفازات</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe3"><label for="ppe3">🥽 Safety Goggles / نظارات السلامة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe4"><label for="ppe4">😷 Dust Mask / Respirator / كمامة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe5"><label for="ppe5">👂 Ear Muffs / واقي الأذن</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe6"><label for="ppe6">👁️ Face Shield / واقي الوجه</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe7"><label for="ppe7">🦺 Safety Harness / حزام الأمان</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe8"><label for="ppe8">🦺 Life Lines / حبال النجاة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe9"><label for="ppe9">🥾 Safety Shoes / أحذية السلامة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe10"><label for="ppe10">🧥 Protective Clothing / الملابس الواقية</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe11"><label for="ppe11">🚒 SCBA / جهاز تنفس ذاتي</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="ppe12"><label for="ppe12">🔥 Flame Arrestor / مانع اللهب</label></div>
+    </div>
+    
+    <h4 style="margin: 15px 0 8px 0; color: var(--primary);">Site Safety Measures / إجراءات السلامة في الموقع</h4>
+    <div class="checkbox-group">
+      <div class="checkbox-item"><input type="checkbox" id="sm1"><label for="sm1">🚧 Barriers Required / حواجز مطلوبة</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="sm2"><label for="sm2">⚠️ Warning Signs / لافتات تحذيرية</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="sm3"><label for="sm3">🚗 Access/Escape Route / طريق الوصول/الهروب</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="sm4"><label for="sm4">📋 Tool Box Talk / اجتماع صندوق الأدوات</label></div>
+      <div class="checkbox-item"><input type="checkbox" id="sm5"><label for="sm5">🔒 Material Area Cleared / منطقة المواد مزالة</label></div>
+    </div>
+    
+    <div class="signature-box" style="margin-top: 15px;">
+      <div style="font-weight: bold; margin-bottom: 8px;">HSE Representative Sign / توقيع ممثل السلامة</div>
+      <canvas id="canvasHSE"></canvas>
+      <div class="signature-controls">
+        <button onclick="app.clearSig('HSE')">Clear</button>
+        <button class="btn btn-primary" onclick="app.saveSig('HSE')">Sign</button>
+      </div>
+      <div class="grid-2" style="margin-top: 10px; text-align: left;">
+        <div class="field"><label>Name / الاسم</label><input type="text" id="hseName"></div>
+        <div class="field"><label>Date & Time</label><input type="datetime-local" id="hseDateTime"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- SECTION 5: GAS TESTING -->
+  <div class="section">
+    <div class="section-header urgent">
+      <span><span class="section-number">5</span>GAS TESTS / اختبارات الغاز</span>
+      <span style="font-size: 10px;">⚠️ Must be carried out before starting activity</span>
+    </div>
+    
+    <div class="table-container">
+      <table id="gasTable">
+        <thead>
+          <tr>
+            <th>Gas Type / نوع الغاز</th>
+            <th>Reading / القراءة</th>
+            <th>Alarm Limit / حد الإنذار</th>
+            <th>Status / الحالة</th>
+            <th>Tested By / اسم الفاحص</th>
+            <th>Signature / التوقيع</th>
+            <th>Date / التاريخ</th>
+            <th>Time / الوقت</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>O₂ — Oxygen / الأكسجين</td>
+            <td><input type="number" step="0.1" data-gas="O2" style="width: 80px;"></td>
+            <td>19.5–23.5%</td>
+            <td class="gas-status">--</td>
+            <td><input type="text" style="width: 120px;"></td>
+            <td><canvas class="mini-sig" width="100" height="40"></canvas></td>
+            <td><input type="date" style="width: 100px;"></td>
+            <td><input type="time" style="width: 80px;"></td>
+          </tr>
+          <tr>
+            <td>LEL — Flammable Gas / الغاز القابل للاشتعال</td>
+            <td><input type="number" step="0.1" data-gas="LEL" style="width: 80px;"></td>
+            <td><10%</td>
+            <td class="gas-status">--</td>
+            <td><input type="text" style="width: 120px;"></td>
+            <td><canvas class="mini-sig" width="100" height="40"></canvas></td>
+            <td><input type="date" style="width: 100px;"></td>
+            <td><input type="time" style="width: 80px;"></td>
+          </tr>
+          <tr>
+            <td>H₂S — Hydrogen Sulfide / كبريتيد الهيدروجين</td>
+            <td><input type="number" step="1" data-gas="H2S" style="width: 80px;"></td>
+            <td><10 ppm</td>
+            <td class="gas-status">--</td>
+            <td><input type="text" style="width: 120px;"></td>
+            <td><canvas class="mini-sig" width="100" height="40"></canvas></td>
+            <td><input type="date" style="width: 100px;"></td>
+            <td><input type="time" style="width: 80px;"></td>
+          </tr>
+          <tr>
+            <td>CO — Carbon Monoxide / أول أكسيد الكربون</td>
+            <td><input type="number" step="1" data-gas="CO" style="width: 80px;"></td>
+            <td><25 ppm</td>
+            <td class="gas-status">--</td>
+            <td><input type="text" style="width: 120px;"></td>
+            <td><canvas class="mini-sig" width="100" height="40"></canvas></td>
+            <td><input type="date" style="width: 100px;"></td>
+            <td><input type="time" style="width: 80px;"></td>
+          </tr>
+          <tr>
+            <td>SO₂ — Sulfur Dioxide / ثاني أكسيد الكبريت</td>
+            <td><input type="number" step="1" data-gas="SO2" style="width: 80px;"></td>
+            <td><2 ppm</td>
+            <td class="gas-status">--</td>
+            <td><input type="text" style="width: 120px;"></td>
+            <td><canvas class="mini-sig" width="100" height="40"></canvas></td>
+            <td><input type="date" style="width: 100px;"></td>
+            <td><input type="time" style="width: 80px;"></td>
+          </tr>
+          <tr>
+            <td>NH₃ — Ammonia / الأمونيا</td>
+            <td><input type="number" step="1" data-gas="NH3" style="width: 80px;"></td>
+            <td><25 ppm</td>
+            <td class="gas-status">--</td>
+            <td><input type="text" style="width: 120px;"></td>
+            <td><canvas class="mini-sig" width="100" height="40"></canvas></td>
+            <td><input type="date" style="width: 100px;"></td>
+            <td><input type="time" style="width: 80px;"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <button class="btn btn-primary" onclick="app.addGasRow()">+ ADD ROW</button>
+    <button class="btn btn-danger" onclick="app.removeGasRow()">− REMOVE ROW</button>
+    <button class="btn btn-success" onclick="app.simulateIoT()">📡 Simulate IoT Device</button>
+  </div>
+  
+  <!-- SECTIONS 6-11: AUTHORIZATION, VALIDATION, SUSPENSION, COMPLETION -->
+  <div class="section">
+    <div class="section-header">
+      <span><span class="section-number">6</span>AUTHORIZATION — SIGNATURES / التواقيع</span>
+    </div>
+    
+    <div class="grid-2">
+      <div class="signature-box">
+        <div style="font-weight: bold; margin-bottom: 8px;">🏭 Area Authority (AA) / سلطة المنطقة</div>
+        <canvas id="canvasAA"></canvas>
+        <div class="signature-controls">
+          <button onclick="app.clearSig('AA')">Clear</button>
+          <button class="btn btn-primary" onclick="app.saveSig('AA')">Sign</button>
+        </div>
+        <div class="field" style="margin-top: 8px;"><input type="text" id="aaName" placeholder="Name / الاسم"></div>
+        <div class="grid-2"><input type="date" id="aaDate"><input type="time" id="aaTime"></div>
+      </div>
+      
+      <div class="signature-box">
+        <div style="font-weight: bold; margin-bottom: 8px;">👷 Performing Authority (PA) / المنفذ</div>
+        <canvas id="canvasPA"></canvas>
+        <div class="signature-controls">
+          <button onclick="app.clearSig('PA')">Clear</button>
+          <button class="btn btn-primary" onclick="app.saveSig('PA')">Sign</button>
+        </div>
+        <div class="field" style="margin-top: 8px;"><input type="text" id="paName2" placeholder="Name / الاسم"></div>
+        <div class="grid-2"><input type="date" id="paDate"><input type="time" id="paTime"></div>
+      </div>
+    </div>
+    
+    <div class="grid-2" style="margin-top: 10px;">
+      <div class="signature-box">
+        <div style="font-weight: bold; margin-bottom: 8px;">🛡️ HSE Supervisor / مشرف السلامة</div>
+        <canvas id="canvasHSE2"></canvas>
+        <div class="signature-controls">
+          <button onclick="app.clearSig('HSE2')">Clear</button>
+          <button class="btn btn-primary" onclick="app.saveSig('HSE2')">Sign</button>
+        </div>
+        <div class="field" style="margin-top: 8px;"><input type="text" id="hseName2" placeholder="Name / الاسم"></div>
+        <div class="grid-2"><input type="date" id="hseDate2"><input type="time" id="hseTime2"></div>
+      </div>
+      
+      <div class="signature-box">
+        <div style="font-weight: bold; margin-bottom: 8px;">👔 Site Supervisor (PRA) / مشرف الموقع</div>
+        <canvas id="canvasPRA"></canvas>
+        <div class="signature-controls">
+          <button onclick="app.clearSig('PRA')">Clear</button>
+          <button class="btn btn-primary" onclick="app.saveSig('PRA')">Sign</button>
+        </div>
+        <div class="field" style="margin-top: 8px;"><input type="text" id="praName" placeholder="Name / الاسم"></div>
+        <div class="grid-2"><input type="date" id="praDate"><input type="time" id="praTime"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- More sections (7-11) would continue here... -->
+  
+  <div class="toolbar">
+    <div class="toolbar-buttons">
+      <button class="btn btn-success" onclick="app.validate()">⚡ VALIDATE</button>
+      <button class="btn btn-primary" onclick="app.exportPDF()">🖨️ PRINT A4</button>
+      <button class="btn btn-warning" onclick="app.save()">💾 SAVE</button>
+    </div>
+    <div>
+      <span class="status-badge status-active" id="statusBadge">ACTIVE</span>
+      <span id="expiryTimer" style="margin-left: 15px; font-weight: bold; font-family: monospace;">--:--:--</span>
+    </div>
+  </div>
+  
+</div>
+
+<script>
+const app = {
+  files: [],
+  sigs: {},
+  gasRows: 6,
+  
+  init() {
+    this.setupSignatures();
+    this.setupGasMonitoring();
+    this.setupTimer();
+    this.loadState();
+  },
+  
+  handleFiles(fileList) {
+    if(this.files.length + fileList.length > 100) {
+      alert('Maximum 100 files allowed!');
+      return;
+    }
+    [...fileList].forEach(file => {
+      this.files.push({
+        name: file.name,
+        size: (file.size/1024).toFixed(2) + ' KB',
+        type: file.type,
+        category: document.getElementById('docCategory').value
+      });
+    });
+    this.renderFiles();
+  },
+  
+  renderFiles() {
+    const list = document.getElementById('fileList');
+    list.innerHTML = this.files.map((f, i) => `
+      <div class="file-item">
+        <div>
+          <strong>${f.name}</strong> (${f.size})<br>
+          <small>Category: ${f.category || 'Not specified'}</small>
+        </div>
+        <span class="remove" onclick="app.removeFile(${i})">✕</span>
+      </div>
+    `).join('');
+    document.getElementById('fileCount').textContent = this.files.length;
+  },
+  
+  removeFile(index) {
+    this.files.splice(index, 1);
+    this.renderFiles();
+  },
+  
+  setupSignatures() {
+    ['HSE','AA','PA','HSE2','PRA'].forEach(role => {
+      const canvas = document.getElementById(`canvas${role}`);
+      const ctx = canvas.getContext('2d');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = 80;
+      
+      let drawing = false;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#000';
+      
+      canvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+      canvas.addEventListener('mousemove', e => { if(!drawing) return; ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); });
+      canvas.addEventListener('mouseup', () => drawing = false);
+      canvas.addEventListener('mouseleave', () => drawing = false);
+      
+      this.sigs[role] = { canvas, ctx };
+    });
+  },
+  
+  clearSig(role) {
+    const s = this.sigs[role];
+    s.ctx.clearRect(0, 0, s.canvas.width, s.canvas.height);
+  },
+  
+  saveSig(role) {
+    const data = this.sigs[role].canvas.toDataURL();
+    const ts = new Date().toISOString();
+    localStorage.setItem(`sig_${role}`, JSON.stringify({ data, ts }));
+    alert(`${role} signature saved at ${ts}`);
+  },
+  
+  setupGasMonitoring() {
+    document.querySelectorAll('#gasTable input[data-gas]').forEach(inp => {
+      inp.addEventListener('input', e => {
+        const row = e.target.closest('tr');
+        const val = parseFloat(e.target.value);
+        const gas = e.target.dataset.gas;
+        const status = row.querySelector('.gas-status');
+        
+        let safe = false, warning = false;
+        if(gas === 'O2') { safe = val >= 19.5 && val <= 23.5; warning = val < 19.5 || val > 23.5; }
+        else if(gas === 'LEL') { safe = val < 10; warning = val >= 10; }
+        else if(gas === 'H2S') { safe = val < 10; warning = val >= 10; }
+        else if(gas === 'CO') { safe = val < 25; warning = val >= 25; }
+        else if(gas === 'SO2') { safe = val < 2; warning = val >= 2; }
+        else if(gas === 'NH3') { safe = val < 25; warning = val >= 25; }
+        
+        row.className = '';
+        if(safe) { status.textContent = 'SAFE'; status.style.color = 'green'; row.classList.add('safe'); }
+        else if(warning) { status.textContent = 'DANGER'; status.style.color = 'red'; row.classList.add('danger'); }
+        
+        const hasDanger = [...document.querySelectorAll('.gas-status')].some(s => s.textContent === 'DANGER');
+        document.getElementById('gasAlert').style.display = hasDanger ? 'block' : 'none';
+      });
+    });
+  },
+  
+  addGasRow() {
+    if(this.gasRows >= 20) return alert('Maximum rows reached');
+    const tbody = document.querySelector('#gasTable tbody');
+    const row = tbody.rows[0].cloneNode(true);
+    row.querySelectorAll('input').forEach(i => i.value = '');
+    row.querySelector('.gas-status').textContent = '--';
+    row.className = '';
+    tbody.appendChild(row);
+    this.gasRows++;
+  },
+  
+  removeGasRow() {
+    if(this.gasRows <= 4) return alert('Minimum 4 rows required');
+    const tbody = document.querySelector('#gasTable tbody');
+    tbody.deleteRow(-1);
+    this.gasRows--;
+  },
+  
+  simulateIoT() {
+    const mock = { O2: 20.9, LEL: 1.2, H2S: 2, CO: 5, SO2: 0.5, NH3: 3 };
+    Object.entries(mock).forEach(([gas, val]) => {
+      const inp = document.querySelector(`#gasTable input[data-gas="${gas}"]`);
+      if(inp) { inp.value = val; inp.dispatchEvent(new Event('input')); }
+    });
+  },
+  
+  setupTimer() {
+    document.getElementById('validUntil').addEventListener('change', () => this.updateTimer());
+    setInterval(() => this.updateTimer(), 1000);
+  },
+  
+  updateTimer() {
+    const until = new Date(document.getElementById('validUntil').value);
+    if(isNaN(until)) return;
+    const diff = until - Date.now();
+    if(diff < 0) {
+      document.getElementById('expiryTimer').textContent = 'EXPIRED';
+      document.getElementById('expiryAlert').style.display = 'block';
+    } else {
+      const h = Math.floor(diff/3600000);
+      const m = Math.floor((diff%3600000)/60000);
+      const s = Math.floor((diff%60000)/1000);
+      document.getElementById('expiryTimer').textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+      if(diff < 1800000) document.getElementById('expiryAlert').style.display = 'block';
+    }
+  },
+  
+  validate() {
+    if(this.files.length === 0) alert('⚠️ No attachments uploaded!');
+    if(document.querySelectorAll('input[type="checkbox"]:checked').length === 0) alert('⚠️ No hazards selected!');
+    alert('✅ Validation complete!');
+  },
+  
+  async exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const canvas = await html2canvas(document.getElementById('permitContent'), { scale: 1.5 });
+    const pdf = new jsPDF('l', 'mm', 'a4');
+    pdf.addImage(canvas, 'PNG', 0, 0, 297, canvas.height*297/canvas.width);
+    pdf.save('HotWorkPermit.pdf');
+  },
+  
+  save() {
+    const data = {
+      permitNo: document.getElementById('permitNo').value,
+      validUntil: document.getElementById('validUntil').value,
+      files: this.files
+    };
+    localStorage.setItem('ptw_data', JSON.stringify(data));
+    alert('✅ Saved successfully!');
+  },
+  
+  loadState() {
+    const saved = JSON.parse(localStorage.getItem('ptw_data') || '{}');
+    if(saved.permitNo) document.getElementById('permitNo').value = saved.permitNo;
+    if(saved.validUntil) document.getElementById('validUntil').value = saved.validUntil;
+    if(saved.files) { this.files = saved.files; this.renderFiles(); }
+  }
+};
+
+window.addEventListener('DOMContentLoaded', () => app.init());
+</script>
+</body>
+</html>

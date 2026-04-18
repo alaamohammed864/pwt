@@ -1,0 +1,2852 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cold Work Permit Pro — Intelligent Oil & Gas Permit System</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root {
+  --primary: #0a2540;
+  --primary-light: #1a3a5c;
+  --primary-dark: #061a2e;
+  --accent: #00b4d8;
+  --accent-glow: #00d4ff;
+  --warning: #e67e22;
+  --danger: #e74c3c;
+  --success: #27ae60;
+  --safe: #2ecc71;
+  --bg: #f0f4f8;
+  --card-bg: #ffffff;
+  --text: #1a1a2e;
+  --text-light: #6b7280;
+  --border: #d1d5db;
+  --shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --shadow-lg: 0 4px 20px rgba(0,0,0,0.15);
+  --radius: 6px;
+  --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --neon-blue: #00b4d8;
+  --neon-orange: #e67e22;
+  --neon-red: #e74c3c;
+  --neon-green: #2ecc71;
+}
+
+[data-theme="dark"] {
+  --bg: #0a0f1a;
+  --card-bg: #111827;
+  --text: #e2e8f0;
+  --text-light: #94a3b8;
+  --border: #2d3748;
+  --shadow: 0 2px 8px rgba(0,0,0,0.4);
+  --shadow-lg: 0 4px 20px rgba(0,0,0,0.5);
+  --primary: #0f172a;
+  --primary-light: #1e293b;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  transition: all 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* ========== HEADER / NAVBAR ========== */
+.navbar {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: white;
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.navbar-brand .logo-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--primary-dark);
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  font-family: var(--font);
+}
+
+.nav-btn:hover { background: rgba(255,255,255,0.2); transform: translateY(-1px); }
+.nav-btn.active { background: var(--accent); color: var(--primary-dark); border-color: var(--accent); }
+
+.nav-btn.icon-only {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 16px;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-draft { background: #6b7280; color: white; }
+.status-active { background: var(--success); color: white; }
+.status-suspended { background: var(--warning); color: white; }
+.status-closed { background: var(--danger); color: white; }
+
+/* ========== MAIN LAYOUT ========== */
+.main-container {
+  display: flex;
+  min-height: calc(100vh - 60px);
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--card-bg);
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+  overflow-y: auto;
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+  transition: all 0.3s;
+}
+
+.sidebar-section {
+  padding: 8px 16px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-light);
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+  color: var(--text);
+  border-left: 3px solid transparent;
+}
+
+.sidebar-item:hover { background: var(--bg); }
+.sidebar-item.active {
+  background: linear-gradient(90deg, rgba(0,180,216,0.1), transparent);
+  border-left-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-item .item-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.sidebar-item .item-num {
+  width: 22px;
+  height: 22px;
+  background: var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sidebar-item.active .item-num {
+  background: var(--accent);
+  color: var(--primary-dark);
+}
+
+.content-area {
+  flex: 1;
+  padding: 24px;
+  max-width: 1200px;
+}
+
+/* ========== FORM SECTIONS ========== */
+.form-section {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.form-section.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--accent);
+}
+
+.section-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+[data-theme="dark"] .section-header h2 { color: var(--accent); }
+
+.section-header .section-number {
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  color: var(--primary-dark);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  transition: all 0.3s;
+}
+
+.card:hover { box-shadow: var(--shadow-lg); }
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+[data-theme="dark"] .card-title { color: var(--accent); }
+
+/* ========== FORM ELEMENTS ========== */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.form-grid-3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.form-group label .required {
+  color: var(--danger);
+  margin-left: 2px;
+}
+
+.form-control {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-family: var(--font);
+  background: var(--card-bg);
+  color: var(--text);
+  transition: all 0.2s;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,180,216,0.15);
+}
+
+.form-control.error {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(231,76,60,0.15);
+}
+
+select.form-control {
+  cursor: pointer;
+  appearance: auto;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.form-row .form-group { flex: 1; }
+
+/* ========== CHECKBOX GROUPS ========== */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13px;
+}
+
+.checkbox-item:hover { background: var(--bg); }
+
+.checkbox-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.checkbox-item.hazard-high {
+  border-left: 3px solid var(--danger);
+  background: rgba(231,76,60,0.05);
+}
+
+.checkbox-item.hazard-medium {
+  border-left: 3px solid var(--warning);
+  background: rgba(230,126,34,0.05);
+}
+
+.checkbox-item.hazard-low {
+  border-left: 3px solid var(--safe);
+  background: rgba(46,204,113,0.05);
+}
+
+/* ========== TABLES ========== */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table thead {
+  background: var(--primary);
+  color: white;
+}
+
+.data-table th {
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table tbody tr:hover {
+  background: rgba(0,180,216,0.05);
+}
+
+.data-table .form-control {
+  padding: 6px 8px;
+  font-size: 13px;
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+.data-table .form-control:focus {
+  border-color: var(--accent);
+  background: var(--card-bg);
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ========== BUTTONS ========== */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  font-family: var(--font);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--primary-dark);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-warning {
+  background: var(--warning);
+  color: white;
+}
+
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* ========== RISK LEVEL INDICATOR ========== */
+.risk-selector {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.risk-option {
+  flex: 1;
+  padding: 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.risk-option:hover { transform: translateY(-2px); }
+
+.risk-option.risk-low { border-color: var(--safe); }
+.risk-option.risk-low.selected {
+  background: var(--safe);
+  color: white;
+  border-color: var(--safe);
+}
+
+.risk-option.risk-medium { border-color: var(--warning); }
+.risk-option.risk-medium.selected {
+  background: var(--warning);
+  color: white;
+  border-color: var(--warning);
+}
+
+.risk-option.risk-high { border-color: var(--danger); }
+.risk-option.risk-high.selected {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+.risk-option .risk-icon { font-size: 28px; margin-bottom: 4px; }
+.risk-option .risk-label { font-size: 14px; font-weight: 700; }
+.risk-option .risk-desc { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+
+/* ========== SIGNATURE BOX ========== */
+.signature-box {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  background: var(--bg);
+  text-align: center;
+}
+
+.signature-box .sig-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+  font-style: italic;
+}
+
+[data-theme="dark"] .signature-box .sig-name { color: var(--accent); }
+
+.signature-box .sig-role {
+  font-size: 11px;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.signature-box .sig-time {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 8px;
+}
+
+/* ========== QR CODE ========== */
+.qr-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+#qr-canvas {
+  display: block;
+}
+
+/* ========== 3D VIEWER ========== */
+.viewer-3d {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 500;
+  display: none;
+}
+
+.viewer-3d.active { display: block; }
+
+#three-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.viewer-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  pointer-events: none;
+}
+
+.viewer-overlay .viewer-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.viewer-overlay .viewer-subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+}
+
+.viewer-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  transition: all 0.2s;
+}
+
+.viewer-close:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.viewer-panel-info {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  pointer-events: all;
+  display: flex;
+  gap: 12px;
+}
+
+.viewer-panel-info .panel-card {
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0,180,216,0.3);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-width: 140px;
+}
+
+.viewer-panel-info .panel-card:hover {
+  border-color: var(--accent);
+  background: rgba(0,180,216,0.2);
+  transform: translateY(-4px);
+}
+
+.viewer-panel-info .panel-card .pc-icon { font-size: 20px; margin-bottom: 4px; }
+.viewer-panel-info .panel-card .pc-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.viewer-panel-info .panel-card .pc-status { font-size: 10px; opacity: 0.7; margin-top: 2px; }
+
+/* ========== NOTIFICATION / TOAST ========== */
+.toast-container {
+  position: fixed;
+  top: 72px;
+  right: 20px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+  min-width: 280px;
+}
+
+.toast.toast-success { border-left: 4px solid var(--success); }
+.toast.toast-error { border-left: 4px solid var(--danger); }
+.toast.toast-warning { border-left: 4px solid var(--warning); }
+.toast.toast-info { border-left: 4px solid var(--accent); }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+/* ========== MODAL ========== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+  animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: var(--primary);
+}
+
+[data-theme="dark"] .modal h3 { color: var(--accent); }
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* ========== PRINT STYLES ========== */
+@media print {
+  .navbar, .sidebar, .viewer-3d, .nav-btn, .toast-container, .modal-overlay { display: none !important; }
+  .main-container { display: block; }
+  .content-area { padding: 0; max-width: 100%; }
+  .form-section { display: block !important; page-break-after: always; }
+  .card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+  .btn { display: none; }
+  body { background: white; color: black; }
+  .section-header { border-bottom: 2px solid #333; }
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+  .sidebar { width: 60px; }
+  .sidebar .item-label, .sidebar .sidebar-section, .sidebar .item-num { display: none; }
+  .sidebar-item { justify-content: center; padding: 12px; }
+  .content-area { padding: 16px; }
+}
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .form-grid { grid-template-columns: 1fr; }
+  .checkbox-grid { grid-template-columns: 1fr; }
+  .risk-selector { flex-direction: column; }
+  .navbar { padding: 0 12px; }
+  .navbar-brand span { display: none; }
+  .content-area { padding: 12px; }
+}
+
+/* ========== RTL SUPPORT ========== */
+[dir="rtl"] .sidebar {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+[dir="rtl"] .sidebar-item {
+  border-left: none;
+  border-right: 3px solid transparent;
+}
+
+[dir="rtl"] .sidebar-item.active {
+  background: linear-gradient(-90deg, rgba(0,180,216,0.1), transparent);
+  border-right-color: var(--accent);
+}
+
+[dir="rtl"] .checkbox-item {
+  border-left: none;
+  border-right: 3px solid;
+}
+
+[dir="rtl"] .data-table th { text-align: right; }
+
+[dir="rtl"] .form-group label .required { margin-right: 2px; margin-left: 0; }
+
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+
+/* ========== PULSE ANIMATION ========== */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse { animation: pulse 2s infinite; }
+
+/* ========== PROGRESS BAR ========== */
+.progress-bar {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.progress-bar .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--success));
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* ========== ADDITIONAL STYLES ========== */
+.audit-log {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.audit-entry {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.audit-entry .audit-time {
+  color: var(--text-light);
+  white-space: nowrap;
+  font-size: 11px;
+  min-width: 120px;
+}
+
+.audit-entry .audit-action { flex: 1; }
+.audit-entry .audit-user { font-weight: 600; }
+
+.emergency-contacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.emergency-card {
+  background: rgba(231,76,60,0.05);
+  border: 1px solid rgba(231,76,60,0.2);
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: center;
+}
+
+.emergency-card .ec-icon { font-size: 24px; margin-bottom: 4px; }
+.emergency-card .ec-name { font-size: 12px; font-weight: 600; }
+.emergency-card .ec-number { font-size: 14px; font-weight: 700; color: var(--danger); }
+
+.inline-flex {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.text-muted { color: var(--text-light); font-size: 12px; }
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tag-blue { background: rgba(0,180,216,0.15); color: var(--accent); }
+.tag-red { background: rgba(231,76,60,0.15); color: var(--danger); }
+.tag-green { background: rgba(46,204,113,0.15); color: var(--success); }
+.tag-orange { background: rgba(230,126,34,0.15); color: var(--warning); }
+
+/* Gas test color coding */
+.gas-ok { color: var(--success); font-weight: 700; }
+.gas-warning { color: var(--warning); font-weight: 700; }
+.gas-danger { color: var(--danger); font-weight: 700; }
+</style>
+</head>
+<body data-theme="light">
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <div class="logo-icon"></div>
+    <span>Cold Work Permit Pro</span>
+    <span style="font-size:11px;opacity:0.7;font-weight:400">v2.0</span>
+  </div>
+  <div class="navbar-actions">
+    <span class="status-badge status-draft" id="permitStatusBadge">DRAFT</span>
+    <button class="nav-btn icon-only" onclick="toggleTheme()" title="Toggle Theme">🌓</button>
+    <button class="nav-btn icon-only" onclick="toggleLang()" title="Toggle Language" id="langBtn">عربي</button>
+    <button class="nav-btn" onclick="show3DViewer()">🔮 3D View</button>
+    <button class="nav-btn" onclick="validateForm()">✓ Validate</button>
+    <button class="nav-btn" onclick="window.print()"> Print</button>
+    <button class="nav-btn" onclick="exportPDF()" style="background:var(--accent);color:var(--primary-dark);font-weight:700"> Export PDF</button>
+  </div>
+</nav>
+
+<!-- 3D VIEWER -->
+<div class="viewer-3d" id="viewer3D">
+  <canvas id="three-canvas"></canvas>
+  <div class="viewer-overlay">
+    <div class="viewer-title">🔮 3D Control Room</div>
+    <div class="viewer-subtitle">Interactive Permit Visualization — Click panels to navigate</div>
+  </div>
+  <button class="viewer-close" onclick="hide3DViewer()">✕</button>
+  <div class="viewer-panel-info" id="viewerPanelInfo">
+    <div class="panel-card" onclick="hide3DViewer();goToSection(0)">
+      <div class="pc-icon">📋</div>
+      <div class="pc-label">Permit Header</div>
+      <div class="pc-status" id="vpc-status">Draft</div>
+    </div>
+    <div class="panel-card" onclick="hide3DViewer();goToSection(1)">
+      <div class="pc-icon">⚠</div>
+      <div class="pc-label">Hazards</div>
+      <div class="pc-status" id="vpc-hazards">0 selected</div>
+    </div>
+    <div class="panel-card" onclick="hide3DViewer();goToSection(4)">
+      <div class="pc-icon">🧪</div>
+      <div class="pc-label">Gas Testing</div>
+      <div class="pc-status" id="vpc-gas">Not tested</div>
+    </div>
+    <div class="panel-card" onclick="hide3DViewer();goToSection(8)">
+      <div class="pc-icon">🛡</div>
+      <div class="pc-label">Authorization</div>
+      <div class="pc-status" id="vpc-auth">Pending</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-container">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">PERMIT SECTIONS</div>
+    <div class="sidebar-item active" onclick="goToSection(0)" data-section="0">
+      <div class="item-icon">📋</div>
+      <span class="item-label">1. Permit Header</span>
+      <div class="item-num">1</div>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(1)" data-section="1">
+      <div class="item-icon">📝</div>
+      <span class="item-label">2. Work Description</span>
+      <div class="item-num">2</div>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(2)" data-section="2">
+      <div class="item-icon">⚠</div>
+      <span class="item-label">3. Hazards Identification</span>
+      <div class="item-num">3</div>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(3)" data-section="3">
+      <div class="item-icon">🛡</div>
+      <span class="item-label">4. Control Measures</span>
+      <div class="item-num">4</div>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(4)" data-section="4">
+      <div class="item-icon">🧪</div>
+      <span class="item-label">5. Gas Testing</span>
+      <div class="item-num">5</div>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(5)" data-section="5">
+      <div class="item-icon">🔧</div>
+      <span class="item-label">6. Equipment & Tools</span>
+      <div class="item-num">6</div>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(6)" data-section="6">
+      <div class="item-icon">👥</div>
+      <span class="item-label">7. Personnel</span>
+      <div class="item-num">7</div>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(7)" data-section="7">
+      <div class="item-icon">🥽</div>
+      <span class="item-label">8. PPE Requirements</span>
+      <div class="item-num">8</div>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(8)" data-section="8">
+      <div class="item-icon">✅</div>
+      <span class="item-label">9. Authorization</span>
+      <div class="item-num">9</div>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(9)" data-section="9">
+      <div class="item-icon">📊</div>
+      <span class="item-label">10. Work Status</span>
+      <div class="item-num">10</div>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(10)" data-section="10">
+      <div class="item-icon">🏁</div>
+      <span class="item-label">11. Work Completion</span>
+      <div class="item-num">11</div>
+    </div>
+
+    <div class="sidebar-section">SYSTEM</div>
+    <div class="sidebar-item" onclick="goToSection(11)" data-section="11">
+      <div class="item-icon">📜</div>
+      <span class="item-label">Audit Trail</span>
+    </div>
+    <div class="sidebar-item" onclick="goToSection(12)" data-section="12">
+      <div class="item-icon"></div>
+      <span class="item-label">Emergency Contacts</span>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content-area">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+
+    <!-- SECTION 0: PERMIT HEADER -->
+    <div class="form-section active" id="section-0">
+      <div class="section-header">
+        <h2><div class="section-number">1</div> Permit Header / رأس التصريح</h2>
+        <div>
+          <span class="tag tag-blue" id="headerRevision">Rev: 0</span>
+          <span class="tag tag-green" id="headerDate"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 Permit Information / معلومات التصريح</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Permit Number <span class="required">*</span></label>
+            <input type="text" class="form-control" id="permitNumber" readonly style="font-weight:700;color:var(--accent)">
+          </div>
+          <div class="form-group">
+            <label>Work Order Number <span class="required">*</span></label>
+            <input type="text" class="form-control" id="workOrder" placeholder="WO-XXXXX">
+          </div>
+          <div class="form-group">
+            <label>Permit Type</label>
+            <select class="form-control" id="permitType">
+              <option value="cold">Cold Work Permit</option>
+              <option value="hot">Hot Work Permit</option>
+              <option value="confined">Confined Space Entry</option>
+              <option value="electrical">Electrical Work</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Revision Number</label>
+            <input type="number" class="form-control" id="revisionNum" value="0" min="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📍 Location & Schedule / الموقع والجدول</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Work Site / Location <span class="required">*</span></label>
+            <input type="text" class="form-control" id="workLocation" placeholder="Area / Unit / Equipment Tag">
+          </div>
+          <div class="form-group">
+            <label>Area Authority</label>
+            <input type="text" class="form-control" id="areaAuthority" placeholder="Name of Area Authority">
+          </div>
+          <div class="form-group">
+            <label>Date <span class="required">*</span></label>
+            <input type="date" class="form-control" id="workDate">
+          </div>
+          <div class="form-group">
+            <label>Start Time</label>
+            <input type="time" class="form-control" id="startTime">
+          </div>
+          <div class="form-group">
+            <label>End Time</label>
+            <input type="time" class="form-control" id="endTime">
+          </div>
+          <div class="form-group">
+            <label>Duration (Hours)</label>
+            <input type="number" class="form-control" id="duration" placeholder="Auto-calculated" readonly>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📱 QR Code / رمز الاستجابة السريعة</div>
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+          <div class="qr-container">
+            <canvas id="qr-canvas" width="120" height="120"></canvas>
+          </div>
+          <div>
+            <p class="text-muted">Scan to verify permit authenticity</p>
+            <p class="text-muted">Generated: <span id="qrTimestamp"></span></p>
+            <p style="font-size:11px;margin-top:8px" id="qrData"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📎 Attachments / المرفقات</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Risk Assessment (WRAP)</label>
+            <input type="text" class="form-control" placeholder="Reference number">
+          </div>
+          <div class="form-group">
+            <label>Scope / Method Statement</label>
+            <input type="text" class="form-control" placeholder="Reference number">
+          </div>
+          <div class="form-group">
+            <label>Procedure / STD Instruction</label>
+            <input type="text" class="form-control" placeholder="Reference number">
+          </div>
+          <div class="form-group">
+            <label>Drawing / Sketch / P&ID</label>
+            <input type="text" class="form-control" placeholder="Reference number">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1: WORK DESCRIPTION -->
+    <div class="form-section" id="section-1">
+      <div class="section-header">
+        <h2><div class="section-number">2</div> Work Description / وصف العمل</h2>
+      </div>
+      <div class="card">
+        <div class="card-title">📝 Detailed Work Description / الوصف التفصيلي للعمل</div>
+        <div class="form-group">
+          <label>Equipment Name / اسم المعدة</label>
+          <input type="text" class="form-control" id="equipmentName" placeholder="Equipment tag number and name">
+        </div>
+        <div class="form-group" style="margin-top:12px">
+          <label>Work Location Details / تفاصيل موقع العمل</label>
+          <input type="text" class="form-control" id="workLocationDetail" placeholder="Specific area, level, coordinates">
+        </div>
+        <div class="form-group" style="margin-top:12px">
+          <label>Detailed Scope of Work <span class="required">*</span></label>
+          <textarea class="form-control" id="workDescription" rows="5" placeholder="Describe in detail the work to be performed, including sequence of activities..."></textarea>
+        </div>
+        <div class="form-group" style="margin-top:12px">
+          <label>Work Sequence / تسلسل العمل</label>
+          <textarea class="form-control" id="workSequence" rows="3" placeholder="Step 1: ... Step 2: ... Step 3: ..."></textarea>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"> Related Permits / التصاريح المرتبطة</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Related Hot Work Permit</label>
+            <input type="text" class="form-control" placeholder="Permit # if applicable">
+          </div>
+          <div class="form-group">
+            <label>Related Confined Space Permit</label>
+            <input type="text" class="form-control" placeholder="Permit # if applicable">
+          </div>
+          <div class="form-group">
+            <label>Related LOTO Reference</label>
+            <input type="text" class="form-control" placeholder="LOTO # if applicable">
+          </div>
+          <div class="form-group">
+            <label>Simultaneous Operations (SIMOPS)</label>
+            <select class="form-control">
+              <option value="none">None</option>
+              <option value="low">Low Risk SIMOPS</option>
+              <option value="medium">Medium Risk SIMOPS</option>
+              <option value="high">High Risk SIMOPS</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: HAZARDS IDENTIFICATION -->
+    <div class="form-section" id="section-2">
+      <div class="section-header">
+        <h2><div class="section-number">3</div> Hazards Identification / بيان الأخطار</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚠ Risk Level Assessment / تقييم مستوى الخطر</div>
+        <div class="risk-selector">
+          <div class="risk-option risk-low" onclick="selectRisk(this,'low')">
+            <div class="risk-icon"></div>
+            <div class="risk-label">Low</div>
+            <div class="risk-desc">Routine activity, standard controls</div>
+          </div>
+          <div class="risk-option risk-medium" onclick="selectRisk(this,'medium')">
+            <div class="risk-icon">🟡</div>
+            <div class="risk-label">Medium</div>
+            <div class="risk-desc">Enhanced controls required</div>
+          </div>
+          <div class="risk-option risk-high" onclick="selectRisk(this,'high')">
+            <div class="risk-icon">🔴</div>
+            <div class="risk-label">High</div>
+            <div class="risk-desc">Critical - Management approval needed</div>
+          </div>
+        </div>
+        <input type="hidden" id="riskLevel" value="">
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔧 Mechanical Hazards / مخاطر ميكانيكية</div>
+        <div class="checkbox-grid">
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="mechanical_pressure"> Liquid or gas under pressure / سائل أو غاز مضغوط</label>
+          <label class="checkbox-item hazard-high"><input type="checkbox" name="hazard" value="mechanical_energy"> Stored energy / طاقة مخزنة</label>
+          <label class="checkbox-item hazard-low"><input type="checkbox" name="hazard" value="mechanical_fall"> Danger of falling / خطر السقوط</label>
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="mechanical_rotating"> Rotating machinery / ماكينات دوارة</label>
+          <label class="checkbox-item hazard-high"><input type="checkbox" name="hazard" value="mechanical_confined"> Confined space entry / دخول مكان محصور</label>
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="mechanical_crane"> Crane rigging operation / عمليات رفع</label>
+          <label class="checkbox-item hazard-low"><input type="checkbox" name="hazard" value="mechanical_scaffolding"> Scaffolding to install / نصب السقالات</label>
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="mechanical_height"> Working at height / العمل على ارتفاع</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚡ Electrical Hazards / مخاطر كهربائية</div>
+        <div class="checkbox-grid">
+          <label class="checkbox-item hazard-high"><input type="checkbox" name="hazard" value="electrical_live"> Live electrical equipment / معدات كهربائية حية</label>
+          <label class="checkbox-item hazard-high"><input type="checkbox" name="hazard" value="electrical_static"> Static electricity / كهرباء ساكنة</label>
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="electrical_arc"> Arc flash potential / احتمال وميض القوس</label>
+          <label class="checkbox-item hazard-low"><input type="checkbox" name="hazard" value="electrical_tools"> Hand power tools / أدوات كهربائية يدوية</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"> Chemical Hazards / مخاطر كيميائية</div>
+        <div class="checkbox-grid">
+          <label class="checkbox-item hazard-high"><input type="checkbox" name="hazard" value="chemical_h2s"> Possible H2S area / منطقة H2S محتملة</label>
+          <label class="checkbox-item hazard-high"><input type="checkbox" name="hazard" value="chemical_toxic"> Toxic materials / مواد سامة</label>
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="chemical_corrosive"> Corrosive materials / مواد أكالة</label>
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="chemical_flammable"> Flammable materials / مواد قابلة للاشتعال</label>
+          <label class="checkbox-item hazard-high"><input type="checkbox" name="hazard" value="chemical_oxygen"> O2 deficiency / نقص الأكسجين</label>
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="chemical_asbestos"> Possible asbestos / احتمال وجود آزبستوس</label>
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="chemical_flying"> Flying particles / مواد متطايرة</label>
+          <label class="checkbox-item hazard-high"><input type="checkbox" name="hazard" value="chemical_radioactive"> Radioactivity / نشاط إشعاعي</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"> Environmental Hazards / مخاطر بيئية</div>
+        <div class="checkbox-grid">
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="env_wind"> Wind / Weather status / حالة الجو / الرياح</label>
+          <label class="checkbox-item hazard-low"><input type="checkbox" name="hazard" value="env_noise"> Noisy area (85 dB) / منطقة ضوضاء أكثر من 85 ديسيبل</label>
+          <label class="checkbox-item hazard-medium"><input type="checkbox" name="hazard" value="env_hot"> Hot materials / مواد ساخنة</label>
+          <label class="checkbox-item hazard-low"><input type="checkbox" name="hazard" value="env_tnorms"> Possible TNORMs / احتمال وجود</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📝 Additional Hazard Notes / ملاحظات أخطار إضافية</div>
+        <textarea class="form-control" id="hazardNotes" rows="3" placeholder="Any additional hazards not listed above..."></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 3: CONTROL MEASURES -->
+    <div class="form-section" id="section-3">
+      <div class="section-header">
+        <h2><div class="section-number">4</div> Control Measures / إجراءات التحكم</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔒 Isolation & Safety Checks / العزل وفحوصات السلامة</div>
+        <div class="checkbox-grid">
+          <label class="checkbox-item"><input type="checkbox" name="control" value="loto"> Lockout/Tagout (LOTO) applied / تطبيق العزل والتعليق</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="blinding"> Equipment blinded / عمى المعدة</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="drained"> Drained / Purged / تم التصريف / التنظيف</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="gas_check"> Gas check prior to start / فحص الغاز قبل البدء</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="fire_ext"> Fire extinguisher available / طفاية حريق متاحة</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="fire_watch"> Fire watch assigned / مراقب حريق معين</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="barricade"> Area barricaded / المنطقة مسيجة</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="signs"> Warning signs posted / لافتات تحذير موضوعة</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="escape"> Escape route cleared / طريق الهروب واضح</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="first_aid"> First aid available / إسعافات أولية متاحة</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="rescue"> Rescue plan in place / خطة إنقاذ جاهزة</label>
+          <label class="checkbox-item"><input type="checkbox" name="control" value="comm"> Communication method established / طريقة اتصال محددة</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"> Equipment Status / حالة المعدة</div>
+        <div class="checkbox-grid">
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="shut_down"> Shut down / إيقاف</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="depressurized"> Depressurized / غير مضغوط</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="drained_check"> Drained / مصرف</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="water_flushed"> Water flushed / مغسول بالماء</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="inerted"> Inerted with N2 / مملوء بـ N2</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="pressurized"> Pressurized with... / مضغوط بـ...</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="blanketed"> Blanketed with... / مغطى بـ...</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="full_of"> Full of (specify) / ممتلئ بـ (حدد)</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="empty"> Empty / فارغ</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="open"> Open / مفتوح</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="gas_free"> Gas Free / خالي من الغاز</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="steamed"> Steamed / بالبخار</label>
+          <label class="checkbox-item"><input type="checkbox" name="equip" value="ventilated"> Ventilated / مزود بالتهوية</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"> Additional Controls / ضوابط إضافية</div>
+        <div class="form-group">
+          <label>Continuous Gas Monitoring / مراقبة مستمرة للغاز</label>
+          <select class="form-control" id="gasMonitoring">
+            <option value="none">Not Required</option>
+            <option value="personal">Personal Gas Monitor</option>
+            <option value="area">Area Gas Monitor</option>
+            <option value="both">Both Personal & Area</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-top:12px">
+          <label>Additional Comments / تعليقات إضافية</label>
+          <textarea class="form-control" rows="3" placeholder="Any additional control measures required..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: GAS TESTING -->
+    <div class="form-section" id="section-4">
+      <div class="section-header">
+        <h2><div class="section-number">5</div> Gas Testing / اختبارات الغاز</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🧪 Gas Test Results / نتائج اختبار الغاز</div>
+        <div style="overflow-x:auto">
+          <table class="data-table" id="gasTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>LEL %</th>
+                <th>O2 %</th>
+                <th>H2S ppm</th>
+                <th>CO ppm</th>
+                <th>Other</th>
+                <th>Time</th>
+                <th>Tester Name</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="gasTableBody">
+              <tr>
+                <td>1</td>
+                <td><input type="number" class="form-control" step="0.1" placeholder="0.0" onchange="checkGasValue(this,0,20)"></td>
+                <td><input type="number" class="form-control" step="0.1" placeholder="20.9" onchange="checkGasValue(this,19.5,23.5)"></td>
+                <td><input type="number" class="form-control" step="0.1" placeholder="0" onchange="checkGasValue(this,0,10)"></td>
+                <td><input type="number" class="form-control" step="0.1" placeholder="0" onchange="checkGasValue(this,0,25)"></td>
+                <td><input type="text" class="form-control" placeholder="Specify"></td>
+                <td><input type="time" class="form-control"></td>
+                <td><input type="text" class="form-control" placeholder="Tester name"></td>
+                <td><button class="btn btn-danger btn-sm btn-icon" onclick="removeGasRow(this)" title="Remove">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-actions">
+          <button class="btn btn-outline btn-sm" onclick="addGasRow()">+ Add Test Row</button>
+          <button class="btn btn-primary btn-sm" onclick="setAllGasTimes()">Set Current Time for All</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📊 Gas Test Limits / حدود اختبار الغاز</div>
+        <div class="form-grid-3 form-grid">
+          <div class="form-group">
+            <label>LEL Limit (%)</label>
+            <input type="text" class="form-control" value="< 10%" readonly style="color:var(--danger);font-weight:700">
+          </div>
+          <div class="form-group">
+            <label>O2 Range (%)</label>
+            <input type="text" class="form-control" value="19.5 - 23.5%" readonly style="color:var(--success);font-weight:700">
+          </div>
+          <div class="form-group">
+            <label>H2S Limit (ppm)</label>
+            <input type="text" class="form-control" value="< 10 ppm" readonly style="color:var(--danger);font-weight:700">
+          </div>
+          <div class="form-group">
+            <label>CO Limit (ppm)</label>
+            <input type="text" class="form-control" value="< 25 ppm" readonly style="color:var(--warning);font-weight:700">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 5: EQUIPMENT & TOOLS -->
+    <div class="form-section" id="section-5">
+      <div class="section-header">
+        <h2><div class="section-number">6</div> Equipment & Tools / المعدات والأدوات</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔧 Tools & Equipment Required / الأدوات والمعدات المطلوبة</div>
+        <div style="overflow-x:auto">
+          <table class="data-table" id="toolsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Tool / Equipment Name</th>
+                <th>Type</th>
+                <th>Certification</th>
+                <th>Quantity</th>
+                <th>Checked By</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="toolsTableBody">
+              <tr>
+                <td>1</td>
+                <td><input type="text" class="form-control" placeholder="Tool name"></td>
+                <td>
+                  <select class="form-control">
+                    <option>Hand Tool</option>
+                    <option>Power Tool</option>
+                    <option>Measuring</option>
+                    <option>Scaffolding</option>
+                    <option>Other</option>
+                  </select>
+                </td>
+                <td><input type="text" class="form-control" placeholder="Calibration #"></td>
+                <td><input type="number" class="form-control" value="1" min="1"></td>
+                <td><input type="text" class="form-control" placeholder="Inspector"></td>
+                <td><button class="btn btn-danger btn-sm btn-icon" onclick="removeTableRow(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-actions">
+          <button class="btn btn-outline btn-sm" onclick="addToolRow()">+ Add Tool</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🚗 Vehicles & Equipment / المركبات والمعدات</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Vehicle Plate Number</label>
+            <input type="text" class="form-control" placeholder="Vehicle plate">
+          </div>
+          <div class="form-group">
+            <label>Vehicle Type</label>
+            <select class="form-control">
+              <option>Pickup Truck</option>
+              <option>Crane</option>
+              <option>Generator</option>
+              <option>Compressor</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Vehicle Status</label>
+            <select class="form-control">
+              <option>Inspected & Approved</option>
+              <option>Pending Inspection</option>
+              <option>Not Required</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Equipment Number</label>
+            <input type="text" class="form-control" placeholder="Equipment tag #">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 6: PERSONNEL -->
+    <div class="form-section" id="section-6">
+      <div class="section-header">
+        <h2><div class="section-number">7</div> Personnel / العمالة</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title"> Day Shift Personnel / عمالية النهار</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Performer Name <span class="required">*</span></label>
+            <input type="text" class="form-control" id="dayPerformer" placeholder="Full name of performer">
+          </div>
+          <div class="form-group">
+            <label>Company</label>
+            <input type="text" class="form-control" placeholder="Company name">
+          </div>
+          <div class="form-group">
+            <label>Number of Workers</label>
+            <input type="number" class="form-control" id="dayWorkers" value="1" min="1">
+          </div>
+          <div class="form-group">
+            <label>Supervisor Name</label>
+            <input type="text" class="form-control" placeholder="Site supervisor">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🌙 Night Shift Personnel / عمالية الليل</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Performer Name</label>
+            <input type="text" class="form-control" id="nightPerformer" placeholder="Full name of performer">
+          </div>
+          <div class="form-group">
+            <label>Company</label>
+            <input type="text" class="form-control" placeholder="Company name">
+          </div>
+          <div class="form-group">
+            <label>Number of Workers</label>
+            <input type="number" class="form-control" id="nightWorkers" value="0" min="0">
+          </div>
+          <div class="form-group">
+            <label>Supervisor Name</label>
+            <input type="text" class="form-control" placeholder="Site supervisor">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 Personnel Competency / كفاءة العمالة</div>
+        <div class="checkbox-grid">
+          <label class="checkbox-item"><input type="checkbox" name="competency" value="trained"> Personnel trained for this task</label>
+          <label class="checkbox-item"><input type="checkbox" name="competency" value="inducted"> Site induction completed</label>
+          <label class="checkbox-item"><input type="checkbox" name="competency" value="certified"> Required certifications valid</label>
+          <label class="checkbox-item"><input type="checkbox" name="competency" value="medical"> Medical fitness verified</label>
+          <label class="checkbox-item"><input type="checkbox" name="competency" value="drug_test"> Drug & alcohol test negative</label>
+          <label class="checkbox-item"><input type="checkbox" name="competency" value="toolbox"> Toolbox talk completed</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 7: PPE REQUIREMENTS -->
+    <div class="form-section" id="section-7">
+      <div class="section-header">
+        <h2><div class="section-number">8</div> PPE Requirements / متطلبات معدات الحماية الشخصية</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🥽 Mandatory PPE / معدات الحماية الإلزامية</div>
+        <div class="checkbox-grid">
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="clothing"> Appropriate Protective Clothing / الملابس الواقية المناسبة</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="goggles"> Goggles / Face shield / النظارات / واقي الوجه</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="earmuffs"> Ear Muffs / واقي الأذن</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="hands"> Hands protection / حماية اليدين</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="safety_harness"> Safety Harness / Life Lines / أحزمة الأمان</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="dust_mask"> Dust Mask / قناع الغبار</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="scba"> SCBA to be worn / يجب ارتداء جهاز التنفس</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="fire_resistant"> Flame Resistant Clothing / ملابس مقاومة للهب</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="welding"> Welding Helmet / خوذة لحام</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="chemical_gloves"> Chemical Resistant Gloves / قفازات مقاومة كيميائياً</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="boots"> Safety Boots / أحذية السلامة</label>
+          <label class="checkbox-item"><input type="checkbox" name="ppe" value="hard_hat"> Hard Hat / خوذة</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔥 Fire Safety Equipment / معدات مكافحة الحريق</div>
+        <div class="checkbox-grid">
+          <label class="checkbox-item"><input type="checkbox" name="fire" value="extinguisher"> Portable fire extinguisher at site</label>
+          <label class="checkbox-item"><input type="checkbox" name="fire" value="fire_truck"> Fire Truck required / سيارة إطفاء مطلوبة</label>
+          <label class="checkbox-item"><input type="checkbox" name="fire" value="fire_hose"> Fire hose extended / زيادة طول خرطوم الإطفاء</label>
+          <label class="checkbox-item"><input type="checkbox" name="fire" value="fire_monitor"> Mobile fire water monitor / مدفع الحريق المتنقل</label>
+          <label class="checkbox-item"><input type="checkbox" name="fire" value="fire_retardant"> Flame retardant partition / حواجز مقاومة للهب</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 8: AUTHORIZATION -->
+    <div class="form-section" id="section-8">
+      <div class="section-header">
+        <h2><div class="section-number">9</div> Authorization / التفويض</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">👤 Performing Authority / الجهة المنفذة</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Name <span class="required">*</span></label>
+            <input type="text" class="form-control" id="paName" placeholder="Performer full name">
+          </div>
+          <div class="form-group">
+            <label>Position</label>
+            <input type="text" class="form-control" placeholder="Job title">
+          </div>
+          <div class="form-group">
+            <label>Company</label>
+            <input type="text" class="form-control" placeholder="Company name">
+          </div>
+          <div class="form-group">
+            <label>Digital Signature</label>
+            <button class="btn btn-primary btn-sm" onclick="signField('pa')">✍ Sign Digitally</button>
+          </div>
+        </div>
+        <div class="signature-box" id="paSignature" style="margin-top:12px;display:none">
+          <div class="sig-name" id="paSigName"></div>
+          <div class="sig-role">Performing Authority</div>
+          <div class="sig-time" id="paSigTime"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"> Area Authority / مسؤول المنطقة</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Name <span class="required">*</span></label>
+            <input type="text" class="form-control" id="aaName" placeholder="Area authority full name">
+          </div>
+          <div class="form-group">
+            <label>Position</label>
+            <input type="text" class="form-control" placeholder="Job title">
+          </div>
+          <div class="form-group">
+            <label>Department</label>
+            <input type="text" class="form-control" placeholder="Department">
+          </div>
+          <div class="form-group">
+            <label>Digital Signature</label>
+            <button class="btn btn-primary btn-sm" onclick="signField('aa')">✍ Sign Digitally</button>
+          </div>
+        </div>
+        <div class="signature-box" id="aaSignature" style="margin-top:12px;display:none">
+          <div class="sig-name" id="aaSigName"></div>
+          <div class="sig-role">Area Authority</div>
+          <div class="sig-time" id="aaSigTime"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🛡 HSE Representative / ممثل الصحة والسلامة</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>HSE Name</label>
+            <input type="text" class="form-control" id="hseName" placeholder="HSE officer name">
+          </div>
+          <div class="form-group">
+            <label>Position</label>
+            <input type="text" class="form-control" placeholder="HSE job title">
+          </div>
+          <div class="form-group">
+            <label>Date/Time</label>
+            <input type="text" class="form-control" id="hseDateTime" readonly>
+          </div>
+          <div class="form-group">
+            <label>Digital Signature</label>
+            <button class="btn btn-primary btn-sm" onclick="signField('hse')">✍ Sign Digitally</button>
+          </div>
+        </div>
+        <div class="signature-box" id="hseSignature" style="margin-top:12px;display:none">
+          <div class="sig-name" id="hseSigName"></div>
+          <div class="sig-role">HSE Representative</div>
+          <div class="sig-time" id="hseSigTime"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">👷 Site Supervisor / مشرف الموقع</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Supervisor Name</label>
+            <input type="text" class="form-control" id="ssName" placeholder="Site supervisor name">
+          </div>
+          <div class="form-group">
+            <label>Position</label>
+            <input type="text" class="form-control" placeholder="Job title">
+          </div>
+          <div class="form-group">
+            <label>Date/Time</label>
+            <input type="text" class="form-control" id="ssDateTime" readonly>
+          </div>
+          <div class="form-group">
+            <label>Digital Signature</label>
+            <button class="btn btn-primary btn-sm" onclick="signField('ss')">✍ Sign Digitally</button>
+          </div>
+        </div>
+        <div class="signature-box" id="ssSignature" style="margin-top:12px;display:none">
+          <div class="sig-name" id="ssSigName"></div>
+          <div class="sig-role">Site Supervisor</div>
+          <div class="sig-time" id="ssSigTime"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 9: WORK STATUS -->
+    <div class="form-section" id="section-9">
+      <div class="section-header">
+        <h2><div class="section-number">10</div> Work Status / حالة العمل</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title"> Current Status / الحالة الحالية</div>
+        <div class="risk-selector" style="flex-wrap:wrap">
+          <div class="risk-option risk-low" onclick="setWorkStatus('active')" id="statusActive" style="flex:1;min-width:150px">
+            <div class="risk-icon">🟢</div>
+            <div class="risk-label">Active</div>
+            <div class="risk-desc">Work in progress</div>
+          </div>
+          <div class="risk-option risk-medium" onclick="setWorkStatus('suspended')" id="statusSuspended" style="flex:1;min-width:150px">
+            <div class="risk-icon">🟡</div>
+            <div class="risk-label">Suspended</div>
+            <div class="risk-desc">Work temporarily halted</div>
+          </div>
+          <div class="risk-option" onclick="setWorkStatus('revalidated')" id="statusRevalidated" style="flex:1;min-width:150px;border-color:var(--accent)">
+            <div class="risk-icon">🔵</div>
+            <div class="risk-label">Revalidated</div>
+            <div class="risk-desc">Permit revalidated</div>
+          </div>
+          <div class="risk-option risk-high" onclick="setWorkStatus('closed')" id="statusClosed" style="flex:1;min-width:150px">
+            <div class="risk-icon">🔴</div>
+            <div class="risk-label">Closed</div>
+            <div class="risk-desc">Work completed</div>
+          </div>
+        </div>
+        <input type="hidden" id="currentStatus" value="draft">
+      </div>
+
+      <div class="card">
+        <div class="card-title">📝 Status Log / سجل الحالة</div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Status Change</th>
+                <th>Reason</th>
+                <th>By</th>
+              </tr>
+            </thead>
+            <tbody id="statusLog">
+              <tr>
+                <td><span id="initialTime"></span></td>
+                <td><span class="tag tag-blue">Draft</span></td>
+                <td>Permit created</td>
+                <td>System</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⏰ Validation Schedule / جدول التحقق</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Next Validation Time</label>
+            <input type="time" class="form-control" id="nextValidation">
+          </div>
+          <div class="form-group">
+            <label>Validation Valid For (Hours)</label>
+            <input type="number" class="form-control" value="4" min="1" max="24">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 10: WORK COMPLETION -->
+    <div class="form-section" id="section-10">
+      <div class="section-header">
+        <h2><div class="section-number">11</div> Work Completion / اكتمال العمل</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🏁 Completion Declaration / إعلان الإنجاز</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Work Completed Date</label>
+            <input type="date" class="form-control" id="completionDate">
+          </div>
+          <div class="form-group">
+            <label>Work Completed Time</label>
+            <input type="time" class="form-control" id="completionTime">
+          </div>
+          <div class="form-group">
+            <label>Worksite Clean & Clear</label>
+            <select class="form-control" id="worksiteClear">
+              <option value="">-- Select --</option>
+              <option value="yes">Yes - Worksite left clean and safe</option>
+              <option value="no">No - Additional cleanup required</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Equipment Returned to Service</label>
+            <select class="form-control" id="equipmentReturn">
+              <option value="">-- Select --</option>
+              <option value="yes">Yes - Returned to normal service</option>
+              <option value="no">No - Equipment still out of service</option>
+              <option value="partial">Partial - Some equipment returned</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">✅ Completion Checklist / قائمة التحقق النهائية</div>
+        <div class="checkbox-grid">
+          <label class="checkbox-item"><input type="checkbox" name="completion" value="tools_removed"> All tools and equipment removed</label>
+          <label class="checkbox-item"><input type="checkbox" name="completion" value="scaffolding"> Scaffolding dismantled (if applicable)</label>
+          <label class="checkbox-item"><input type="checkbox" name="completion" value="barricades"> Barricades and signs removed</label>
+          <label class="checkbox-item"><input type="checkbox" name="completion" value="isolation"> Isolations removed / LOTO cleared</label>
+          <label class="checkbox-item"><input type="checkbox" name="completion" value="waste"> Waste materials disposed properly</label>
+          <label class="checkbox-item"><input type="checkbox" name="completion" value="inspected"> Final inspection completed</label>
+          <label class="checkbox-item"><input type="checkbox" name="completion" value="handover"> Handover to operations completed</label>
+          <label class="checkbox-item"><input type="checkbox" name="completion" value="notifications"> All parties notified of completion</label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📝 Completion Notes / ملاحظات الإنجاز</div>
+        <textarea class="form-control" rows="3" placeholder="Any notes about the completed work, issues encountered, etc."></textarea>
+      </div>
+    </div>
+
+    <!-- SECTION 11: AUDIT TRAIL -->
+    <div class="form-section" id="section-11">
+      <div class="section-header">
+        <h2><div class="section-number"></div> Audit Trail / سجل التدقيق</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 Activity Log</div>
+        <div class="audit-log" id="auditLog">
+          <div class="audit-entry">
+            <span class="audit-time">System</span>
+            <span class="audit-action"><span class="audit-user">System</span> — Permit system initialized</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📊 Permit Statistics</div>
+        <div class="form-grid-3 form-grid">
+          <div style="text-align:center;padding:16px">
+            <div style="font-size:32px;font-weight:800;color:var(--accent)" id="statHazards">0</div>
+            <div style="font-size:12px;color:var(--text-light)">Hazards Identified</div>
+          </div>
+          <div style="text-align:center;padding:16px">
+            <div style="font-size:32px;font-weight:800;color:var(--success)" id="statControls">0</div>
+            <div style="font-size:12px;color:var(--text-light)">Controls Applied</div>
+          </div>
+          <div style="text-align:center;padding:16px">
+            <div style="font-size:32px;font-weight:800;color:var(--warning)" id="statGasTests">0</div>
+            <div style="font-size:12px;color:var(--text-light)">Gas Tests Done</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 12: EMERGENCY CONTACTS -->
+    <div class="form-section" id="section-12">
+      <div class="section-header">
+        <h2><div class="section-number">📞</div> Emergency Contacts / جهات الاتصال الطارئة</h2>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🚨 Emergency Numbers / أرقام الطوارئ</div>
+        <div class="emergency-contacts">
+          <div class="emergency-card">
+            <div class="ec-icon">🚒</div>
+            <div class="ec-name">Fire Department</div>
+            <div class="ec-number">911</div>
+          </div>
+          <div class="emergency-card">
+            <div class="ec-icon">🏥</div>
+            <div class="ec-name">Medical Emergency</div>
+            <div class="ec-number">912</div>
+          </div>
+          <div class="emergency-card">
+            <div class="ec-icon">🛡</div>
+            <div class="ec-name">HSE Department</div>
+            <div class="ec-number">Ext. 4500</div>
+          </div>
+          <div class="emergency-card">
+            <div class="ec-icon">👮</div>
+            <div class="ec-name">Security</div>
+            <div class="ec-number">Ext. 5000</div>
+          </div>
+          <div class="emergency-card">
+            <div class="ec-icon"></div>
+            <div class="ec-name">Control Room</div>
+            <div class="ec-number">Ext. 1000</div>
+          </div>
+          <div class="emergency-card">
+            <div class="ec-icon">🔧</div>
+            <div class="ec-name">Maintenance</div>
+            <div class="ec-number">Ext. 3000</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📞 On-Call Personnel / الأشخاص المتصلون</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Emergency Coordinator</label>
+            <input type="text" class="form-control" placeholder="Name">
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" class="form-control" placeholder="+966 XXX XXXX">
+          </div>
+          <div class="form-group">
+            <label>HSE On-Call</label>
+            <input type="text" class="form-control" placeholder="Name">
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <input type="tel" class="form-control" placeholder="+966 XXX XXXX">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========================
+// GLOBAL STATE
+// ========================
+const APP_KEY = 'coldWorkPermit_v2';
+let currentSection = 0;
+let currentTheme = 'light';
+let currentLang = 'en';
+let workStatus = 'draft';
+let auditTrail = [];
+
+// ========================
+// INITIALIZATION
+// ========================
+document.addEventListener('DOMContentLoaded', function() {
+  generatePermitNumber();
+  setCurrentDateTime();
+  generateQRCode();
+  loadFromStorage();
+  updateStats();
+  updateProgress();
+  init3D();
+
+  // Auto-save every 30 seconds
+  setInterval(saveToStorage, 30000);
+
+  // Calculate duration when times change
+  const startEl = document.getElementById('startTime');
+  const endEl = document.getElementById('endTime');
+  if(startEl) startEl.addEventListener('change', calcDuration);
+  if(endEl) endEl.addEventListener('change', calcDuration);
+
+  // Hazard checkboxes listener
+  document.querySelectorAll('input[name="hazard"]').forEach(cb => {
+    cb.addEventListener('change', updateStats);
+  });
+
+  // Control checkboxes listener
+  document.querySelectorAll('input[name="control"], input[name="equip"]').forEach(cb => {
+    cb.addEventListener('change', updateStats);
+  });
+
+  // Set initial time
+  const initTime = document.getElementById('initialTime');
+  if(initTime) initTime.textContent = new Date().toLocaleString();
+
+  addAuditEntry('Permit system initialized');
+});
+
+// ========================
+// PERMIT NUMBER GENERATION
+// ========================
+function generatePermitNumber() {
+  const now = new Date();
+  const yr = now.getFullYear().toString().slice(-2);
+  const mo = String(now.getMonth()+1).padStart(2,'0');
+  const dy = String(now.getDate()).padStart(2,'0');
+  const seq = String(Math.floor(Math.random()*9999)).padStart(4,'0');
+  const num = `CWP-${yr}${mo}${dy}-${seq}`;
+  document.getElementById('permitNumber').value = num;
+  document.getElementById('qrData').textContent = `Permit: ${num} | Generated: ${now.toLocaleString()}`;
+}
+
+// ========================
+// DATE/TIME
+// ========================
+function setCurrentDateTime() {
+  const now = new Date();
+  document.getElementById('workDate').value = now.toISOString().split('T')[0];
+  document.getElementById('headerDate').textContent = now.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  document.getElementById('qrTimestamp').textContent = now.toLocaleString();
+  document.getElementById('hseDateTime').value = now.toLocaleString();
+  document.getElementById('ssDateTime').value = now.toLocaleString();
+}
+
+function calcDuration() {
+  const start = document.getElementById('startTime').value;
+  const end = document.getElementById('endTime').value;
+  if(start && end) {
+    const [sh, sm] = start.split(':').map(Number);
+    const [eh, em] = end.split(':').map(Number);
+    let diff = (eh * 60 + em) - (sh * 60 + sm);
+    if(diff < 0) diff += 24 * 60;
+    document.getElementById('duration').value = (diff / 60).toFixed(1);
+  }
+}
+
+// ========================
+// QR CODE GENERATOR (Simple)
+// ========================
+function generateQRCode() {
+  const canvas = document.getElementById('qr-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const size = 120;
+  const modules = 25;
+  const cellSize = size / modules;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, size, size);
+
+  // Generate pseudo-random QR-like pattern seeded with permit number
+  const permitNum = document.getElementById('permitNumber').value;
+  let seed = 0;
+  for(let i = 0; i < permitNum.length; i++) {
+    seed = ((seed << 5) - seed) + permitNum.charCodeAt(i);
+    seed |= 0;
+  }
+
+  function seededRandom() {
+    seed = (seed * 16807 + 0) % 2147483647;
+    return (seed & 0x7FFFFFFF) / 2147483647;
+  }
+
+  ctx.fillStyle = '#0a2540';
+
+  // Position patterns (corners)
+  function drawFinder(x, y) {
+    for(let r = 0; r < 7; r++) {
+      for(let c = 0; c < 7; c++) {
+        if(r === 0 || r === 6 || c === 0 || c === 6 ||
+           (r >= 2 && r <= 4 && c >= 2 && c <= 4)) {
+          ctx.fillRect((x+c)*cellSize, (y+r)*cellSize, cellSize, cellSize);
+        }
+      }
+    }
+  }
+
+  drawFinder(0, 0);
+  drawFinder(modules-7, 0);
+  drawFinder(0, modules-7);
+
+  // Data modules
+  for(let r = 0; r < modules; r++) {
+    for(let c = 0; c < modules; c++) {
+      if((r < 8 && c < 8) || (r < 8 && c > modules-9) || (r > modules-9 && c < 8)) continue;
+      if(seededRandom() > 0.55) {
+        ctx.fillRect(c*cellSize, r*cellSize, cellSize, cellSize);
+      }
+    }
+  }
+}
+
+// ========================
+// NAVIGATION
+// ========================
+function goToSection(idx) {
+  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+
+  const section = document.getElementById(`section-${idx}`);
+  if(section) section.classList.add('active');
+
+  const items = document.querySelectorAll('.sidebar-item[data-section]');
+  items.forEach(item => {
+    if(parseInt(item.dataset.section) === idx) item.classList.add('active');
+  });
+
+  currentSection = idx;
+  updateProgress();
+}
+
+// ========================
+// RISK LEVEL
+// ========================
+function selectRisk(el, level) {
+  document.querySelectorAll('.risk-option').forEach(o => {
+    if(o.classList.contains('risk-low') || o.classList.contains('risk-medium') || o.classList.contains('risk-high')) {
+      o.classList.remove('selected');
+    }
+  });
+  el.classList.add('selected');
+  document.getElementById('riskLevel').value = level;
+  addAuditEntry(`Risk level set to: ${level.toUpperCase()}`);
+  updateProgress();
+}
+
+// ========================
+// WORK STATUS
+// ========================
+function setWorkStatus(status) {
+  const prevStatus = workStatus;
+  workStatus = status;
+  document.getElementById('currentStatus').value = status;
+
+  // Update badge
+  const badge = document.getElementById('permitStatusBadge');
+  badge.className = 'status-badge';
+  const labels = { draft:'DRAFT', active:'ACTIVE', suspended:'SUSPENDED', revalidated:'REVALIDATED', closed:'CLOSED' };
+  const classes = { draft:'status-draft', active:'status-active', suspended:'status-suspended', revalidated:'status-active', closed:'status-closed' };
+  badge.classList.add(classes[status]);
+  badge.textContent = labels[status];
+
+  // Highlight selected
+  document.querySelectorAll('.risk-selector .risk-option').forEach(o => o.classList.remove('selected'));
+  const target = document.getElementById(`status${status.charAt(0).toUpperCase() + status.slice(1)}`);
+  if(target) target.classList.add('selected');
+
+  addAuditEntry(`Work status changed from ${prevStatus} to ${status}`);
+  showToast(`Status updated to ${labels[status]}`, status === 'closed' ? 'success' : 'info');
+  updateProgress();
+}
+
+// ========================
+// GAS TESTING
+// ========================
+let gasRowCount = 1;
+
+function addGasRow() {
+  gasRowCount++;
+  const tbody = document.getElementById('gasTableBody');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${gasRowCount}</td>
+    <td><input type="number" class="form-control" step="0.1" placeholder="0.0" onchange="checkGasValue(this,0,20)"></td>
+    <td><input type="number" class="form-control" step="0.1" placeholder="20.9" onchange="checkGasValue(this,19.5,23.5)"></td>
+    <td><input type="number" class="form-control" step="0.1" placeholder="0" onchange="checkGasValue(this,0,10)"></td>
+    <td><input type="number" class="form-control" step="0.1" placeholder="0" onchange="checkGasValue(this,0,25)"></td>
+    <td><input type="text" class="form-control" placeholder="Specify"></td>
+    <td><input type="time" class="form-control"></td>
+    <td><input type="text" class="form-control" placeholder="Tester name"></td>
+    <td><button class="btn btn-danger btn-sm btn-icon" onclick="removeGasRow(this)" title="Remove">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+  updateStats();
+}
+
+function removeGasRow(btn) {
+  const row = btn.closest('tr');
+  if(document.querySelectorAll('#gasTableBody tr').length > 1) {
+    row.remove();
+    renumberTable('gasTableBody');
+    gasRowCount = document.querySelectorAll('#gasTableBody tr').length;
+    updateStats();
+  }
+}
+
+function checkGasValue(input, min, max) {
+  const val = parseFloat(input.value);
+  if(isNaN(val)) return;
+  input.style.color = (val >= min && val <= max) ? 'var(--success)' : 'var(--danger)';
+  input.style.fontWeight = '700';
+}
+
+function setAllGasTimes() {
+  const now = new Date();
+  const timeStr = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  document.querySelectorAll('#gasTableBody tr').forEach(row => {
+    const timeInput = row.querySelector('input[type="time"]');
+    if(timeInput) timeInput.value = timeStr;
+  });
+  showToast('All gas test times set to current time', 'success');
+}
+
+// ========================
+// TOOLS TABLE
+// ========================
+function addToolRow() {
+  const tbody = document.getElementById('toolsTableBody');
+  const count = tbody.querySelectorAll('tr').length + 1;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${count}</td>
+    <td><input type="text" class="form-control" placeholder="Tool name"></td>
+    <td>
+      <select class="form-control">
+        <option>Hand Tool</option>
+        <option>Power Tool</option>
+        <option>Measuring</option>
+        <option>Scaffolding</option>
+        <option>Other</option>
+      </select>
+    </td>
+    <td><input type="text" class="form-control" placeholder="Calibration #"></td>
+    <td><input type="number" class="form-control" value="1" min="1"></td>
+    <td><input type="text" class="form-control" placeholder="Inspector"></td>
+    <td><button class="btn btn-danger btn-sm btn-icon" onclick="removeTableRow(this)">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function removeTableRow(btn) {
+  const tbody = btn.closest('tbody');
+  if(tbody.querySelectorAll('tr').length > 1) {
+    btn.closest('tr').remove();
+    renumberTable(tbody);
+  }
+}
+
+function renumberTable(tbody) {
+  if(typeof tbody === 'string') tbody = document.getElementById(tbody);
+  tbody.querySelectorAll('tr').forEach((row, i) => {
+    row.cells[0].textContent = i + 1;
+  });
+}
+
+// ========================
+// DIGITAL SIGNATURE
+// ========================
+function signField(prefix) {
+  const nameInput = document.getElementById(`${prefix}Name`);
+  const name = nameInput ? nameInput.value : '';
+  if(!name) {
+    showToast('Please enter a name before signing', 'error');
+    nameInput.focus();
+    nameInput.classList.add('error');
+    setTimeout(() => nameInput.classList.remove('error'), 2000);
+    return;
+  }
+
+  const sigBox = document.getElementById(`${prefix}Signature`);
+  const sigName = document.getElementById(`${prefix}SigName`);
+  const sigTime = document.getElementById(`${prefix}SigTime`);
+
+  sigName.textContent = name;
+  sigTime.textContent = new Date().toLocaleString();
+  sigBox.style.display = 'block';
+
+  addAuditEntry(`Digital signature applied by: ${name} (${prefix.toUpperCase()})`);
+  showToast(`Signed by ${name}`, 'success');
+}
+
+// ========================
+// VALIDATION
+// ========================
+function validateForm() {
+  let errors = [];
+  let requiredFields = [
+    { id: 'workOrder', label: 'Work Order' },
+    { id: 'workLocation', label: 'Work Location' },
+    { id: 'workDate', label: 'Date' },
+    { id: 'workDescription', label: 'Work Description' },
+  ];
+
+  requiredFields.forEach(f => {
+    const el = document.getElementById(f.id);
+    if(el && !el.value.trim()) {
+      el.classList.add('error');
+      errors.push(f.label);
+      setTimeout(() => el.classList.remove('error'), 3000);
+    }
+  });
+
+  if(errors.length === 0) {
+    showToast('✓ All required fields are completed!', 'success');
+    addAuditEntry('Form validation passed');
+  } else {
+    showToast(`⚠ Missing: ${errors.join(', ')}`, 'error');
+    addAuditEntry(`Validation failed - missing: ${errors.join(', ')}`);
+  }
+
+  updateProgress();
+}
+
+// ========================
+// PROGRESS BAR
+// ========================
+function updateProgress() {
+  let total = 0;
+  let filled = 0;
+
+  // Count filled fields
+  const inputs = document.querySelectorAll('.form-control');
+  inputs.forEach(inp => {
+    if(inp.type === 'hidden') return;
+    total++;
+    if(inp.value && inp.value.trim()) filled++;
+  });
+
+  // Count checked items
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(cb => {
+    total++;
+    if(cb.checked) filled++;
+  });
+
+  const pct = total > 0 ? Math.round((filled / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ========================
+// STATISTICS
+// ========================
+function updateStats() {
+  const hazards = document.querySelectorAll('input[name="hazard"]:checked').length;
+  const controls = document.querySelectorAll('input[name="control"]:checked, input[name="equip"]:checked').length;
+  const gasTests = document.querySelectorAll('#gasTableBody tr').length;
+
+  document.getElementById('statHazards').textContent = hazards;
+  document.getElementById('statControls').textContent = controls;
+  document.getElementById('statGasTests').textContent = gasTests;
+
+  // Update 3D viewer panel info
+  const vpcHazards = document.getElementById('vpc-hazards');
+  if(vpcHazards) vpcHazards.textContent = hazards + ' selected';
+  const vpcGas = document.getElementById('vpc-gas');
+  if(vpcGas) vpcGas.textContent = gasTests + ' tests';
+}
+
+// ========================
+// AUDIT TRAIL
+// ========================
+function addAuditEntry(action) {
+  const now = new Date().toLocaleString();
+  auditTrail.push({ time: now, action: action });
+
+  const log = document.getElementById('auditLog');
+  if(log) {
+    const entry = document.createElement('div');
+    entry.className = 'audit-entry';
+    entry.innerHTML = `
+      <span class="audit-time">${now}</span>
+      <span class="audit-action"><span class="audit-user">User</span> — ${action}</span>
+    `;
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+  }
+}
+
+// ========================
+// THEME TOGGLE
+// ========================
+function toggleTheme() {
+  currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+  document.body.setAttribute('data-theme', currentTheme);
+  localStorage.setItem('cwp_theme', currentTheme);
+  addAuditEntry(`Theme changed to ${currentTheme}`);
+}
+
+// ========================
+// LANGUAGE TOGGLE
+// ========================
+function toggleLang() {
+  currentLang = currentLang === 'en' ? 'ar' : 'en';
+  document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = currentLang;
+  document.getElementById('langBtn').textContent = currentLang === 'en' ? 'عربي' : 'EN';
+  addAuditEntry(`Language changed to ${currentLang === 'en' ? 'English' : 'Arabic'}`);
+}
+
+// ========================
+// TOAST NOTIFICATIONS
+// ========================
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  const icons = { success:'✓', error:'✕', warning:'⚠', info:'ℹ' };
+  toast.innerHTML = `<span>${icons[type] || 'ℹ'}</span><span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ========================
+// LOCAL STORAGE
+// ========================
+function saveToStorage() {
+  const data = {};
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    if(el.id) {
+      if(el.type === 'checkbox') {
+        data[el.id] = el.checked;
+      } else if(el.type !== 'hidden') {
+        data[el.id] = el.value;
+      }
+    }
+  });
+
+  // Save checkboxes by name
+  document.querySelectorAll('input[name]').forEach(el => {
+    if(el.type === 'checkbox' && el.name) {
+      if(!data['_check_' + el.name]) data['_check_' + el.name] = [];
+      if(el.checked) data['_check_' + el.name].push(el.value);
+    }
+  });
+
+  data._permitNumber = document.getElementById('permitNumber').value;
+  data._workStatus = workStatus;
+  data._auditTrail = auditTrail;
+  data._gasRowCount = gasRowCount;
+  data._savedAt = new Date().toISOString();
+
+  try {
+    localStorage.setItem(APP_KEY, JSON.stringify(data));
+  } catch(e) {
+    console.warn('Storage save failed:', e);
+  }
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(APP_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+
+    if(data._savedAt) {
+      showToast(`Auto-loaded permit from ${new Date(data._savedAt).toLocaleString()}`, 'info');
+    }
+
+    // Restore values
+    Object.keys(data).forEach(key => {
+      if(key.startsWith('_') || key.startsWith('check_')) return;
+      const el = document.getElementById(key);
+      if(el) {
+        if(el.type === 'checkbox') el.checked = data[key];
+        else el.value = data[key];
+      }
+    });
+
+    // Restore checkboxes
+    Object.keys(data).forEach(key => {
+      if(key.startsWith('_check_')) {
+        const name = key.replace('_check_', '');
+        const values = data[key];
+        document.querySelectorAll(`input[name="${name}"]`).forEach(cb => {
+          cb.checked = values.includes(cb.value);
+        });
+      }
+    });
+
+    // Restore work status
+    if(data._workStatus && data._workStatus !== 'draft') {
+      setWorkStatus(data._workStatus);
+    }
+
+    if(data._auditTrail) {
+      auditTrail = data._auditTrail;
+      rebuildAuditLog();
+    }
+
+    updateStats();
+    updateProgress();
+  } catch(e) {
+    console.warn('Storage load failed:', e);
+  }
+}
+
+function rebuildAuditLog() {
+  const log = document.getElementById('auditLog');
+  if(!log || !auditTrail.length) return;
+  log.innerHTML = '';
+  auditTrail.forEach(entry => {
+    const div = document.createElement('div');
+    div.className = 'audit-entry';
+    div.innerHTML = `
+      <span class="audit-time">${entry.time}</span>
+      <span class="audit-action"><span class="audit-user">User</span> — ${entry.action}</span>
+    `;
+    log.appendChild(div);
+  });
+}
+
+// ========================
+// EXPORT PDF (Print)
+// ========================
+function exportPDF() {
+  showToast('Opening print dialog for PDF export...', 'info');
+  setTimeout(() => window.print(), 500);
+}
+
+// ========================
+// 3D VISUALIZATION (Three.js)
+// ========================
+let scene, camera, renderer, panels = [], particles;
+let mouseX = 0, mouseY = 0;
+let targetX = 0, targetY = 0;
+let raycaster, mouse;
+let animationId;
+
+function init3D() {
+  const canvas = document.getElementById('three-canvas');
+  if(!canvas) return;
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x0a0f1a, 0.02);
+
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth / (window.innerHeight - 60), 0.1, 1000);
+  camera.position.set(0, 0, 30);
+
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setSize(window.innerWidth, window.innerHeight - 60);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x0a0f1a, 1);
+
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0x00b4d8, 0.3);
+  scene.add(ambientLight);
+
+  const pointLight1 = new THREE.PointLight(0x00b4d8, 2, 100);
+  pointLight1.position.set(15, 15, 15);
+  scene.add(pointLight1);
+
+  const pointLight2 = new THREE.PointLight(0xe67e22, 1.5, 80);
+  pointLight2.position.set(-15, -10, 10);
+  scene.add(pointLight2);
+
+  const pointLight3 = new THREE.PointLight(0x27ae60, 1, 60);
+  pointLight3.position.set(0, 20, -10);
+  scene.add(pointLight3);
+
+  // Create holographic panels
+  createPanels();
+
+  // Create particle system
+  createParticles();
+
+  // Grid
+  const gridHelper = new THREE.GridHelper(60, 60, 0x00b4d8, 0x0a2540);
+  gridHelper.position.y = -15;
+  gridHelper.material.opacity = 0.3;
+  gridHelper.material.transparent = true;
+  scene.add(gridHelper);
+
+  // Raycaster for interaction
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+
+  // Event listeners
+  canvas.addEventListener('mousemove', on3DMouseMove);
+  canvas.addEventListener('click', on3DClick);
+  window.addEventListener('resize', on3DResize);
+
+  // Start animation loop
+  animate3D();
+}
+
+function createPanels() {
+  const panelData = [
+    { label: 'Permit\nHeader', icon: '📋', pos: [-12, 8, 0], color: 0x00b4d8, section: 0 },
+    { label: 'Work\nDescription', icon: '📝', pos: [-4, 8, -2], color: 0x27ae60, section: 1 },
+    { label: 'Hazards\nID', icon: '⚠', pos: [4, 8, 0], color: 0xe74c3c, section: 2 },
+    { label: 'Control\nMeasures', icon: '🛡', pos: [12, 8, -2], color: 0xe67e22, section: 3 },
+    { label: 'Gas\nTesting', icon: '🧪', pos: [-12, 0, -3], color: 0x9b59b6, section: 4 },
+    { label: 'Equipment\n& Tools', icon: '🔧', pos: [0, 0, -4], color: 0x3498db, section: 5 },
+    { label: 'Personnel', icon: '👥', pos: [12, 0, -3], color: 0x1abc9c, section: 6 },
+    { label: 'PPE\nRequirements', icon: '🥽', pos: [-6, -8, -2], color: 0xf39c12, section: 7 },
+    { label: 'Authorization', icon: '✅', pos: [6, -8, 0], color: 0x2ecc71, section: 8 },
+    { label: 'Work\nStatus', icon: '📊', pos: [14, -8, -2], color: 0xe74c3c, section: 9 },
+  ];
+
+  panelData.forEach(data => {
+    // Panel background
+    const geom = new THREE.BoxGeometry(5, 3.5, 0.15);
+    const mat = new THREE.MeshPhongMaterial({
+      color: data.color,
+      transparent: true,
+      opacity: 0.15,
+      emissive: data.color,
+      emissiveIntensity: 0.3,
+    });
+    const panel = new THREE.Mesh(geom, mat);
+    panel.position.set(data.pos[0], data.pos[1], data.pos[2]);
+    panel.userData = { section: data.section, label: data.label, color: data.color };
+    scene.add(panel);
+    panels.push(panel);
+
+    // Edge glow
+    const edgeGeom = new THREE.EdgesGeometry(geom);
+    const edgeMat = new THREE.LineBasicMaterial({
+      color: data.color,
+      transparent: true,
+      opacity: 0.8,
+    });
+    const edge = new THREE.LineSegments(edgeGeom, edgeMat);
+    panel.add(edge);
+
+    // Inner border
+    const innerGeom = new THREE.BoxGeometry(4.6, 3.1, 0.01);
+    const innerMat = new THREE.MeshPhongMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.5,
+    });
+    const inner = new THREE.Mesh(innerGeom, innerMat);
+    inner.position.z = 0.08;
+    panel.add(inner);
+  });
+
+  // Central hub
+  const hubGeom = new THREE.OctahedronGeometry(2, 0);
+  const hubMat = new THREE.MeshPhongMaterial({
+    color: 0x00b4d8,
+    emissive: 0x00b4d8,
+    emissiveIntensity: 0.5,
+    transparent: true,
+    opacity: 0.6,
+  });
+  const hub = new THREE.Mesh(hubGeom, hubMat);
+  hub.position.set(0, 0, 2);
+  hub.userData = { isHub: true };
+  scene.add(hub);
+  panels.push(hub);
+
+  // Connecting lines
+  panels.filter(p => !p.userData.isHub).forEach(panel => {
+    const lineGeom = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 2),
+      panel.position.clone()
+    ]);
+    const lineMat = new THREE.LineBasicMaterial({
+      color: 0x00b4d8,
+      transparent: true,
+      opacity: 0.2,
+    });
+    const line = new THREE.Line(lineGeom, lineMat);
+    scene.add(line);
+  });
+}
+
+function createParticles() {
+  const count = 2000;
+  const geom = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  const colors = new Float32Array(count * 3);
+
+  for(let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 80;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 60;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 60;
+
+    const colorChoice = Math.random();
+    if(colorChoice < 0.6) {
+      colors[i*3] = 0; colors[i*3+1] = 0.706; colors[i*3+2] = 0.847;
+    } else if(colorChoice < 0.8) {
+      colors[i*3] = 0.902; colors[i*3+1] = 0.494; colors[i*3+2] = 0.133;
+    } else {
+      colors[i*3] = 0.18; colors[i*3+1] = 0.965; colors[i*3+2] = 1;
+    }
+  }
+
+  geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geom.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  const mat = new THREE.PointsMaterial({
+    size: 0.15,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.6,
+    blending: THREE.AdditiveBlending,
+    sizeAttenuation: true,
+  });
+
+  particles = new THREE.Points(geom, mat);
+  scene.add(particles);
+}
+
+function on3DMouseMove(event) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+}
+
+function on3DClick(event) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(panels);
+
+  if(intersects.length > 0) {
+    const obj = intersects[0].object;
+    if(obj.userData.section !== undefined) {
+      hide3DViewer();
+      goToSection(obj.userData.section);
+      showToast(`Navigated to: ${obj.userData.label.replace('\n', ' ')}`, 'info');
+    } else if(obj.userData.isHub) {
+      showToast('Central Hub — Cold Work Permit Pro', 'info');
+    }
+  }
+}
+
+function on3DResize() {
+  if(!renderer) return;
+  camera.aspect = window.innerWidth / (window.innerHeight - 60);
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight - 60);
+}
+
+function animate3D() {
+  if(!renderer) return;
+  animationId = requestAnimationFrame(animate3D);
+
+  targetX += (mouseX - targetX) * 0.02;
+  targetY += (mouseY - targetY) * 0.02;
+
+  // Parallax camera
+  camera.position.x += (targetX * 5 - camera.position.x) * 0.02;
+  camera.position.y += (-targetY * 3 - camera.position.y) * 0.02;
+  camera.lookAt(0, 0, 0);
+
+  // Rotate hub
+  const hub = panels.find(p => p.userData.isHub);
+  if(hub) {
+    hub.rotation.x += 0.01;
+    hub.rotation.y += 0.015;
+  }
+
+  // Animate panels
+  panels.forEach((panel, i) => {
+    if(!panel.userData.isHub) {
+      panel.position.y += Math.sin(Date.now() * 0.001 + i) * 0.003;
+      panel.rotation.y = Math.sin(Date.now() * 0.0005 + i * 0.5) * 0.1;
+
+      // Highlight based on hazards
+      if(panel.userData.section === 2) {
+        const hazards = document.querySelectorAll('input[name="hazard"]:checked').length;
+        if(hazards > 5) {
+          panel.material.emissiveIntensity = 0.8;
+          panel.material.opacity = 0.3;
+        }
+      }
+    }
+  });
+
+  // Rotate particles
+  if(particles) {
+    particles.rotation.y += 0.0003;
+    particles.rotation.x += 0.0001;
+  }
+
+  renderer.render(scene, camera);
+}
+
+function show3DViewer() {
+  document.getElementById('viewer3D').classList.add('active');
+  if(renderer) {
+    on3DResize();
+  }
+  addAuditEntry('3D visualization opened');
+}
+
+function hide3DViewer() {
+  document.getElementById('viewer3D').classList.remove('active');
+}
+
+// ========================
+// KEYBOARD SHORTCUTS
+// ========================
+document.addEventListener('keydown', function(e) {
+  if(e.ctrlKey && e.key === 's') {
+    e.preventDefault();
+    saveToStorage();
+    showToast('Permit saved!', 'success');
+  }
+  if(e.key === 'Escape') {
+    hide3DViewer();
+  }
+  if(e.altKey && e.key >= '1' && e.key <= '9') {
+    e.preventDefault();
+    goToSection(parseInt(e.key) - 1);
+  }
+});
+
+// ========================
+// AUTO CALCULATE DURATION
+// ========================
+setInterval(() => {
+  if(document.getElementById('startTime').value && document.getElementById('endTime').value) {
+    calcDuration();
+  }
+}, 5000);
+
+// ========================
+// CLEANUP
+// ========================
+window.addEventListener('beforeunload', function() {
+  saveToStorage();
+});
+</script>
+</body>
+</html>

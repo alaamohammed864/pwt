@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hot Work Permit System — Refinery Control Platform</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+<style>
+:root {
+  --primary: #B22222;
+  --primary-dark: #8B0000;
+  --warning: #FF6B00;
+  --safe: #2E7D32;
+  --bg: #0A0A0F;
+  --panel-bg: rgba(15,15,22,0.92);
+  --card-bg: #121218;
+  --field-bg: #1A1A24;
+  --field-border: #2A2A3A;
+  --text: #E8E6E3;
+  --text-muted: #888899;
+  --accent: #FF4D4D;
+  --success: #4CAF50;
+  --glow: rgba(178,34,34,0.4);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+#three-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+}
+.app-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, var(--primary-dark), #1A0A0A);
+  border-bottom: 2px solid var(--primary);
+  border-radius: 12px 12px 0 0;
+  margin-bottom: 2px;
+}
+.header-bar h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #FFD700;
+  text-shadow: 0 0 10px var(--glow);
+}
+.header-bar .badge {
+  background: var(--primary);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.status-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 24px;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--field-border);
+}
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.status-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--warning);
+  box-shadow: 0 0 8px var(--warning);
+  animation: pulse 2s infinite;
+}
+.status-dot.active { background: var(--success); box-shadow: 0 0 8px var(--success); }
+.status-dot.suspended { background: #FF9800; box-shadow: 0 0 8px #FF9800; }
+.status-dot.closed { background: #666; box-shadow: none; animation: none; }
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:0.5; transform:scale(0.85); }
+}
+.main-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr 280px;
+  gap: 16px;
+  padding: 16px;
+  background: var(--panel-bg);
+  border-radius: 0 0 12px 12px;
+  backdrop-filter: blur(10px);
+  min-height: 80vh;
+}
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sidebar-card {
+  background: var(--card-bg);
+  border: 1px solid var(--field-border);
+  border-radius: 10px;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+.sidebar-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 15px var(--glow);
+}
+.sidebar-card h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--primary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.section {
+  background: var(--card-bg);
+  border: 1px solid var(--field-border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.section:hover {
+  border-color: rgba(178,34,34,0.3);
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: linear-gradient(90deg, rgba(178,34,34,0.15), transparent);
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--field-border);
+}
+.section-header h2 {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-header .toggle-icon {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+.section.collapsed .toggle-icon { transform: rotate(-90deg); }
+.section.collapsed .section-body { display: none; }
+.section-body { padding: 18px; }
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group.full { grid-column: 1 / -1; }
+.form-group label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--glow);
+}
+.form-group input.error {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255,77,77,0.2);
+}
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--field-bg);
+  border: 1px solid var(--field-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.checkbox-item:hover {
+  border-color: var(--primary);
+}
+.checkbox-item.checked {
+  background: rgba(178,34,34,0.2);
+  border-color: var(--primary);
+}
+.checkbox-item.critical {
+  border-color: #FF4D4D;
+}
+.checkbox-item.critical.checked {
+  background: rgba(255,77,77,0.2);
+  border-color: #FF4D4D;
+}
+.checkbox-box {
+  width: 20px; height: 20px;
+  border: 2px solid var(--field-border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.checkbox-item.checked .checkbox-box {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.checkbox-item.critical.checked .checkbox-box {
+  background: #FF4D4D;
+  border-color: #FF4D4D;
+}
+.checkbox-box svg {
+  width: 12px; height: 12px;
+  stroke: white;
+  stroke-width: 3;
+  fill: none;
+  opacity: 0;
+}
+.checkbox-item.checked .checkbox-box svg { opacity: 1; }
+.table-container {
+  overflow-x: auto;
+  margin-top: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+thead th {
+  background: var(--field-bg);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--primary);
+  white-space: nowrap;
+}
+tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--field-border);
+  background: var(--card-bg);
+}
+tbody tr:hover td {
+  background: rgba(178,34,34,0.08);
+}
+tbody input {
+  background: transparent;
+  border: 1px solid var(--field-border);
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: var(--text);
+  font-size: 12px;
+  width: 100%;
+  font-family: inherit;
+}
+tbody input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.action-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+.btn-primary:hover {
+  background: #CC2222;
+  box-shadow: 0 0 12px var(--glow);
+}
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--field-border);
+  color: var(--text);
+}
+.btn-outline:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.btn-success {
+  background: var(--safe);
+  color: white;
+}
+.btn-success:hover {
+  background: #388E3C;
+}
+.btn-warning {
+  background: var(--warning);
+  color: white;
+}
+.btn-warning:hover {
+  background: #E65C00;
+}
+.signature-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 10px;
+}
+.signature-pad {
+  background: var(--field-bg);
+  border: 1px dashed var(--field-border);
+  border-radius: 8px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.signature-pad:hover {
+  border-color: var(--primary);
+}
+.signature-pad canvas {
+  width: 100%;
+  height: 100%;
+}
+.signature-pad .sig-text {
+  position: absolute;
+  pointer-events: none;
+}
+.signature-pad.signed .sig-text { display: none; }
+.signature-pad.signed canvas { display: block; }
+.signature-info {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.signature-info .name { color: var(--text); font-weight: 600; }
+.signature-info .timestamp { color: var(--primary); font-size: 10px; }
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+}
+.qr-code {
+  width: 120px;
+  height: 120px;
+  background: white;
+  border-radius: 8px;
+  padding: 8px;
+}
+.audit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.audit-item {
+  padding: 10px;
+  background: var(--field-bg);
+  border-radius: 6px;
+  font-size: 11px;
+  border-left: 3px solid var(--primary);
+}
+.audit-item .audit-time {
+  color: var(--primary);
+  font-weight: 600;
+}
+.audit-item .audit-action {
+  color: var(--text);
+  margin-top: 4px;
+}
+.emergency-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.contact-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: var(--field-bg);
+  border-radius: 6px;
+  font-size: 12px;
+}
+.contact-item .label { color: var(--text-muted); }
+.contact-item .value { color: var(--warning); font-weight: 600; }
+.progress-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: var(--field-bg);
+  border-radius: 6px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+.step.active { background: rgba(178,34,34,0.2); border-left: 3px solid var(--primary); }
+.step.completed { background: rgba(46,125,50,0.2); border-left: 3px solid var(--safe); }
+.step.pending { opacity: 0.5; }
+.step-number {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--field-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.step.active .step-number { background: var(--primary); }
+.step.completed .step-number { background: var(--safe); }
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--card-bg);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 0 40px var(--glow);
+}
+.modal h3 {
+  color: var(--primary);
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.toast {
+  padding: 12px 20px;
+  background: var(--card-bg);
+  border-left: 4px solid var(--primary);
+  border-radius: 6px;
+  font-size: 13px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  animation: slideIn 0.3s ease;
+}
+.toast.success { border-left-color: var(--safe); }
+.toast.warning { border-left-color: var(--warning); }
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.print-only { display: none; }
+@media print {
+  #three-canvas, .btn, .action-row, .toast-container, .sidebar { display: none !important; }
+  body { background: white; color: black; }
+  .app-container { max-width: 100%; padding: 0; }
+  .header-bar, .status-bar, .main-grid, .section, .section-header, .section-body {
+    background: white;
+    color: black;
+    border-color: #333;
+    box-shadow: none;
+  }
+  .form-group input, .form-group select, .form-group textarea,
+  .checkbox-item, tbody td, tbody input, .signature-pad {
+    background: white;
+    color: black;
+    border-color: #666;
+  }
+  .section-header h2, .form-group label, thead th { color: #333; }
+  .print-only { display: block; }
+  .main-grid { grid-template-columns: 1fr; }
+  .section { break-inside: avoid; }
+}
+@media (max-width: 1200px) {
+  .main-grid { grid-template-columns: 1fr; }
+  .sidebar { order: 2; }
+  .form-content { order: 1; }
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--field-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+.highlight-critical { color: #FF4D4D; font-weight: 700; }
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tag-red { background: rgba(178,34,34,0.3); color: #FF4D4D; border: 1px solid var(--primary); }
+.tag-green { background: rgba(46,125,50,0.3); color: #4CAF50; border: 1px solid var(--safe); }
+.tag-orange { background: rgba(255,107,0,0.3); color: #FF9800; border: 1px solid var(--warning); }
+</style>
+</head>
+<body>
+
+<canvas id="three-canvas"></canvas>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="app-container">
+  <div class="header-bar">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+        <circle cx="12" cy="12" r="3" fill="#FFD700"/>
+        <path d="M12 6v2m0 8v2m-6-6h2m8 0h2" stroke="#FFD700"/>
+      </svg>
+      <h1>🔥 HOT WORK PERMIT SYSTEM</h1>
+      <span class="badge">Refinery Control Platform v4.2</span>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <span class="tag tag-red" id="revisionTag">REV 01</span>
+      <span class="tag tag-orange" id="permitStatusTag">DRAFT</span>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-indicator">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Permit Status: DRAFT</span>
+    </div>
+    <div class="status-indicator">
+      <span>📋 Permit #: <strong id="permitNumberDisplay">HWP-2026-0001</strong></span>
+    </div>
+    <div class="status-indicator">
+      <span>🕐 Created: <strong id="createdDate">--</strong></span>
+    </div>
+    <div class="status-indicator">
+      <span>📍 Auto-save: <strong style="color:var(--safe)">Active</strong></span>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn btn-outline" onclick="validateForm()">✓ Validate</button>
+      <button class="btn btn-primary" onclick="submitPermit()">📤 Submit</button>
+      <button class="btn btn-warning" onclick="suspendPermit()">⏸ Suspend</button>
+      <button class="btn btn-success" onclick="closePermit()">✓ Close</button>
+      <button class="btn btn-outline" onclick="window.print()">🖨 Print</button>
+      <button class="btn btn-outline" onclick="exportPDF()">📄 Export</button>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <h3>📊 Workflow Progress</h3>
+        <div class="progress-steps" id="progressSteps">
+          <div class="step active" data-step="1">
+            <div class="step-number">1</div>
+            <div>Permit Created</div>
+          </div>
+          <div class="step pending" data-step="2">
+            <div class="step-number">2</div>
+            <div>Hazards Identified</div>
+          </div>
+          <div class="step pending" data-step="3">
+            <div class="step-number">3</div>
+            <div>Gas Testing</div>
+          </div>
+          <div class="step pending" data-step="4">
+            <div class="step-number">4</div>
+            <div>Authorizations</div>
+          </div>
+          <div class="step pending" data-step="5">
+            <div class="step-number">5</div>
+            <div>Work Started</div>
+          </div>
+          <div class="step pending" data-step="6">
+            <div class="step-number">6</div>
+            <div>Work Completed</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>🆔 Permit QR Code</h3>
+        <div class="qr-container">
+          <canvas id="qrCanvas" class="qr-code" width="120" height="120"></canvas>
+          <span style="font-size:10px;color:var(--text-muted);">Scan for permit verification</span>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>🚨 Emergency Contacts</h3>
+        <div class="emergency-contacts">
+          <div class="contact-item">
+            <span class="label">Emergency</span>
+            <span class="value">911</span>
+          </div>
+          <div class="contact-item">
+            <span class="label">Fire Brigade</span>
+            <span class="value">555-0100</span>
+          </div>
+          <div class="contact-item">
+            <span class="label">HSE Office</span>
+            <span class="value">555-0200</span>
+          </div>
+          <div class="contact-item">
+            <span class="label">Medic</span>
+            <span class="value">555-0300</span>
+          </div>
+          <div class="contact-item">
+            <span class="label">Control Room</span>
+            <span class="value">555-0400</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <h3>📝 Audit Trail</h3>
+        <div class="audit-list" id="auditList">
+          <div class="audit-item">
+            <div class="audit-time" id="auditFirstTime">--</div>
+            <div class="audit-action">Permit created</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="form-content" id="formContent">
+
+      <!-- SECTION 1: HEADER INFO -->
+      <div class="section" id="sec1">
+        <div class="section-header" onclick="toggleSection('sec1')">
+          <h2>📋 SECTION 1: PERMIT IDENTIFICATION</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Main Permit Number</label>
+              <input type="text" id="permitNumber" placeholder="HWP-2026-0001" data-audit="Permit number set">
+            </div>
+            <div class="form-group">
+              <label>Revision Number</label>
+              <input type="text" id="revisionNumber" value="01" data-audit="Revision updated">
+            </div>
+            <div class="form-group">
+              <label>SCE (Safety Critical Element)</label>
+              <select id="sceCheckbox" data-audit="SCE status changed">
+                <option value="No">No</option>
+                <option value="Yes">Yes — Requires Additional Approval</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Category of Risk</label>
+              <select id="riskCategory" data-audit="Risk category changed">
+                <option value="">Select...</option>
+                <option value="High">🔴 High — Critical Operations</option>
+                <option value="Medium">🟠 Medium — Controlled Operations</option>
+                <option value="Low">🟢 Low — Routine Operations</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Work Order No.</label>
+              <input type="text" id="workOrder" placeholder="WO-XXXXXX" data-audit="Work order set">
+            </div>
+            <div class="form-group">
+              <label>Work to be done by</label>
+              <input type="text" id="contractorCompany" placeholder="Company / Contractor Name" data-audit="Contractor updated">
+            </div>
+            <div class="form-group full" style="background:linear-gradient(90deg,rgba(178,34,34,0.15),transparent);padding:14px;border-radius:8px;border:1px solid var(--primary);">
+              <label style="color:#FFD700;font-size:14px;letter-spacing:2px;">🔥 HOT WORK PERMIT — OPEN FLAME / SPARK / HEAT GENERATION</label>
+              <span style="font-size:11px;color:var(--text-muted);">This permit covers all activities generating sparks, flames, or heat. Must comply with API RP 2217A & NFPA 51B.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: WORK INFORMATION -->
+      <div class="section" id="sec2">
+        <div class="section-header" onclick="toggleSection('sec2')">
+          <h2>📍 SECTION 2: WORK INFORMATION</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Work Site / Unit</label>
+              <input type="text" id="workSite" placeholder="e.g., CDU Unit 3, Area B" data-audit="Work site updated">
+            </div>
+            <div class="form-group">
+              <label>Specific Location</label>
+              <input type="text" id="workLocation" placeholder="e.g., Column C-101, Level +5m" data-audit="Location updated">
+            </div>
+            <div class="form-group">
+              <label>Permit Valid From (Date/Time)</label>
+              <input type="datetime-local" id="validFrom" data-audit="Valid from set">
+            </div>
+            <div class="form-group">
+              <label>Permit Valid Until (Date/Time)</label>
+              <input type="datetime-local" id="validUntil" data-audit="Valid until set">
+            </div>
+            <div class="form-group full">
+              <label>Attachments</label>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Risk Assessment</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Method Statement</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Isolation Certificate</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Engineering Drawing</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Confined Space Entry</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Other (Specify)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: WORK DESCRIPTION -->
+      <div class="section" id="sec3">
+        <div class="section-header" onclick="toggleSection('sec3')">
+          <h2>🔧 SECTION 3: WORK DESCRIPTION</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Equipment Name / Tag</label>
+              <input type="text" id="equipmentName" placeholder="e.g., Heat Exchanger E-201" data-audit="Equipment set">
+            </div>
+            <div class="form-group">
+              <label>Equipment Number</label>
+              <input type="text" id="equipmentNumber" placeholder="Tag / Serial No." data-audit="Equipment number set">
+            </div>
+            <div class="form-group">
+              <label>Vehicle Plate Number</label>
+              <input type="text" id="vehiclePlate" placeholder="If applicable" data-audit="Vehicle plate set">
+            </div>
+            <div class="form-group full">
+              <label>Tools & Equipment to be Used</label>
+              <textarea id="toolsEquipment" rows="3" placeholder="List all tools, welding machines, grinders, cutting torches, etc." data-audit="Tools updated"></textarea>
+            </div>
+            <div class="form-group full">
+              <label>Detailed Work Description</label>
+              <textarea id="workDescription" rows="4" placeholder="Describe the work to be performed in detail. Include scope, methods, and any special requirements." data-audit="Work description updated"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Number of Personnel — Day Shift</label>
+              <input type="number" id="peopleDay" min="0" placeholder="0" data-audit="Day shift personnel">
+            </div>
+            <div class="form-group">
+              <label>Number of Personnel — Night Shift</label>
+              <input type="number" id="peopleNight" min="0" placeholder="0" data-audit="Night shift personnel">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: HAZARDS IDENTIFICATION -->
+      <div class="section" id="sec4">
+        <div class="section-header" onclick="toggleSection('sec4')">
+          <h2>⚠️ SECTION 4: HAZARDS IDENTIFICATION (POTENTIAL HAZARDS)</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <p style="font-size:11px;color:var(--text-muted);margin-bottom:14px;">Select all applicable hazards. Red-bordered items are critical and require additional controls.</p>
+          <div class="checkbox-grid">
+            <label class="checkbox-item critical" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🔴 Flammable Materials / Hydrocarbons</span>
+            </label>
+            <label class="checkbox-item critical" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🔴 Toxic Gases (H2S, CO, etc.)</span>
+            </label>
+            <label class="checkbox-item critical" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🔴 Electricity / Live Circuits</span>
+            </label>
+            <label class="checkbox-item critical" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🔴 Confined Space Entry</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🟠 Noise > 85 dB</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🟠 Flying Particles / Grinding</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🟠 Weather Conditions</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🟠 Adjacent Operations</span>
+            </label>
+            <label class="checkbox-item critical" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🔴 Working at Height (> 1.8m)</span>
+            </label>
+            <label class="checkbox-item critical" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🔴 Pressurized Systems</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🟠 Chemical Exposure</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🟠 Excavation / Trenching</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🟠 Hot Surfaces</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🟠 Radiation / UV</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🟠 Heavy Lifting / Manual Handling</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🟠 Others (Specify in comments)</span>
+            </label>
+          </div>
+          <div class="form-group" style="margin-top:14px;">
+            <label>Additional Hazard Comments</label>
+            <textarea id="hazardComments" rows="2" placeholder="Describe any additional hazards identified..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 5: SAFE WORKING CONDITIONS -->
+      <div class="section" id="sec5">
+        <div class="section-header" onclick="toggleSection('sec5')">
+          <h2>🛡️ SECTION 5: SAFE WORKING CONDITIONS</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Equipment Status</label>
+              <select id="equipStatus">
+                <option value="">Select...</option>
+                <option value="In Service">In Service</option>
+                <option value="Shut Down">Shut Down</option>
+                <option value="Isolated">Isolated & Blinded</option>
+                <option value="Depressurized">Depressurized</option>
+                <option value="Purged">Purged / Inerted</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Isolation Checklist</label>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Valves Isolated</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Blinds / Spades Installed</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Electrical Isolation (LOTO)</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>System Depressurized</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Purged / Inerted (N2)</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Drained & Ventilated</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group full">
+              <label>Gas Test Before Start Required?</label>
+              <select id="gasTestRequired">
+                <option value="Yes">✅ Yes — Mandatory</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Fire Protection</label>
+              <select id="fireProtection">
+                <option value="Fire Extinguisher">Fire Extinguisher Available</option>
+                <option value="Fire Blanket">Fire Blanket Available</option>
+                <option value="Fire Hose">Fire Hose Connected</option>
+                <option value="Fire Watch">Fire Watch Posted</option>
+                <option value="All">All Above + Additional</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Electrical Isolation Verified?</label>
+              <select id="elecIsolation">
+                <option value="">Select...</option>
+                <option value="Yes">Yes — LOTO Applied</option>
+                <option value="N/A">N/A — No Electrical Work</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Additional Safety Comments</label>
+              <textarea id="safetyComments" rows="2" placeholder="Any additional safety measures or precautions..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 6: HSE REQUIREMENTS -->
+      <div class="section" id="sec6">
+        <div class="section-header" onclick="toggleSection('sec6')">
+          <h2>🦺 SECTION 6: HSE REQUIREMENTS (PPE & CONTROLS)</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <p style="font-size:11px;color:var(--text-muted);margin-bottom:14px;">All applicable PPE must be worn by all personnel entering the work area.</p>
+          <div class="checkbox-grid">
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🦺 Safety Helmet</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🧤 Safety Gloves</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🥽 Safety Goggles / Face Shield</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>👷 Safety Shoes (Steel Toe)</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>👔 Fire Resistant Clothing (FRC)</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🎧 Hearing Protection</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>😷 Respirator / Breathing Apparatus</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🦺 Safety Harness (if working at height)</span>
+            </label>
+            <label class="checkbox-item critical" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🔥 Fire Watch Assigned</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>🚧 Barriers / Barricades Installed</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>⚠️ Warning Signs Posted</span>
+            </label>
+            <label class="checkbox-item" onclick="toggleCheckbox(this)">
+              <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+              <span>📻 Two-Way Radio Available</span>
+            </label>
+          </div>
+          <div class="form-group" style="margin-top:14px;">
+            <label>Fire Watch Name</label>
+            <input type="text" id="fireWatchName" placeholder="Full name of assigned fire watch">
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 7: GAS TESTING -->
+      <div class="section" id="sec7">
+        <div class="section-header" onclick="toggleSection('sec7')">
+          <h2>🧪 SECTION 7: GAS TESTING RECORD</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <p style="font-size:11px;color:var(--text-muted);margin-bottom:14px;">Gas testing must be conducted before work starts and at regular intervals. All values must be within acceptable limits.</p>
+          <div class="table-container">
+            <table id="gasTestTable">
+              <thead>
+                <tr>
+                  <th>Test #</th>
+                  <th>O₂ (%)<br><small style="color:var(--safe)">19.5 - 23.5</small></th>
+                  <th>LEL (%)<br><small style="color:var(--warning)">&lt; 10%</small></th>
+                  <th>H₂S (ppm)<br><small style="color:var(--accent)">&lt; 10</small></th>
+                  <th>CO (ppm)<br><small style="color:var(--warning)">&lt; 25</small></th>
+                  <th>Tester Name</th>
+                  <th>Signature</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="gasTestBody">
+              </tbody>
+            </table>
+          </div>
+          <div class="action-row">
+            <button class="btn btn-primary" onclick="addGasTestRow()">➕ Add Gas Test Row</button>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:var(--field-bg);border-radius:8px;border:1px solid var(--field-border);">
+            <span style="font-size:11px;color:var(--text-muted);">📌 Acceptable Limits: O₂ = 19.5-23.5% | LEL < 10% | H₂S < 10 ppm | CO < 25 ppm | All values outside limits require immediate work stoppage.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 8: AUTHORIZATIONS -->
+      <div class="section" id="sec8">
+        <div class="section-header" onclick="toggleSection('sec8')">
+          <h2>✍️ SECTION 8: AUTHORIZATIONS & APPROVALS</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <div class="signature-block">
+            <div>
+              <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">Area Authority (Issuer)</label>
+              <div class="signature-pad" id="sigAreaAuth" onclick="initSignature('sigAreaAuth')">
+                <span class="sig-text">Click to sign</span>
+                <canvas></canvas>
+              </div>
+              <div class="signature-info">
+                <div class="name" id="sigAreaAuthName">Not signed</div>
+                <div class="timestamp" id="sigAreaAuthTime">--</div>
+              </div>
+              <input type="text" id="areaAuthName" placeholder="Printed Name" style="margin-top:8px;width:100%;background:var(--field-bg);border:1px solid var(--field-border);border-radius:4px;padding:6px;color:var(--text);font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">Performing Authority (Receiver)</label>
+              <div class="signature-pad" id="sigPerfAuth" onclick="initSignature('sigPerfAuth')">
+                <span class="sig-text">Click to sign</span>
+                <canvas></canvas>
+              </div>
+              <div class="signature-info">
+                <div class="name" id="sigPerfAuthName">Not signed</div>
+                <div class="timestamp" id="sigPerfAuthTime">--</div>
+              </div>
+              <input type="text" id="perfAuthName" placeholder="Printed Name" style="margin-top:8px;width:100%;background:var(--field-bg);border:1px solid var(--field-border);border-radius:4px;padding:6px;color:var(--text);font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">HSE Supervisor</label>
+              <div class="signature-pad" id="sigHSE" onclick="initSignature('sigHSE')">
+                <span class="sig-text">Click to sign</span>
+                <canvas></canvas>
+              </div>
+              <div class="signature-info">
+                <div class="name" id="sigHSEName">Not signed</div>
+                <div class="timestamp" id="sigHSETime">--</div>
+              </div>
+              <input type="text" id="hseName" placeholder="Printed Name" style="margin-top:8px;width:100%;background:var(--field-bg);border:1px solid var(--field-border);border-radius:4px;padding:6px;color:var(--text);font-size:12px;">
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);">Site Supervisor</label>
+              <div class="signature-pad" id="sigSite" onclick="initSignature('sigSite')">
+                <span class="sig-text">Click to sign</span>
+                <canvas></canvas>
+              </div>
+              <div class="signature-info">
+                <div class="name" id="sigSiteName">Not signed</div>
+                <div class="timestamp" id="sigSiteTime">--</div>
+              </div>
+              <input type="text" id="siteName" placeholder="Printed Name" style="margin-top:8px;width:100%;background:var(--field-bg);border:1px solid var(--field-border);border-radius:4px;padding:6px;color:var(--text);font-size:12px;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 9: VALIDATION ON SITE -->
+      <div class="section" id="sec9">
+        <div class="section-header" onclick="toggleSection('sec9')">
+          <h2>📍 SECTION 9: SITE VALIDATION & SHIFT TRACKING</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Current Shift</label>
+              <select id="currentShift">
+                <option value="Day">☀️ Day Shift (06:00 - 18:00)</option>
+                <option value="Night">🌙 Night Shift (18:00 - 06:00)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Handover Required?</label>
+              <select id="handoverRequired">
+                <option value="Yes">Yes — Cross-shift handover</option>
+                <option value="No">No — Single shift only</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Work Safe to Start?</label>
+              <div style="display:flex;gap:12px;margin-top:8px;">
+                <label class="checkbox-item" onclick="toggleCheckbox(this)" style="flex:1;justify-content:center;padding:14px;">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span style="font-size:14px;color:var(--safe);">✅ YES — All controls verified</span>
+                </label>
+                <label class="checkbox-item critical" onclick="toggleCheckbox(this)" style="flex:1;justify-content:center;padding:14px;">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span style="font-size:14px;color:var(--accent);">❌ NO — Additional controls needed</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group full">
+              <label>Pre-Start Checklist Comments</label>
+              <textarea id="preStartComments" rows="2" placeholder="Confirm all preparations are complete..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 10: SUSPENSION & REISSUE -->
+      <div class="section" id="sec10">
+        <div class="section-header" onclick="toggleSection('sec10')">
+          <h2>⏸ SECTION 10: SUSPENSION & REISSUE</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Suspension Reason</label>
+              <select id="suspensionReason">
+                <option value="">Select...</option>
+                <option value="Weather">Adverse Weather</option>
+                <option value="Emergency">Emergency / Alarm</option>
+                <option value="Gas Alarm">Gas Detection Alarm</option>
+                <option value="Shift Change">Shift Change</option>
+                <option value="Change in Conditions">Change in Work Conditions</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Suspension Date/Time</label>
+              <input type="datetime-local" id="suspensionTime">
+            </div>
+            <div class="form-group full">
+              <label>Suspension Details</label>
+              <textarea id="suspensionDetails" rows="2" placeholder="Details of why the permit was suspended..."></textarea>
+            </div>
+            <div class="form-group" style="background:rgba(46,125,50,0.1);padding:14px;border-radius:8px;border:1px solid var(--safe);">
+              <label style="color:var(--safe);">Resume Work Authorization</label>
+              <input type="datetime-local" id="resumeTime">
+              <input type="text" id="resumeBy" placeholder="Authorized by (Name)" style="margin-top:8px;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 11: WORK COMPLETION -->
+      <div class="section" id="sec11">
+        <div class="section-header" onclick="toggleSection('sec11')">
+          <h2>✅ SECTION 11: WORK COMPLETION & SITE CLEARANCE</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Completion Checklist</label>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Work completed as described</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Work area cleaned & clear</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>All tools & equipment removed</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Fire watch maintained for 30 min after</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Isolations removed / restored</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Final gas test satisfactory</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Site handed back to Operations</span>
+                </label>
+                <label class="checkbox-item" onclick="toggleCheckbox(this)">
+                  <div class="checkbox-box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+                  <span>Permit returned to Control Room</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Work Completion Date/Time</label>
+              <input type="datetime-local" id="completionTime">
+            </div>
+            <div class="form-group">
+              <label>Cleared By (Name)</label>
+              <input type="text" id="clearedBy" placeholder="Full name">
+            </div>
+            <div class="form-group full">
+              <label>Final Comments / Notes</label>
+              <textarea id="completionComments" rows="2" placeholder="Any outstanding issues or notes for handover..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-card">
+        <h3>⚡ Quick Actions</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-outline" onclick="loadSavedPermit()" style="width:100%;justify-content:center;">💾 Load Saved Permit</button>
+          <button class="btn btn-outline" onclick="clearForm()" style="width:100%;justify-content:center;">🗑️ Clear All Fields</button>
+          <button class="btn btn-outline" onclick="duplicatePermit()" style="width:100%;justify-content:center;">📋 Duplicate Permit</button>
+        </div>
+      </div>
+      <div class="sidebar-card">
+        <h3>📊 Permit Statistics</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="color:var(--text-muted);">Fields Filled</span>
+            <span id="fieldCount" style="color:var(--success);">0 / 0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="color:var(--text-muted);">Hazards Selected</span>
+            <span id="hazardCount" style="color:var(--warning);">0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="color:var(--text-muted);">Signatures</span>
+            <span id="sigCount" style="color:var(--text);">0 / 4</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;">
+            <span style="color:var(--text-muted);">Gas Tests</span>
+            <span id="gasTestCount" style="color:var(--text);">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="sidebar-card">
+        <h3>📜 Compliance Standards</h3>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.8;">
+          • API RP 2217A<br>
+          • NFPA 51B<br>
+          • OSHA 1910.252<br>
+          • EN 15153<br>
+          • Company HSE-MS<br>
+          • ISO 45001
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalContent">
+    <h3 id="modalTitle">Modal Title</h3>
+    <p id="modalBody" style="color:var(--text-muted);font-size:13px;line-height:1.6;margin-bottom:16px;">Content here</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeModal()">Close</button>
+      <button class="btn btn-primary" id="modalAction">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== THREE.JS 3D BACKGROUND ==========
+const canvas = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 0, 30);
+
+// Particles
+const particleCount = 2000;
+const positions = new Float32Array(particleCount * 3);
+const colors = new Float32Array(particleCount * 3);
+const sizes = new Float32Array(particleCount);
+
+for(let i = 0; i < particleCount; i++) {
+  positions[i*3] = (Math.random() - 0.5) * 80;
+  positions[i*3+1] = (Math.random() - 0.5) * 60;
+  positions[i*3+2] = (Math.random() - 0.5) * 40;
+  
+  const r = 0.8 + Math.random() * 0.2;
+  const g = 0.1 + Math.random() * 0.3;
+  const b = 0.0;
+  colors[i*3] = r;
+  colors[i*3+1] = g;
+  colors[i*3+2] = b;
+  sizes[i] = Math.random() * 2 + 0.5;
+}
+
+const particleGeo = new THREE.BufferGeometry();
+particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+particleGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+particleGeo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+const particleMat = new THREE.PointsMaterial({
+  size: 0.15,
+  vertexColors: true,
+  transparent: true,
+  opacity: 0.8,
+  blending: THREE.AdditiveBlending
+});
+
+const particles = new THREE.Points(particleGeo, particleMat);
+scene.add(particles);
+
+// Floating geometric shapes
+const shapes = [];
+const geometries = [
+  new THREE.TetrahedronGeometry(0.8),
+  new THREE.OctahedronGeometry(0.6),
+  new THREE.IcosahedronGeometry(0.5),
+  new THREE.TorusGeometry(0.5, 0.2, 8, 16)
+];
+
+for(let i = 0; i < 12; i++) {
+  const mat = new THREE.MeshBasicMaterial({
+    color: new THREE.Color(0.6 + Math.random()*0.4, 0.1, 0.0),
+    wireframe: true,
+    transparent: true,
+    opacity: 0.3
+  });
+  const mesh = new THREE.Mesh(geometries[i % geometries.length], mat);
+  mesh.position.set(
+    (Math.random() - 0.5) * 50,
+    (Math.random() - 0.5) * 40,
+    (Math.random() - 0.5) * 20 - 10
+  );
+  mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+  mesh.userData = {
+    rotSpeed: { x: (Math.random()-0.5)*0.01, y: (Math.random()-0.5)*0.01 },
+    floatSpeed: Math.random() * 0.5 + 0.2,
+    floatOffset: Math.random() * Math.PI * 2
+  };
+  scene.add(mesh);
+  shapes.push(mesh);
+}
+
+// Lights
+const ambientLight = new THREE.AmbientLight(0x110000, 0.5);
+scene.add(ambientLight);
+
+const pointLight1 = new THREE.PointLight(0xff4400, 2, 50);
+pointLight1.position.set(10, 10, 10);
+scene.add(pointLight1);
+
+const pointLight2 = new THREE.PointLight(0xff2200, 1.5, 40);
+pointLight2.position.set(-10, -5, 5);
+scene.add(pointLight2);
+
+let mouseX = 0, mouseY = 0;
+document.addEventListener('mousemove', (e) => {
+  mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+  mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+});
+
+function animate3D() {
+  requestAnimationFrame(animate3D);
+  
+  const time = Date.now() * 0.001;
+  
+  particles.rotation.y = time * 0.02;
+  
+  const pos = particles.geometry.attributes.position.array;
+  for(let i = 0; i < particleCount; i++) {
+    pos[i*3+1] += Math.sin(time * 0.5 + i) * 0.005;
+  }
+  particles.geometry.attributes.position.needsUpdate = true;
+  
+  shapes.forEach(shape => {
+    shape.rotation.x += shape.userData.rotSpeed.x;
+    shape.rotation.y += shape.userData.rotSpeed.y;
+    shape.position.y += Math.sin(time * shape.userData.floatSpeed + shape.userData.floatOffset) * 0.01;
+  });
+  
+  camera.position.x += (mouseX * 3 - camera.position.x) * 0.02;
+  camera.position.y += (mouseY * 2 - camera.position.y) * 0.02;
+  camera.lookAt(0, 0, 0);
+  
+  renderer.render(scene, camera);
+}
+animate3D();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ========== PERMIT SYSTEM LOGIC ==========
+const STORAGE_KEY = 'hotWorkPermit_v4';
+let signaturePads = {};
+let currentModalCallback = null;
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.getElementById('createdDate').textContent = now.toLocaleString();
+  document.getElementById('auditFirstTime').textContent = now.toLocaleTimeString();
+  
+  loadSavedPermit();
+  initGasTestTable();
+  initQRCode();
+  updateStats();
+  
+  // Auto-save every 30 seconds
+  setInterval(() => autoSave(), 30000);
+  
+  // Listen for input changes
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    el.addEventListener('change', () => {
+      if(el.dataset.audit) addAudit(el.dataset.audit);
+      updateStats();
+    });
+  });
+});
+
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('collapsed');
+}
+
+function toggleCheckbox(el) {
+  el.classList.toggle('checked');
+  updateStats();
+}
+
+// Gas Test Table
+function initGasTestTable() {
+  for(let i = 0; i < 3; i++) addGasTestRow(i + 1);
+}
+
+function addGasTestRow(num) {
+  const tbody = document.getElementById('gasTestBody');
+  const rowCount = tbody.children.length + 1;
+  const rowNum = num || rowCount;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="font-weight:600;color:var(--primary);">${rowNum}</td>
+    <td><input type="number" step="0.1" placeholder="20.9"></td>
+    <td><input type="number" step="0.1" placeholder="0"></td>
+    <td><input type="number" step="0.1" placeholder="0"></td>
+    <td><input type="number" step="0.1" placeholder="0"></td>
+    <td><input type="text" placeholder="Tester name"></td>
+    <td><input type="text" placeholder="Signature"></td>
+    <td><input type="date"></td>
+    <td><input type="time"></td>
+    <td><button class="btn btn-outline" onclick="this.closest('tr').remove();updateStats();" style="padding:4px 8px;font-size:10px;">✕</button></td>
+  `;
+  tbody.appendChild(tr);
+  updateStats();
+}
+
+// Signature Pads
+function initSignature(id) {
+  if(signaturePads[id]) return;
+  
+  const pad = document.getElementById(id);
+  pad.classList.add('signed');
+  pad.removeEventListener('click', () => initSignature(id));
+  
+  const canvas = pad.querySelector('canvas');
+  const rect = pad.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+  const ctx = canvas.getContext('2d');
+  
+  let drawing = false;
+  
+  canvas.style.display = 'block';
+  ctx.strokeStyle = '#FFD700';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  
+  canvas.addEventListener('mousedown', (e) => {
+    drawing = true;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+  });
+  
+  canvas.addEventListener('mousemove', (e) => {
+    if(!drawing) return;
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+  });
+  
+  canvas.addEventListener('mouseup', () => {
+    drawing = false;
+    const now = new Date();
+    const nameInput = pad.closest('div').querySelector('input[type="text"]');
+    const name = nameInput ? nameInput.value || 'Authorized' : 'Authorized';
+    document.getElementById(id + 'Name').textContent = name;
+    document.getElementById(id + 'Time').textContent = now.toLocaleString();
+    addAudit(`${id} signed by ${name}`);
+    updateStats();
+  });
+  
+  canvas.addEventListener('mouseleave', () => { drawing = false; });
+  
+  signaturePads[id] = ctx;
+  updateStats();
+}
+
+// QR Code Generator (Simple implementation)
+function initQRCode() {
+  const canvas = document.getElementById('qrCanvas');
+  const ctx = canvas.getContext('2d');
+  const size = 120;
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, size, size);
+  
+  // Generate a visual QR-like pattern
+  const permitNum = document.getElementById('permitNumber').value || 'HWP-2026-0001';
+  const hash = simpleHash(permitNum);
+  
+  const cellSize = 4;
+  const gridSize = size / cellSize;
+  
+  ctx.fillStyle = '#111';
+  
+  // Draw finder patterns
+  drawFinder(ctx, 0, 0, cellSize);
+  drawFinder(ctx, (gridSize-7)*cellSize, 0, cellSize);
+  drawFinder(ctx, 0, (gridSize-7)*cellSize, cellSize);
+  
+  // Draw data modules
+  let seed = hash;
+  for(let y = 0; y < gridSize; y++) {
+    for(let x = 0; x < gridSize; x++) {
+      // Skip finder patterns
+      if((x < 8 && y < 8) || (x >= gridSize-8 && y < 8) || (x < 8 && y >= gridSize-8)) continue;
+      
+      seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+      if(seed % 3 === 0) {
+        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+      }
+    }
+  }
+}
+
+function drawFinder(ctx, x, y, cellSize) {
+  for(let i = 0; i < 7; i++) {
+    for(let j = 0; j < 7; j++) {
+      if(i === 0 || i === 6 || j === 0 || j === 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4)) {
+        ctx.fillRect(x + j * cellSize, y + i * cellSize, cellSize, cellSize);
+      }
+    }
+  }
+}
+
+function simpleHash(str) {
+  let hash = 0;
+  for(let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+// Auto-save
+function autoSave() {
+  const data = {};
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    if(el.id) data[el.id] = el.value;
+  });
+  
+  // Save checkbox states
+  document.querySelectorAll('.checkbox-item.checked').forEach((el, i) => {
+    data[`checkbox_${i}`] = true;
+  });
+  
+  // Save gas test table
+  const rows = document.querySelectorAll('#gasTestBody tr');
+  data.gasTestRows = [];
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const vals = Array.from(inputs).map(i => i.value);
+    data.gasTestRows.push(vals);
+  });
+  
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  showToast('Permit auto-saved', 'success');
+}
+
+function loadSavedPermit() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(!saved) return;
+  
+  try {
+    const data = JSON.parse(saved);
+    
+    Object.keys(data).forEach(key => {
+      if(key === 'gasTestRows') return;
+      if(key.startsWith('checkbox_')) {
+        const idx = parseInt(key.split('_')[1]);
+        const checkboxes = document.querySelectorAll('.checkbox-item');
+        if(checkboxes[idx] && data[key]) checkboxes[idx].classList.add('checked');
+        return;
+      }
+      const el = document.getElementById(key);
+      if(el) el.value = data[key];
+    });
+    
+    // Restore gas test rows
+    if(data.gasTestRows) {
+      document.getElementById('gasTestBody').innerHTML = '';
+      data.gasTestRows.forEach((row, i) => {
+        addGasTestRow(i + 1);
+      });
+      const rows = document.querySelectorAll('#gasTestBody tr');
+      data.gasTestRows.forEach((vals, i) => {
+        if(rows[i]) {
+          const inputs = rows[i].querySelectorAll('input');
+          vals.forEach((v, j) => { if(inputs[j]) inputs[j].value = v; });
+        }
+      });
+    }
+    
+    updateStats();
+    showToast('Permit loaded successfully', 'success');
+  } catch(e) {
+    showToast('Error loading permit', 'warning');
+  }
+}
+
+function clearForm() {
+  if(!confirm('Are you sure you want to clear all fields? This cannot be undone.')) return;
+  
+  document.querySelectorAll('input:not([type="button"]), select, textarea').forEach(el => {
+    if(el.type === 'checkbox') el.checked = false;
+    else el.value = '';
+  });
+  
+  document.querySelectorAll('.checkbox-item').forEach(el => el.classList.remove('checked'));
+  
+  localStorage.removeItem(STORAGE_KEY);
+  updateStats();
+  showToast('Form cleared', 'warning');
+}
+
+function duplicatePermit() {
+  const newNum = 'HWP-2026-' + String(Math.floor(Math.random() * 9000) + 1000);
+  document.getElementById('permitNumber').value = newNum;
+  document.getElementById('permitNumberDisplay').textContent = newNum;
+  autoSave();
+  initQRCode();
+  showToast(`Duplicated as ${newNum}`, 'success');
+}
+
+// Validation
+function validateForm() {
+  let errors = 0;
+  const requiredFields = [
+    'permitNumber', 'workSite', 'workLocation', 'workDescription',
+    'equipStatus', 'validFrom', 'validUntil'
+  ];
+  
+  requiredFields.forEach(id => {
+    const el = document.getElementById(id);
+    if(el && !el.value.trim()) {
+      el.classList.add('error');
+      errors++;
+    } else if(el) {
+      el.classList.remove('error');
+    }
+  });
+  
+  // Check at least one hazard selected
+  const hazards = document.querySelectorAll('#sec4 .checkbox-item.checked');
+  if(hazards.length === 0) errors++;
+  
+  // Check at least 2 signatures
+  const sigs = Object.keys(signaturePads).length;
+  if(sigs < 2) errors++;
+  
+  if(errors > 0) {
+    showToast(`Validation failed: ${errors} issue(s) found`, 'warning');
+  } else {
+    showToast('✅ All validation checks passed!', 'success');
+    updateProgress(2);
+  }
+  
+  return errors === 0;
+}
+
+// Status Management
+function submitPermit() {
+  if(!validateForm()) return;
+  
+  const now = new Date();
+  document.getElementById('statusText').textContent = 'Permit Status: ACTIVE';
+  document.getElementById('permitStatusTag').textContent = 'ACTIVE';
+  document.getElementById('permitStatusTag').className = 'tag tag-green';
+  document.getElementById('statusDot').className = 'status-dot active';
+  
+  addAudit('Permit submitted and activated');
+  updateProgress(3);
+  showToast('🔥 Permit submitted successfully!', 'success');
+  autoSave();
+}
+
+function suspendPermit() {
+  const reason = prompt('Enter suspension reason:');
+  if(!reason) return;
+  
+  document.getElementById('suspensionReason').value = reason;
+  document.getElementById('suspensionTime').value = new Date().toISOString().slice(0,16);
+  
+  document.getElementById('statusText').textContent = 'Permit Status: SUSPENDED';
+  document.getElementById('permitStatusTag').textContent = 'SUSPENDED';
+  document.getElementById('permitStatusTag').className = 'tag tag-orange';
+  document.getElementById('statusDot').className = 'status-dot suspended';
+  
+  addAudit(`Permit suspended: ${reason}`);
+  showToast('Permit suspended', 'warning');
+  autoSave();
+}
+
+function closePermit() {
+  if(!confirm('Close this permit? This action is irreversible.')) return;
+  
+  document.getElementById('statusText').textContent = 'Permit Status: CLOSED';
+  document.getElementById('permitStatusTag').textContent = 'CLOSED';
+  document.getElementById('permitStatusTag').className = 'tag tag-red';
+  document.getElementById('statusDot').className = 'status-dot closed';
+  document.getElementById('completionTime').value = new Date().toISOString().slice(0,16);
+  
+  addAudit('Permit closed');
+  updateProgress(6);
+  showToast('Permit closed successfully', 'success');
+  autoSave();
+}
+
+// Audit Trail
+function addAudit(action) {
+  const list = document.getElementById('auditList');
+  const item = document.createElement('div');
+  item.className = 'audit-item';
+  item.innerHTML = `
+    <div class="audit-time">${new Date().toLocaleTimeString()}</div>
+    <div class="audit-action">${action}</div>
+  `;
+  list.insertBefore(item, list.firstChild);
+}
+
+// Progress Steps
+function updateProgress(step) {
+  document.querySelectorAll('.step').forEach(s => {
+    const sStep = parseInt(s.dataset.step);
+    s.classList.remove('active', 'completed', 'pending');
+    if(sStep < step) s.classList.add('completed');
+    else if(sStep === step) s.classList.add('active');
+    else s.classList.add('pending');
+  });
+}
+
+// Update Stats
+function updateStats() {
+  const inputs = document.querySelectorAll('input:not([type="button"]), select, textarea');
+  let filled = 0;
+  inputs.forEach(el => { if(el.value && el.value.trim()) filled++; });
+  document.getElementById('fieldCount').textContent = `${filled} / ${inputs.length}`;
+  
+  const hazards = document.querySelectorAll('#sec4 .checkbox-item.checked');
+  document.getElementById('hazardCount').textContent = hazards.length;
+  
+  const sigs = Object.keys(signaturePads).length;
+  document.getElementById('sigCount').textContent = `${sigs} / 4`;
+  
+  const gasRows = document.querySelectorAll('#gasTestBody tr');
+  document.getElementById('gasTestCount').textContent = gasRows.length;
+}
+
+// Modal
+function showModal(title, body, callback) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').textContent = body;
+  document.getElementById('modalOverlay').classList.add('show');
+  currentModalCallback = callback;
+  document.getElementById('modalAction').onclick = () => {
+    closeModal();
+    if(callback) callback();
+  };
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+// Toast Notifications
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    toast.style.transition = 'all 0.3s ease';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Export to PDF (via print)
+function exportPDF() {
+  showToast('Preparing PDF export... Opening print dialog.', 'info');
+  setTimeout(() => window.print(), 500);
+}
+
+// Initialize QR after a short delay
+setTimeout(initQRCode, 100);
+</script>
+</body>
+</html>

@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌳 PTW Repository — شجرة المستودع التفاعلية</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#e8c96a; --gold-dim:#a8832a;
+  --green-bright:#4ade80; --green-mid:#22c55e; --green-dark:#15803d;
+  --blue-acc:#38bdf8; --red-acc:#f87171; --purple-acc:#c084fc;
+  --bg:#030b18; --surface:rgba(255,255,255,0.04); --border:rgba(255,255,255,0.09);
+  --font-mono:'JetBrains Mono',monospace; --font-ar:'IBM Plex Sans Arabic',sans-serif;
+  --radius:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+  background:radial-gradient(ellipse at 50% 0%,#0a1e12 0%,#030b18 55%,#020608 100%);
+  min-height:100vh; font-family:var(--font-ar);
+  overflow-x:hidden; display:flex; flex-direction:column; align-items:center;
+  transition:background 0.6s;
+}
+body.day-mode{
+  background:linear-gradient(180deg,#c8e6f5 0%,#e8f5e9 40%,#f0f9f0 100%);
+}
+
+/* ═══════════════ CUSTOM CURSOR ═══════════════ */
+body.custom-cursor{cursor:none!important;}
+body.custom-cursor *{cursor:none!important;}
+#cursor{
+  position:fixed;width:18px;height:18px;pointer-events:none;z-index:99999;
+  border:2px solid rgba(74,222,128,0.8);border-radius:50%;
+  transform:translate(-50%,-50%);transition:transform 0.08s,border-color 0.15s,width 0.15s,height 0.15s;
+  mix-blend-mode:exclusion;
+}
+#cursor.hovering{width:28px;height:28px;border-color:rgba(232,201,106,0.9);}
+#cursor-dot{
+  position:fixed;width:5px;height:5px;pointer-events:none;z-index:99999;
+  background:var(--green-bright);border-radius:50%;transform:translate(-50%,-50%);
+  transition:transform 0.04s;
+}
+
+/* ═══════════════ TOP BAR ═══════════════ */
+.top-bar{
+  width:100%;background:rgba(2,8,18,0.92);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(16px);padding:8px 24px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  position:sticky;top:0;z-index:500;
+}
+.top-bar-left{display:flex;align-items:center;gap:12px;}
+.ptw-logo{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--gold);
+  text-decoration:none;
+}
+.ptw-logo svg{width:22px;height:22px;}
+.live-badge{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.25);
+  border-radius:20px;padding:3px 10px;
+  font-family:var(--font-mono);font-size:10px;color:var(--green-bright);letter-spacing:1.5px;
+}
+.live-badge::before{content:'';width:6px;height:6px;background:var(--green-bright);
+  border-radius:50%;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.top-bar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.top-btn{
+  display:flex;align-items:center;gap:5px;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:5px 12px;font-family:var(--font-mono);font-size:11px;color:rgba(200,220,210,0.75);
+  cursor:pointer;transition:all 0.2s;white-space:nowrap;
+}
+.top-btn:hover{background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.3);color:var(--green-bright);}
+.top-btn.active{background:rgba(74,222,128,0.15);border-color:rgba(74,222,128,0.4);color:var(--green-bright);}
+.top-btn.danger:hover{background:rgba(248,113,113,0.1);border-color:rgba(248,113,113,0.3);color:var(--red-acc);}
+
+/* ═══════════════ HEADER ═══════════════ */
+header{
+  width:100%;max-width:940px;padding:28px 24px 12px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;
+}
+.build-badge{
+  position:absolute;top:28px;left:24px;
+  display:flex;align-items:center;gap:6px;
+  background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.25);
+  border-radius:6px;padding:3px 10px;
+  font-family:var(--font-mono);font-size:10px;color:var(--blue-acc);letter-spacing:1px;
+}
+.build-badge::before{content:'⬤ ';font-size:7px;color:#22c55e;}
+
+header h1{
+  color:var(--gold);font-size:26px;font-weight:700;letter-spacing:1.5px;
+  text-shadow:0 0 40px rgba(232,201,106,0.4),0 0 80px rgba(232,201,106,0.12);
+  text-align:center;
+}
+.day-mode header h1{color:#1a4a2e;text-shadow:none;}
+header .sub{color:rgba(160,200,170,0.7);font-size:13px;text-align:center;font-weight:300;}
+.day-mode header .sub{color:#3a7a50;}
+
+/* ═══════════════ STATS BAR ═══════════════ */
+.stats-bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:8px 0 4px;}
+.stat-chip{
+  display:flex;align-items:center;gap:6px;background:var(--surface);
+  border:1px solid var(--border);border-radius:8px;padding:5px 12px;
+  font-family:var(--font-mono);font-size:11px;color:rgba(200,220,210,0.75);
+  transition:all 0.2s;
+}
+.stat-chip .dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.day-mode .stat-chip{background:rgba(0,0,0,0.06);border-color:rgba(0,0,0,0.1);color:#2a5a3a;}
+
+/* ═══════════════ FILTER LEGEND ═══════════════ */
+.filter-bar{
+  display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+  padding:0 16px 6px;max-width:940px;
+}
+.filter-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:5px 14px;font-family:var(--font-mono);font-size:11px;color:rgba(190,210,200,0.7);
+  cursor:pointer;transition:all 0.22s;
+}
+.filter-btn:hover,.filter-btn.active{
+  background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.3);
+  color:#fff;transform:translateY(-1px);
+}
+.filter-btn .fbdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.filter-count{
+  background:rgba(255,255,255,0.12);border-radius:10px;
+  padding:1px 6px;font-size:10px;
+}
+
+/* ═══════════════ SEARCH ═══════════════ */
+.search-wrap{width:100%;max-width:460px;margin:6px auto 2px;position:relative;}
+.search-wrap input{
+  width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(74,222,128,0.2);
+  border-radius:10px;padding:9px 38px 9px 40px;color:#c8e8d8;
+  font-size:13px;font-family:var(--font-mono);outline:none;
+  transition:border-color 0.2s,background 0.2s;direction:ltr;text-align:left;
+}
+.search-wrap input::placeholder{color:rgba(150,180,160,0.4);}
+.search-wrap input:focus{border-color:rgba(74,222,128,0.5);background:rgba(255,255,255,0.07);}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:rgba(74,222,128,0.55);font-size:14px;pointer-events:none;}
+.search-clear{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(200,100,100,0.6);cursor:pointer;
+  font-size:16px;display:none;transition:color 0.2s;
+}
+.search-clear.show{display:block;}
+.search-clear:hover{color:var(--red-acc);}
+#searchResults{
+  text-align:center;font-family:var(--font-mono);font-size:11px;
+  color:rgba(150,190,160,0.6);padding:3px 0;min-height:18px;transition:all 0.2s;
+}
+.no-results{color:rgba(248,113,113,0.7)!important;}
+
+/* ═══════════════ CANVAS ═══════════════ */
+canvas{display:block;width:100%;max-width:880px;height:auto;cursor:none;}
+
+/* ═══════════════ VIEW TOGGLE ═══════════════ */
+.view-toggle{
+  display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:4px;margin:6px 0 2px;
+}
+.view-btn{
+  padding:5px 14px;border-radius:7px;font-family:var(--font-mono);font-size:11px;
+  color:rgba(180,200,190,0.6);cursor:pointer;transition:all 0.2s;border:none;background:none;
+}
+.view-btn.active{background:rgba(74,222,128,0.15);color:var(--green-bright);}
+
+/* ═══════════════ LIST VIEW ═══════════════ */
+#listView{
+  width:100%;max-width:880px;padding:0 16px 10px;display:none;
+}
+#listView.visible{display:block;}
+.list-table{width:100%;border-collapse:collapse;}
+.list-table th{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(150,190,160,0.55);padding:8px 12px;border-bottom:1px solid var(--border);
+  text-align:right;
+}
+.list-table td{
+  padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);
+  font-family:var(--font-mono);font-size:12px;color:rgba(200,220,210,0.8);
+  transition:background 0.15s;
+}
+.list-table tr:hover td{background:rgba(74,222,128,0.05);}
+.list-table tr{cursor:pointer;}
+.file-name-cell{color:#b0f0d0!important;direction:ltr;text-align:left;}
+.group-tag{
+  display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;
+}
+.open-link{
+  color:rgba(74,222,128,0.7);text-decoration:none;padding:3px 8px;
+  border:1px solid rgba(74,222,128,0.2);border-radius:6px;font-size:11px;
+  transition:all 0.2s;
+}
+.open-link:hover{background:rgba(74,222,128,0.1);color:var(--green-bright);}
+
+/* ═══════════════ HINT ═══════════════ */
+.hint{
+  color:rgba(150,190,160,0.4);text-align:center;font-size:11px;
+  padding:4px 0 10px;font-family:var(--font-mono);letter-spacing:0.4px;
+}
+
+/* ═══════════════ TOOLTIP ═══════════════ */
+#tooltip{
+  position:fixed;background:rgba(3,10,20,0.97);
+  border:1px solid rgba(74,222,128,0.28);border-radius:16px;
+  padding:15px 18px;color:#e0f0e8;font-size:13px;pointer-events:none;
+  opacity:0;transition:opacity 0.14s ease,transform 0.14s ease;
+  transform:translateY(6px) scale(0.97);
+  max-width:280px;text-align:center;z-index:9999;
+  box-shadow:0 10px 40px rgba(0,150,80,0.25),0 0 0 1px rgba(74,222,128,0.06);
+  backdrop-filter:blur(16px);
+}
+#tooltip.visible{opacity:1;transform:translateY(0) scale(1);}
+.tip-header{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;}
+.tip-group-badge{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  padding:2px 8px;border-radius:10px;
+}
+.tip-version{font-family:var(--font-mono);font-size:9px;color:rgba(150,180,160,0.6);}
+.tip-name{
+  font-size:12px;font-weight:700;color:#a8f0c8;margin-bottom:5px;
+  word-break:break-all;line-height:1.5;font-family:var(--font-mono);
+  direction:ltr;
+}
+.tip-desc{
+  font-size:12px;color:rgba(160,200,175,0.8);margin-bottom:8px;
+  line-height:1.6;font-family:var(--font-ar);
+}
+.tip-meta{
+  display:flex;justify-content:center;gap:12px;margin-bottom:10px;
+  font-family:var(--font-mono);font-size:10px;color:rgba(120,170,140,0.6);
+}
+.tip-complexity{display:flex;gap:3px;align-items:center;}
+.tip-complexity span{width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,0.12);}
+.tip-complexity span.filled{background:var(--green-bright);}
+.tip-actions{display:flex;gap:6px;justify-content:center;}
+.tip-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 14px;border-radius:8px;font-size:11px;font-family:var(--font-mono);
+  cursor:pointer;border:none;transition:all 0.18s;letter-spacing:0.4px;
+}
+.tip-btn-primary{background:linear-gradient(135deg,#0f4a28,#1a7a45);color:#c0f0d8;border:1px solid rgba(74,222,128,0.25);}
+.tip-btn-primary:hover{background:linear-gradient(135deg,#1a7a45,#26b060);transform:scale(1.04);}
+.tip-btn-secondary{background:rgba(56,189,248,0.12);color:rgba(147,210,240,0.9);border:1px solid rgba(56,189,248,0.2);}
+.tip-btn-secondary:hover{background:rgba(56,189,248,0.22);transform:scale(1.04);}
+
+/* ═══════════════ TOAST ═══════════════ */
+#toast{
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:rgba(4,12,22,0.96);border:1px solid rgba(74,222,128,0.35);
+  border-radius:12px;padding:10px 20px;font-family:var(--font-mono);font-size:12px;
+  color:#c0f0d8;z-index:9999;opacity:0;transition:all 0.3s;pointer-events:none;
+  backdrop-filter:blur(12px);
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ═══════════════ PROGRESS BARS ═══════════════ */
+.group-progress{
+  width:100%;max-width:880px;padding:0 24px 8px;
+  display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
+}
+.prog-item{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:6px 12px;flex:1;min-width:140px;max-width:180px;
+}
+.prog-label{font-family:var(--font-mono);font-size:10px;color:rgba(180,200,190,0.65);width:50px;flex-shrink:0;}
+.prog-bar-wrap{flex:1;height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
+.prog-bar{height:100%;border-radius:3px;transition:width 1s ease;}
+.prog-num{font-family:var(--font-mono);font-size:10px;color:rgba(180,200,190,0.5);width:20px;text-align:center;}
+
+/* ═══════════════ CHANGELOG ═══════════════ */
+#changelogPanel{
+  width:100%;max-width:880px;padding:0 16px 16px;display:none;
+}
+#changelogPanel.visible{display:block;}
+.changelog-box{
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  border-radius:12px;padding:16px 20px;
+}
+.changelog-box h3{font-family:var(--font-mono);font-size:12px;color:var(--gold);letter-spacing:1.5px;margin-bottom:12px;}
+.cl-item{display:flex;gap:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.cl-item:last-child{border-bottom:none;}
+.cl-date{font-family:var(--font-mono);font-size:10px;color:rgba(150,190,160,0.5);width:80px;flex-shrink:0;}
+.cl-msg{font-family:var(--font-mono);font-size:11px;color:rgba(190,220,200,0.75);}
+.cl-tag{
+  font-size:9px;padding:1px 6px;border-radius:6px;margin-right:6px;
+  font-family:var(--font-mono);letter-spacing:0.5px;
+}
+.cl-new{background:rgba(74,222,128,0.2);color:#4ade80;}
+.cl-fix{background:rgba(248,113,113,0.2);color:#f87171;}
+.cl-improve{background:rgba(56,189,248,0.2);color:#38bdf8;}
+
+/* ═══════════════ FOOTER ═══════════════ */
+footer{
+  color:rgba(100,140,110,0.4);font-size:11px;text-align:center;
+  padding:12px 16px 32px;font-family:var(--font-mono);letter-spacing:0.8px;
+  max-width:880px;width:100%;
+}
+footer a{color:rgba(74,222,128,0.5);text-decoration:none;transition:color 0.2s;}
+footer a:hover{color:var(--green-bright);}
+.footer-stats{
+  display:flex;justify-content:center;gap:20px;flex-wrap:wrap;
+  margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border);
+}
+.footer-stat{font-family:var(--font-mono);font-size:10px;color:rgba(130,170,140,0.5);}
+.footer-stat strong{color:rgba(130,170,140,0.8);}
+
+/* ═══════════════ EMBED MODAL ═══════════════ */
+#embedModal{
+  position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);
+  z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;
+}
+#embedModal.open{display:flex;}
+.modal-box{
+  background:#080f1c;border:1px solid rgba(74,222,128,0.25);border-radius:16px;
+  padding:24px;max-width:500px;width:100%;
+}
+.modal-box h3{font-family:var(--font-mono);font-size:13px;color:var(--gold);margin-bottom:14px;}
+.modal-box textarea{
+  width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:8px;padding:10px;color:#a0d0b0;font-family:var(--font-mono);
+  font-size:11px;resize:vertical;min-height:80px;outline:none;direction:ltr;
+}
+.modal-actions{display:flex;gap:8px;margin-top:12px;}
+
+/* ═══════════════ KEYBOARD SHORTCUT HINT ═══════════════ */
+.kbd{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+  border-radius:5px;padding:1px 6px;font-family:var(--font-mono);font-size:10px;
+  color:rgba(200,220,210,0.6);
+}
+
+/* ═══════════════ SPARKLE OVERLAY ═══════════════ */
+#sparkleCanvas{
+  position:fixed;inset:0;pointer-events:none;z-index:9998;
+}
+
+/* ═══════════════ DAY MODE OVERRIDES ═══════════════ */
+.day-mode .top-bar{background:rgba(240,250,245,0.95);border-color:rgba(0,0,0,0.08);}
+.day-mode .top-btn{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1);color:#2a5a3a;}
+.day-mode .filter-btn{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1);color:#2a5a3a;}
+.day-mode .search-wrap input{background:rgba(0,0,0,0.05);border-color:rgba(30,120,70,0.3);color:#1a4a2e;}
+.day-mode .hint{color:rgba(50,120,80,0.5);}
+.day-mode footer{color:rgba(50,100,70,0.5);}
+.day-mode .prog-item{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.1);}
+
+/* ═══════════════ RESPONSIVE ═══════════════ */
+@media(max-width:640px){
+  .top-btn span.label{display:none;}
+  header h1{font-size:20px;}
+  .modal-box{padding:16px;}
+  .footer-stats{gap:12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+<div id="cursor-dot"></div>
+
+<!-- Sparkle Canvas -->
+<canvas id="sparkleCanvas"></canvas>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <a class="ptw-logo" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      PTW-SYSTEM
+    </a>
+    <div class="live-badge">LIVE · v4.0</div>
+  </div>
+  <div class="top-bar-right">
+    <button class="top-btn" onclick="toggleDayMode()" id="dayBtn" title="تبديل النهار/الليل">
+      🌙 <span class="label">الوضع</span>
+    </button>
+    <button class="top-btn" onclick="sortBySize()" id="sortBtn" title="ترتيب حسب الحجم">
+      📊 <span class="label">حجم</span>
+    </button>
+    <button class="top-btn" onclick="openRandom()" title="ملف عشوائي">
+      🎲 <span class="label">عشوائي</span>
+    </button>
+    <button class="top-btn" onclick="openAll()" title="فتح الكل">
+      🚀 <span class="label">فتح الكل</span>
+    </button>
+    <button class="top-btn" onclick="exportCSV()" title="تصدير CSV">
+      ⬇ <span class="label">CSV</span>
+    </button>
+    <button class="top-btn" onclick="showEmbed()" title="تضمين">
+      ‹/› <span class="label">Embed</span>
+    </button>
+    <button class="top-btn" onclick="copyClone()" title="نسخ git clone">
+      📋 <span class="label">Clone</span>
+    </button>
+    <a class="top-btn" href="https://github.com/YOUR_USERNAME/YOUR_REPO" target="_blank">
+      ⭐ <span class="label">GitHub</span>
+    </a>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="build-badge">BUILD PASSING · 27 FILES · HTML5</div>
+  <h1>🌳 شجرة مستودع نظام تصاريح العمل</h1>
+  <p class="sub">مرّر الماوس فوق الثمار لرؤية الملفات — انقر لفتحها على GitHub</p>
+  <div class="stats-bar">
+    <div class="stat-chip"><span class="dot" style="background:#ff6b6b"></span>3 Hot Work Permit</div>
+    <div class="stat-chip"><span class="dot" style="background:#38bdf8"></span>2 Cold Work Permit</div>
+    <div class="stat-chip"><span class="dot" style="background:#e8c96a"></span>12 AI Prototype</div>
+    <div class="stat-chip"><span class="dot" style="background:#c084fc"></span>1 PTW Roadmap</div>
+    <div class="stat-chip"><span class="dot" style="background:#4ade80"></span>9 Prototype Misc</div>
+    <div class="stat-chip" id="viewsChip">👁 <span id="viewCount">0</span> مشاهدة</div>
+  </div>
+</header>
+
+<!-- FILTER BUTTONS -->
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="setFilter('all')" data-filter="all">
+    <span class="fbdot" style="background:rgba(255,255,255,0.4)"></span>
+    الكل <span class="filter-count">27</span>
+  </button>
+  <button class="filter-btn" onclick="setFilter('hot')" data-filter="hot">
+    <span class="fbdot" style="background:#ff6b6b"></span>
+    🔥 Hot Work <span class="filter-count">3</span>
+  </button>
+  <button class="filter-btn" onclick="setFilter('cold')" data-filter="cold">
+    <span class="fbdot" style="background:#38bdf8"></span>
+    ❄ Cold Work <span class="filter-count">2</span>
+  </button>
+  <button class="filter-btn" onclick="setFilter('ai')" data-filter="ai">
+    <span class="fbdot" style="background:#e8c96a"></span>
+    🤖 AI Proto <span class="filter-count">12</span>
+  </button>
+  <button class="filter-btn" onclick="setFilter('ptw')" data-filter="ptw">
+    <span class="fbdot" style="background:#c084fc"></span>
+    📋 PTW Road <span class="filter-count">1</span>
+  </button>
+  <button class="filter-btn" onclick="setFilter('proto')" data-filter="proto">
+    <span class="fbdot" style="background:#4ade80"></span>
+    🔧 Prototype <span class="filter-count">9</span>
+  </button>
+</div>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <span class="search-icon">🔍</span>
+  <input type="text" id="searchInput"
+    placeholder="ابحث... (hot-work, cold, ai-prototype, rtl, 3d, v4...)"
+    autocomplete="off">
+  <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+</div>
+<div id="searchResults"></div>
+
+<!-- VIEW TOGGLE -->
+<div class="view-toggle">
+  <button class="view-btn active" onclick="setView('tree')" id="treeViewBtn">🌳 شجرة</button>
+  <button class="view-btn" onclick="setView('list')" id="listViewBtn">📋 قائمة</button>
+</div>
+
+<!-- CANVAS (Tree View) -->
+<canvas id="c" width="880" height="820"></canvas>
+<p class="hint">✦ كل ثمرة = ملف · اضغط لفتح الملف · <span class="kbd">Ctrl+F</span> للبحث · <span class="kbd">Esc</span> لإلغاء الفلترة · <span class="kbd">R</span> عشوائي</p>
+
+<!-- LIST VIEW -->
+<div id="listView">
+  <table class="list-table">
+    <thead>
+      <tr>
+        <th>اسم الملف</th>
+        <th>المجموعة</th>
+        <th>الوصف</th>
+        <th>الحجم</th>
+        <th>التعقيد</th>
+        <th>فتح</th>
+      </tr>
+    </thead>
+    <tbody id="listBody"></tbody>
+  </table>
+</div>
+
+<!-- PROGRESS BARS -->
+<div class="group-progress" id="groupProgress"></div>
+
+<!-- CHANGELOG -->
+<div style="width:100%;max-width:880px;padding:0 16px 4px;display:flex;align-items:center;justify-content:space-between;">
+  <span style="font-family:var(--font-mono);font-size:11px;color:rgba(150,190,160,0.5);">📝 سجل التغييرات</span>
+  <button class="top-btn" onclick="toggleChangelog()" id="clBtn" style="padding:3px 10px;font-size:10px;">عرض</button>
+</div>
+<div id="changelogPanel">
+  <div class="changelog-box">
+    <h3>CHANGELOG · PTW-SYSTEM</h3>
+    <div class="cl-item"><div class="cl-date">2025-07</div><div class="cl-msg"><span class="cl-tag cl-new">NEW</span>ai-prototype-refinery-control-v4.8.2 — أحدث إصدار للمصفاة</div></div>
+    <div class="cl-item"><div class="cl-date">2025-06</div><div class="cl-msg"><span class="cl-tag cl-new">NEW</span>cold-work-permit-advanced-dashboard-v4.0 — لوحة تحكم متقدمة</div></div>
+    <div class="cl-item"><div class="cl-date">2025-05</div><div class="cl-msg"><span class="cl-tag cl-improve">UPD</span>hot-work-permit-react-spa-v2.0 — ترقية إلى React SPA</div></div>
+    <div class="cl-item"><div class="cl-date">2025-04</div><div class="cl-msg"><span class="cl-tag cl-new">NEW</span>ai-prototype-workflow-progress-qr — دعم QR Code</div></div>
+    <div class="cl-item"><div class="cl-date">2025-03</div><div class="cl-msg"><span class="cl-tag cl-fix">FIX</span>cold-work-permit-enhanced-rtl-v2.0 — إصلاح RTL العربي</div></div>
+    <div class="cl-item"><div class="cl-date">2025-02</div><div class="cl-msg"><span class="cl-tag cl-new">NEW</span>prototype-5x5-matrix-audit-trail — مصفوفة مخاطر 5×5</div></div>
+    <div class="cl-item"><div class="cl-date">2025-01</div><div class="cl-msg"><span class="cl-tag cl-improve">UPD</span>ptw-improvement-roadmap-v1.0 — خارطة طريق محدّثة</div></div>
+  </div>
+</div>
+
+<!-- TOOLTIP -->
+<div id="tooltip"></div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- EMBED MODAL -->
+<div id="embedModal">
+  <div class="modal-box">
+    <h3>‹/› تضمين الشجرة في موقعك</h3>
+    <textarea id="embedCode" readonly></textarea>
+    <div class="modal-actions">
+      <button class="tip-btn tip-btn-primary" onclick="copyEmbed()">📋 نسخ</button>
+      <button class="tip-btn tip-btn-secondary" onclick="closeEmbed()">✕ إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-stats">
+    <span class="footer-stat">🔥 <strong>3</strong> Hot Work Permits</span>
+    <span class="footer-stat">❄ <strong>2</strong> Cold Work Permits</span>
+    <span class="footer-stat">🤖 <strong>12</strong> AI Prototypes</span>
+    <span class="footer-stat">🔧 <strong>9</strong> Misc Prototypes</span>
+    <span class="footer-stat">📁 <strong>27</strong> Total Files</span>
+    <span class="footer-stat" id="totalSizeLabel">💾 ~3.8 MB Total</span>
+  </div>
+  🏭 Permit-to-Work System · HSE Industrial Suite ·
+  <a href="https://github.com/YOUR_USERNAME/YOUR_REPO" target="_blank">GitHub →</a>
+  · <a href="https://github.com/YOUR_USERNAME/YOUR_REPO/issues" target="_blank">Report Issue →</a>
+</footer>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════ -->
+<script>
+/* ══════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════ */
+const REPO_BASE = 'https://github.com/YOUR_USERNAME/YOUR_REPO/blob/main/';
+const REPO_URL  = 'https://github.com/YOUR_USERNAME/YOUR_REPO';
+
+/* ══════════════════════════════════════════
+   FILE DATA
+══════════════════════════════════════════ */
+const FILE_GROUPS = {
+  hot:  {color:'#ff6b6b',shine:'#ffaaaa',shadow:'#8b1a1a',label:'Hot Work',  emoji:'🔥'},
+  cold: {color:'#38bdf8',shine:'#7dd3fc',shadow:'#0369a1',label:'Cold Work', emoji:'❄'},
+  ai:   {color:'#e8c96a',shine:'#fde68a',shadow:'#92400e',label:'AI Proto',  emoji:'🤖'},
+  ptw:  {color:'#c084fc',shine:'#dda8ff',shadow:'#5b21b6',label:'PTW Road',  emoji:'📋'},
+  proto:{color:'#4ade80',shine:'#86efac',shadow:'#166534',label:'Prototype', emoji:'🔧'},
+};
+
+const RAW_FILES = [
+  {name:'hot-work-permit-basic-bilingual-v1.0.html',         size:45,  group:'hot',  desc:'تصريح عمل ساخن ثنائي اللغة — النسخة الأساسية',   complexity:1, version:'v1.0', isNew:false},
+  {name:'hot-work-permit-react-spa-v2.0.html',               size:120, group:'hot',  desc:'تصريح عمل ساخن — SPA كاملة بـ React وHooks',      complexity:3, version:'v2.0', isNew:false},
+  {name:'hot-work-permit-industrial-offline-v3.0.html',      size:180, group:'hot',  desc:'نسخة صناعية تعمل بدون إنترنت — Service Worker',   complexity:3, version:'v3.0', isNew:false},
+  {name:'cold-work-permit-advanced-dashboard-v4.0.html',     size:200, group:'cold', desc:'لوحة تحكم متقدمة للعمل البارد مع Analytics',       complexity:3, version:'v4.0', isNew:true},
+  {name:'cold-work-permit-enhanced-rtl-v2.0.html',           size:95,  group:'cold', desc:'تصريح عمل بارد بدعم RTL العربي المحسّن',           complexity:2, version:'v2.0', isNew:false},
+  {name:'ptw-improvement-roadmap-v1.0.html',                 size:60,  group:'ptw',  desc:'خارطة طريق تحسين منظومة تصاريح العمل',             complexity:1, version:'v1.0', isNew:false},
+  {name:'ai-prototype-refinery-control-v4.8.2.html',         size:310, group:'ai',   desc:'نموذج تحكم مصفاة بالذكاء الاصطناعي — الأحدث',     complexity:3, version:'v4.8', isNew:true},
+  {name:'ai-prototype-role-based-cold-work.html',            size:145, group:'ai',   desc:'نموذج صلاحيات متعددة الأدوار للعمل البارد',        complexity:2, version:'v1.0', isNew:false},
+  {name:'ai-prototype-multi-role-approval-flow.html',        size:165, group:'ai',   desc:'مسار اعتمادات متعدد الأدوار مع Workflow',           complexity:3, version:'v1.0', isNew:false},
+  {name:'ai-prototype-dark-industrial-3d-hwp.html',          size:220, group:'ai',   desc:'واجهة صناعية داكنة ثلاثية الأبعاد',                complexity:3, version:'v1.0', isNew:false},
+  {name:'ai-prototype-cold-work-simple-bilingual.html',      size:88,  group:'ai',   desc:'نموذج ثنائي اللغة بسيط للعمل البارد',              complexity:1, version:'v1.0', isNew:false},
+  {name:'ai-prototype-zfd-cold-work-pro.html',               size:175, group:'ai',   desc:'نموذج ZFD المحترف للعمل البارد',                   complexity:3, version:'v1.0', isNew:false},
+  {name:'ai-prototype-certificates-gas-log-table.html',      size:130, group:'ai',   desc:'شهادات + جدول سجل الغاز التفاعلي',                 complexity:2, version:'v1.0', isNew:false},
+  {name:'ai-prototype-master-certificates-ppe-matrix.html',  size:155, group:'ai',   desc:'مصفوفة PPE + الشهادات الرئيسية',                   complexity:2, version:'v1.0', isNew:false},
+  {name:'ai-prototype-file-uploads-risk-matrix.html',        size:190, group:'ai',   desc:'رفع الملفات + مصفوفة المخاطر التفاعلية',           complexity:3, version:'v1.0', isNew:true},
+  {name:'ai-prototype-cold-work-3d-viewer.html',             size:245, group:'ai',   desc:'عارض ثلاثي الأبعاد للعمل البارد',                  complexity:3, version:'v1.0', isNew:false},
+  {name:'ai-prototype-hot-work-rtl-arabic.html',             size:100, group:'ai',   desc:'تصريح عمل ساخن — عربي RTL كامل',                  complexity:2, version:'v1.0', isNew:false},
+  {name:'ai-prototype-workflow-progress-qr.html',            size:140, group:'ai',   desc:'تقدم سير العمل + رمز QR للمشاركة',                 complexity:2, version:'v1.0', isNew:true},
+  {name:'prototype-industrial-simple-stamp.html',            size:75,  group:'proto',desc:'ختم صناعي بسيط للتصاريح',                          complexity:1, version:'v1.0', isNew:false},
+  {name:'prototype-hard-edges-gas-validation.html',          size:110, group:'proto',desc:'التحقق من الغاز بتصميم الحواف الحادة',              complexity:2, version:'v1.0', isNew:false},
+  {name:'prototype-3d-sparks-background.html',               size:135, group:'proto',desc:'خلفية شرارات ثلاثية الأبعاد متحركة',               complexity:2, version:'v1.0', isNew:false},
+  {name:'prototype-3d-hse-dark-voice.html',                  size:195, group:'proto',desc:'واجهة HSE داكنة مع دعم الصوت',                    complexity:3, version:'v1.0', isNew:false},
+  {name:'prototype-sidebar-file-manager.html',               size:160, group:'proto',desc:'مدير ملفات بقائمة جانبية تفاعلية',                 complexity:2, version:'v1.0', isNew:false},
+  {name:'prototype-comprehensive-100-files.html',            size:420, group:'proto',desc:'نموذج شامل — 100 ملف مدمج',                        complexity:3, version:'v1.0', isNew:false},
+  {name:'prototype-workflow-signature-pads.html',            size:185, group:'proto',desc:'مسار العمل مع لوحات التوقيع الرقمي',               complexity:3, version:'v1.0', isNew:false},
+  {name:'prototype-5x5-matrix-audit-trail.html',             size:145, group:'proto',desc:'مصفوفة مخاطر 5×5 مع مسار التدقيق',                complexity:2, version:'v1.0', isNew:false},
+  {name:'prototype-a4-print-optimized-hatch.html',           size:90,  group:'proto',desc:'طباعة A4 محسّنة مع نمط الهاشور',                  complexity:1, version:'v1.0', isNew:false},
+];
+
+const files = RAW_FILES.map(f => {
+  const g = FILE_GROUPS[f.group];
+  return {...f, color:g.color, shine:g.shine, shadow:g.shadow,
+    groupLabel:g.label, groupEmoji:g.emoji,
+    sizeLabel: f.size >= 1000 ? (f.size/1000).toFixed(1)+' MB' : '~'+f.size+' KB'};
+});
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+let searchTerm = '';
+let activeFilter = 'all';
+let sortMode = 'default'; // default | size
+let viewMode = 'tree';
+let dayMode = false;
+let lastClicked = null;
+let viewCount = parseInt(localStorage.getItem('ptw_views')||'0') + 1;
+localStorage.setItem('ptw_views', viewCount);
+document.getElementById('viewCount').textContent = viewCount;
+
+/* ══════════════════════════════════════════
+   CANVAS
+══════════════════════════════════════════ */
+const cv  = document.getElementById('c');
+const ctx = cv.getContext('2d');
+const W = 880, H = 820;
+const CX = W/2, GROUND = 720;
+let fruits=[], hoveredFruit=null, animT=0, focusedIdx=-1;
+
+const BRANCHES = [
+  {x1:CX,y1:418,x2:CX-215,y2:215,fruits:3},
+  {x1:CX,y1:418,x2:CX+220,y2:205,fruits:3},
+  {x1:CX,y1:428,x2:CX-280,y2:310,fruits:3},
+  {x1:CX,y1:428,x2:CX+273,y2:300,fruits:3},
+  {x1:CX,y1:433,x2:CX-180,y2:345,fruits:2},
+  {x1:CX,y1:433,x2:CX+185,y2:338,fruits:2},
+  {x1:CX,y1:408,x2:CX-93, y2:143,fruits:2},
+  {x1:CX,y1:408,x2:CX+98, y2:138,fruits:2},
+  {x1:CX,y1:405,x2:CX,    y2:110,fruits:2},
+  {x1:CX,y1:438,x2:CX-360,y2:378,fruits:2},
+  {x1:CX,y1:438,x2:CX+353,y2:370,fruits:1},
+  {x1:CX-215,y1:215,x2:CX-330,y2:145,fruits:1},
+  {x1:CX+220,y1:205,x2:CX+323,y2:137,fruits:1},
+];
+
+function getVisibleFiles() {
+  return files.map((f,i) => {
+    const matchFilter = activeFilter==='all' || f.group===activeFilter;
+    const matchSearch = !searchTerm || f.name.toLowerCase().includes(searchTerm) || f.desc.includes(searchTerm);
+    return {...f, _i:i, dimmed: !(matchFilter && matchSearch)};
+  });
+}
+
+function buildFruits() {
+  const rngPos = mulberry32(42);
+  fruits = [];
+  const vf = getVisibleFiles();
+  let fi = 0;
+  BRANCHES.forEach(b => {
+    for (let i=0; i<b.fruits && fi<vf.length; i++, fi++) {
+      const t = 0.52 + (i/Math.max(b.fruits-1,1))*0.46;
+      const px = b.x1+(b.x2-b.x1)*t;
+      const py = b.y1+(b.y2-b.y1)*t;
+      const f = vf[fi];
+      const baseR = 22 + (f.size/420)*10;
+      fruits.push({
+        bx:px, by:py,
+        cx:px+(rngPos()-0.5)*22,
+        cy:py+28+rngPos()*40,
+        r: baseR + rngPos()*4,
+        file:f, dimmed:f.dimmed,
+        sway:rngPos()*Math.PI*2,
+        swaySpeed:0.24+rngPos()*0.34,
+        swayAmp:1.5+rngPos()*2.5,
+        clickAnim:0,
+        isNew: f.isNew,
+        isLastClicked: f.name === lastClicked,
+      });
+    }
+  });
+  updateSearchResults();
+  buildListView();
+  buildGroupProgress();
+}
+
+function updateSearchResults() {
+  const el = document.getElementById('searchResults');
+  const visible = fruits.filter(f=>!f.dimmed).length;
+  if(searchTerm || activeFilter !== 'all') {
+    el.textContent = visible > 0
+      ? `✦ ${visible} ملف مطابق من أصل ${files.length}`
+      : '✕ لا توجد نتائج مطابقة';
+    el.className = visible===0 ? 'no-results' : '';
+  } else {
+    el.textContent = '';
+  }
+}
+
+/* ══════════════════════════════════════════
+   DRAW: SKY
+══════════════════════════════════════════ */
+function drawSky() {
+  if(dayMode) {
+    const g=ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#b8def5'); g.addColorStop(0.5,'#d8eed5'); g.addColorStop(1,'#e8f5e0');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    // clouds
+    for(let i=0;i<5;i++){
+      const cx2=120+i*160+Math.sin(animT*0.2+i)*12;
+      const cy2=60+i*18;
+      ctx.globalAlpha=0.55;
+      ctx.fillStyle='#fff';
+      ctx.beginPath(); ctx.ellipse(cx2,cy2,40+i*6,22,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(cx2+20,cy2-8,28,16,0,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(cx2-18,cy2-5,24,14,0,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=1; return;
+  }
+  const grd=ctx.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0,'#020810'); grd.addColorStop(0.45,'#061420'); grd.addColorStop(1,'#081c0d');
+  ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+  // Stars
+  for(let i=0;i<120;i++){
+    const sx=Math.sin(i*137.508)*420+W/2;
+    const sy=Math.cos(i*137.508)*240+200;
+    const sr=0.3+(i%7)*0.17;
+    if(sy<GROUND-200){
+      ctx.globalAlpha=0.3+Math.sin(animT*1.1+i*0.7)*0.28;
+      ctx.fillStyle=i%15===0?'#fde68a':i%9===0?'#a8c8ff':'rgba(255,255,255,0.9)';
+      ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill();
+    }
+  }
+  ctx.globalAlpha=1;
+  // Aurora
+  ctx.save();
+  const aGrd=ctx.createLinearGradient(0,0,W,150);
+  aGrd.addColorStop(0,'rgba(34,197,94,0)');
+  aGrd.addColorStop(0.35,'rgba(34,197,94,0.05)');
+  aGrd.addColorStop(0.65,'rgba(56,189,248,0.04)');
+  aGrd.addColorStop(1,'rgba(56,189,248,0)');
+  ctx.fillStyle=aGrd; ctx.fillRect(0,0,W,160);
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════
+   DRAW: MOON / SUN
+══════════════════════════════════════════ */
+function drawMoon() {
+  ctx.save();
+  if(dayMode){
+    const sg=ctx.createRadialGradient(90,80,5,90,80,42);
+    sg.addColorStop(0,'#fff9c4'); sg.addColorStop(0.6,'#ffd54f'); sg.addColorStop(1,'#ff8f00');
+    ctx.shadowColor='rgba(255,200,50,0.7)'; ctx.shadowBlur=60;
+    ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(90,80,40,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+  } else {
+    const mx=100,my=88,mr=40;
+    const mg=ctx.createRadialGradient(mx-9,my-9,4,mx,my,mr);
+    mg.addColorStop(0,'#fffde0'); mg.addColorStop(0.65,'#f0d070'); mg.addColorStop(1,'#c8a030');
+    ctx.shadowColor='rgba(240,210,80,0.45)'; ctx.shadowBlur=38;
+    ctx.fillStyle=mg; ctx.beginPath(); ctx.arc(mx,my,mr,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    [[-10,-8,6],[8,-12,4],[4,10,5],[-5,14,3]].forEach(([cx,cy,cr])=>{
+      ctx.fillStyle='rgba(170,130,15,0.22)';
+      ctx.beginPath(); ctx.arc(mx+cx,my+cy,cr,0,Math.PI*2); ctx.fill();
+    });
+  }
+  ctx.restore();
+}
+
+/* ══════════════════════════════════════════
+   DRAW: GROUND
+══════════════════════════════════════════ */
+function drawGround(){
+  const gg=ctx.createLinearGradient(0,GROUND,0,GROUND+80);
+  if(dayMode){
+    gg.addColorStop(0,'#4caf50'); gg.addColorStop(0.3,'#66bb6a'); gg.addColorStop(1,'#1b5e20');
+  } else {
+    gg.addColorStop(0,'#1c5e1c'); gg.addColorStop(0.3,'#2a7a2a'); gg.addColorStop(1,'#0a1a0a');
+  }
+  ctx.fillStyle=gg;
+  ctx.beginPath(); ctx.ellipse(CX,GROUND+18,315,62,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,0.38)';
+  ctx.beginPath(); ctx.ellipse(CX+8,GROUND+44,215,35,0,0,Math.PI*2); ctx.fill();
+  const rng=mulberry32(99);
+  ctx.lineWidth=1.4;
+  for(let i=0;i<38;i++){
+    const gx=CX-285+rng()*570,gy=GROUND-4+rng()*38;
+    const gc=dayMode?`rgba(${50+Math.floor(rng()*60)},${160+Math.floor(rng()*60)},${40+Math.floor(rng()*40)},0.7)`:
+      `rgba(${40+Math.floor(rng()*70)},${130+Math.floor(rng()*70)},${30+Math.floor(rng()*40)},0.5)`;
+    ctx.strokeStyle=gc;
+    ctx.beginPath();
+    ctx.moveTo(gx,gy+10);
+    ctx.quadraticCurveTo(gx+(rng()-0.5)*12,gy-4,gx+(rng()-0.5)*8,gy-16);
+    ctx.stroke();
+  }
+}
+
+/* ══════════════════════════════════════════
+   DRAW: TRUNK
+══════════════════════════════════════════ */
+function drawTrunk(){
+  const tg=ctx.createLinearGradient(CX-36,0,CX+36,0);
+  tg.addColorStop(0,'#2a1204'); tg.addColorStop(0.32,'#622e0e');
+  tg.addColorStop(0.62,'#8a4416'); tg.addColorStop(1,'#2a1204');
+  ctx.fillStyle=tg;
+  ctx.beginPath();
+  ctx.moveTo(CX-40,GROUND);
+  ctx.bezierCurveTo(CX-34,575,CX-22,478,CX-16,440);
+  ctx.lineTo(CX+16,440);
+  ctx.bezierCurveTo(CX+22,478,CX+34,575,CX+40,GROUND);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle='rgba(50,18,3,0.35)'; ctx.lineWidth=1;
+  for(let i=0;i<7;i++){
+    ctx.beginPath();
+    ctx.moveTo(CX-26+i*10,450);
+    ctx.bezierCurveTo(CX-24+i*9,528,CX-22+i*8.5,600,CX-22+i*9,GROUND-8);
+    ctx.stroke();
+  }
+}
+
+/* ══════════════════════════════════════════
+   DRAW: BRANCHES
+══════════════════════════════════════════ */
+function drawBranches(){
+  BRANCHES.forEach(b=>{
+    const dist=Math.hypot(b.x2-b.x1,b.y2-b.y1);
+    const thick=Math.max(2,16-dist/30);
+    const bg=ctx.createLinearGradient(b.x1,b.y1,b.x2,b.y2);
+    bg.addColorStop(0,'#462006'); bg.addColorStop(0.5,'#622e10'); bg.addColorStop(1,'#381a04');
+    ctx.strokeStyle=bg; ctx.lineWidth=thick; ctx.lineCap='round';
+    ctx.beginPath();
+    const mx=(b.x1+b.x2)/2+(b.x2>CX?24:-24);
+    const my=(b.y1+b.y2)/2-28;
+    ctx.moveTo(b.x1,b.y1);
+    ctx.quadraticCurveTo(mx,my,b.x2,b.y2);
+    ctx.stroke();
+  });
+}
+
+/* ══════════════════════════════════════════
+   DRAW: CANOPY
+══════════════════════════════════════════ */
+function drawLeafCluster(x,y,r,alpha){
+  const g1=dayMode?['#2e7d32','#388e3c','#43a047','#1b5e20','#4caf50','#66bb6a']:
+    ['#0f4d1e','#186228','#1e7a32','#0d4418','#196028','#28a448'];
+  for(let i=0;i<9;i++){
+    const angle=i*(Math.PI*2/9)+animT*0.033;
+    const lx=x+Math.cos(angle)*r*0.66;
+    const ly=y+Math.sin(angle)*r*0.56;
+    const lr=r*0.56;
+    ctx.globalAlpha=alpha*0.85;
+    ctx.fillStyle=g1[i%g1.length];
+    ctx.beginPath(); ctx.ellipse(lx,ly,lr,lr*0.6,angle,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=alpha*0.18;
+    ctx.fillStyle=dayMode?'#a5d6a7':'#5dd870';
+    ctx.beginPath(); ctx.ellipse(lx-lr*0.2,ly-lr*0.2,lr*0.26,lr*0.16,angle-0.3,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+}
+function drawCanopy(){
+  [{x:CX,y:163,r:110},{x:CX-224,y:183,r:84},{x:CX+228,y:175,r:82},
+   {x:CX-150,y:121,r:68},{x:CX+157,y:116,r:66},
+   {x:CX-288,y:253,r:62},{x:CX+283,y:245,r:60},
+   {x:CX-362,y:323,r:56},{x:CX+354,y:315,r:54},
+   {x:CX-180,y:283,r:50},{x:CX+187,y:276,r:52},
+   {x:CX,y:101,r:60},{x:CX-320,y:145,r:52},{x:CX+314,y:139,r:50},
+  ].forEach(c=>drawLeafCluster(c.x,c.y,c.r,0.91));
+}
+
+/* ══════════════════════════════════════════
+   DRAW: FRUIT
+══════════════════════════════════════════ */
+function drawFruit(f, isHovered) {
+  const sway=Math.sin(animT*f.swaySpeed+f.sway)*f.swayAmp;
+  const cx=f.cx+sway, cy=f.cy;
+  const dimA=f.dimmed?0.14:1;
+
+  // Stem
+  ctx.globalAlpha=dimA*0.65;
+  ctx.strokeStyle=dayMode?'rgba(40,100,40,0.55)':'rgba(60,120,60,0.48)';
+  ctx.lineWidth=1.2; ctx.setLineDash([3,2]);
+  ctx.beginPath();
+  ctx.moveTo(f.bx,f.by);
+  ctx.quadraticCurveTo(f.bx+sway*0.4,f.by+(cy-f.by)*0.5,cx,cy-f.r);
+  ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha=1;
+
+  // Click bounce
+  if(f.clickAnim>0){ f.clickAnim=Math.max(0,f.clickAnim-0.08); }
+  const bounceScale=1+Math.sin(f.clickAnim*Math.PI)*0.12;
+
+  const sc=(isHovered?1.22:1)*bounceScale;
+  ctx.save();
+  ctx.globalAlpha=dimA;
+  ctx.translate(cx,cy); ctx.scale(sc,sc);
+
+  if(isHovered&&!f.dimmed){
+    ctx.shadowColor=f.file.color; ctx.shadowBlur=26;
+  }
+
+  // Body
+  ctx.shadowOffsetX=3; ctx.shadowOffsetY=5;
+  if(!isHovered){ctx.shadowColor='rgba(0,0,0,0.55)'; ctx.shadowBlur=11;}
+  const fg=ctx.createRadialGradient(-f.r*0.3,-f.r*0.36,f.r*0.05,0,0,f.r);
+  fg.addColorStop(0,f.file.shine);
+  fg.addColorStop(0.42,f.file.color);
+  fg.addColorStop(1,f.file.shadow);
+  ctx.fillStyle=fg;
+  ctx.beginPath(); ctx.arc(0,0,f.r,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0; ctx.shadowOffsetX=0; ctx.shadowOffsetY=0;
+
+  // Heat shimmer for hot-work
+  if(f.file.group==='hot'&&!f.dimmed){
+    ctx.globalAlpha=dimA*0.18;
+    for(let h=0;h<3;h++){
+      const hr=f.r+(h+1)*5+Math.sin(animT*3+h)*2;
+      const hg=ctx.createRadialGradient(0,0,f.r,0,0,hr);
+      hg.addColorStop(0,'rgba(255,100,50,0.3)');
+      hg.addColorStop(1,'rgba(255,100,50,0)');
+      ctx.fillStyle=hg;
+      ctx.beginPath(); ctx.arc(0,0,hr,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=dimA;
+  }
+
+  // Ice shimmer for cold-work
+  if(f.file.group==='cold'&&!f.dimmed){
+    ctx.globalAlpha=dimA*0.12;
+    for(let c=0;c<4;c++){
+      const angle=c*(Math.PI/2)+animT*0.5;
+      const ix=Math.cos(angle)*f.r*0.7, iy=Math.sin(angle)*f.r*0.7;
+      ctx.fillStyle='rgba(180,230,255,0.8)';
+      ctx.beginPath(); ctx.arc(ix,iy,2.5,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=dimA;
+  }
+
+  // Shine
+  ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.beginPath(); ctx.ellipse(-f.r*0.28,-f.r*0.32,f.r*0.21,f.r*0.12,-0.5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,0.18)';
+  ctx.beginPath(); ctx.ellipse(-f.r*0.1,-f.r*0.5,f.r*0.08,f.r*0.05,0,0,Math.PI*2); ctx.fill();
+
+  // Hover rings
+  if(isHovered&&!f.dimmed){
+    ctx.strokeStyle='rgba(255,255,255,0.8)'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.arc(0,0,f.r+5,0,Math.PI*2); ctx.stroke();
+    const pr=f.r+9+Math.sin(animT*4)*4;
+    ctx.strokeStyle=`rgba(255,255,255,${0.18+Math.sin(animT*4)*0.1})`; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(0,0,pr,0,Math.PI*2); ctx.stroke();
+  }
+
+  // "NEW" badge
+  if(f.file.isNew&&!f.dimmed){
+    ctx.save();
+    ctx.rotate(-0.6);
+    ctx.fillStyle='rgba(74,222,128,0.9)';
+    ctx.beginPath(); ctx.roundRect(-f.r*0.9,-f.r*1.05,f.r*0.85,14,4); ctx.fill();
+    ctx.fillStyle='#000'; ctx.font=`bold 8px 'JetBrains Mono',monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('NEW',-f.r*0.47,-f.r*0.99+7);
+    ctx.restore();
+  }
+
+  // Last-clicked crown
+  if(f.isLastClicked&&!f.dimmed){
+    ctx.fillStyle='rgba(232,201,106,0.9)';
+    ctx.font=`${f.r*0.7}px serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('★',0,-f.r*1.4);
+  }
+
+  // Stem
+  ctx.strokeStyle='rgba(28,10,0,0.88)'; ctx.lineWidth=1.5; ctx.lineCap='round';
+  ctx.beginPath();
+  ctx.moveTo(0,-f.r);
+  ctx.bezierCurveTo(1,-f.r-5,4,-f.r-9,3,-f.r-14);
+  ctx.stroke();
+  ctx.fillStyle='rgba(18,65,18,0.88)';
+  ctx.beginPath(); ctx.ellipse(4,-f.r-11,5,3,0.6,0,Math.PI*2); ctx.fill();
+
+  // Label
+  const label=getShortLabel(f.file.name);
+  const fs=f.r<26?7.5:8.5;
+  ctx.font=`700 ${fs}px 'JetBrains Mono',monospace`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillText(label,0.5,0.5);
+  ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fillText(label,0,0);
+
+  ctx.restore();
+  ctx.globalAlpha=1;
+}
+
+function getShortLabel(n){
+  if(n.startsWith('hot-work'))   return 'HWP';
+  if(n.startsWith('cold-work'))  return 'CWP';
+  if(n.startsWith('ai-'))        return 'AI';
+  if(n.startsWith('ptw'))        return 'PTW';
+  if(n.startsWith('prototype'))  return 'PRO';
+  return 'HTM';
+}
+
+/* ══════════════════════════════════════════
+   SPARKLE SYSTEM
+══════════════════════════════════════════ */
+const spCv=document.getElementById('sparkleCanvas');
+const spCtx=spCv.getContext('2d');
+let sparkles=[];
+
+function resizeSparkle(){
+  spCv.width=window.innerWidth;
+  spCv.height=window.innerHeight;
+}
+resizeSparkle();
+window.addEventListener('resize',resizeSparkle);
+
+function addSparkle(x,y,color){
+  for(let i=0;i<8;i++){
+    const angle=Math.random()*Math.PI*2;
+    sparkles.push({
+      x,y,vx:Math.cos(angle)*(2+Math.random()*4),
+      vy:Math.sin(angle)*(2+Math.random()*4)-2,
+      life:1,color,r:2+Math.random()*3
+    });
+  }
+}
+
+function drawSparkles(){
+  spCtx.clearRect(0,0,spCv.width,spCv.height);
+  sparkles=sparkles.filter(s=>s.life>0);
+  sparkles.forEach(s=>{
+    s.x+=s.vx; s.y+=s.vy; s.vy+=0.15; s.life-=0.04;
+    spCtx.globalAlpha=s.life*0.8;
+    spCtx.fillStyle=s.color;
+    spCtx.beginPath(); spCtx.arc(s.x,s.y,s.r*s.life,0,Math.PI*2); spCtx.fill();
+  });
+  spCtx.globalAlpha=1;
+}
+
+/* ══════════════════════════════════════════
+   MAIN LOOP
+══════════════════════════════════════════ */
+function drawScene(){
+  ctx.clearRect(0,0,W,H);
+  drawSky(); drawMoon(); drawGround(); drawTrunk(); drawBranches(); drawCanopy();
+  fruits.forEach(f=>drawFruit(f,f===hoveredFruit));
+  drawSparkles();
+}
+
+/* ══════════════════════════════════════════
+   MOUSE / TOUCH
+══════════════════════════════════════════ */
+function getPos(e){
+  const rect=cv.getBoundingClientRect();
+  const src=e.touches?e.touches[0]:e;
+  return {
+    x:(src.clientX-rect.left)*(W/rect.width),
+    y:(src.clientY-rect.top)*(H/rect.height),
+    cx:src.clientX, cy:src.clientY
+  };
+}
+function findFruit(mx,my){
+  for(let i=fruits.length-1;i>=0;i--){
+    const f=fruits[i];
+    const sway=Math.sin(animT*f.swaySpeed+f.sway)*f.swayAmp;
+    const dx=mx-(f.cx+sway),dy=my-f.cy;
+    if(dx*dx+dy*dy<=f.r*f.r*1.6) return f;
+  }
+  return null;
+}
+
+const tip=document.getElementById('tooltip');
+const cursor=document.getElementById('cursor');
+const cursorDot=document.getElementById('cursor-dot');
+
+document.body.classList.add('custom-cursor');
+
+document.addEventListener('mousemove',e=>{
+  cursor.style.left=e.clientX+'px'; cursor.style.top=e.clientY+'px';
+  cursorDot.style.left=e.clientX+'px'; cursorDot.style.top=e.clientY+'px';
+});
+
+cv.addEventListener('mousemove',e=>{
+  const {x,y,cx,cy}=getPos(e);
+  const f=findFruit(x,y);
+  hoveredFruit=f;
+  if(f&&!f.dimmed){
+    cursor.classList.add('hovering');
+    showTooltip(f,cx,cy);
+  } else {
+    cursor.classList.remove('hovering');
+    tip.classList.remove('visible');
+  }
+});
+
+cv.addEventListener('click',e=>{
+  const {x,y,cx,cy}=getPos(e);
+  const f=findFruit(x,y);
+  if(f&&!f.dimmed){
+    f.clickAnim=1;
+    lastClicked=f.file.name;
+    addSparkle(cx,cy,f.file.color);
+    buildFruits();
+    openFile(f.file.name);
+  }
+});
+
+cv.addEventListener('mouseleave',()=>{
+  hoveredFruit=null;
+  cursor.classList.remove('hovering');
+  tip.classList.remove('visible');
+});
+
+// Touch support
+cv.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  const {x,y,cx,cy}=getPos(e);
+  const f=findFruit(x,y);
+  if(f&&!f.dimmed){
+    showTooltip(f,cx,cy);
+    f.clickAnim=1;
+    lastClicked=f.file.name;
+    addSparkle(cx,cy,f.file.color);
+    buildFruits();
+    setTimeout(()=>openFile(f.file.name),600);
+  }
+},{passive:false});
+
+function showTooltip(f,cx,cy){
+  const compl=f.file.complexity;
+  const stars=Array.from({length:3},(_,i)=>`<span class="${i<compl?'filled':''}">&nbsp;</span>`).join('');
+  const tipColor=f.file.color;
+  tip.innerHTML=`
+    <div class="tip-header">
+      <span class="tip-group-badge" style="background:${tipColor}22;color:${tipColor};border:1px solid ${tipColor}44">
+        ${f.file.groupEmoji} ${f.file.groupLabel}
+      </span>
+      <span class="tip-version">${f.file.version}</span>
+      ${f.file.isNew?`<span style="background:rgba(74,222,128,0.2);color:#4ade80;font-size:9px;padding:2px 7px;border-radius:8px;font-family:var(--font-mono)">NEW</span>`:''}
+    </div>
+    <div class="tip-name">${f.file.name}</div>
+    <div class="tip-desc">${f.file.desc}</div>
+    <div class="tip-meta">
+      <span>💾 ${f.file.sizeLabel}</span>
+      <span class="tip-complexity">${stars} تعقيد</span>
+    </div>
+    <div class="tip-actions">
+      <button class="tip-btn tip-btn-primary" onclick="openFile('${f.file.name}')">⇗ فتح GitHub</button>
+      <button class="tip-btn tip-btn-secondary" onclick="copyFileLink('${f.file.name}')">📋 نسخ رابط</button>
+    </div>`;
+  tip.classList.add('visible');
+  const tipX=Math.min(cx+18,window.innerWidth-290);
+  const tipY=Math.max(cy-90,10);
+  tip.style.left=tipX+'px'; tip.style.top=tipY+'px';
+}
+
+/* ══════════════════════════════════════════
+   KEYBOARD SHORTCUTS
+══════════════════════════════════════════ */
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='f'){
+    e.preventDefault();
+    document.getElementById('searchInput').focus();
+  }
+  if(e.key==='Escape'){
+    clearSearch();
+    setFilter('all');
+    document.getElementById('searchInput').blur();
+    tip.classList.remove('visible');
+  }
+  if(e.key.toLowerCase()==='r'&&document.activeElement.tagName!=='INPUT'){
+    openRandom();
+  }
+  // Arrow key navigation
+  if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+    const visF=fruits.filter(f=>!f.dimmed);
+    if(visF.length===0) return;
+    focusedIdx=(focusedIdx+(e.key==='ArrowRight'?1:-1)+visF.length)%visF.length;
+    hoveredFruit=visF[focusedIdx];
+    const {bx,by}=visF[focusedIdx];
+    const rect=cv.getBoundingClientRect();
+    const screenX=rect.left+(bx/W)*rect.width;
+    const screenY=rect.top+(by/H)*rect.height;
+    showTooltip(visF[focusedIdx],screenX,screenY);
+  }
+  if(e.key==='Enter'&&hoveredFruit&&!hoveredFruit.dimmed){
+    openFile(hoveredFruit.file.name);
+  }
+});
+
+/* ══════════════════════════════════════════
+   SEARCH
+══════════════════════════════════════════ */
+const searchInput=document.getElementById('searchInput');
+const searchClear=document.getElementById('searchClear');
+
+// URL param support
+const urlP=new URLSearchParams(window.location.search);
+if(urlP.get('filter')){setFilter(urlP.get('filter'));}
+if(urlP.get('search')){searchInput.value=urlP.get('search');searchTerm=urlP.get('search').toLowerCase();}
+
+searchInput.addEventListener('input',e=>{
+  searchTerm=e.target.value.toLowerCase();
+  searchClear.classList.toggle('show',searchTerm.length>0);
+  buildFruits();
+});
+
+function clearSearch(){
+  searchInput.value=''; searchTerm='';
+  searchClear.classList.remove('show');
+  buildFruits();
+}
+
+/* ══════════════════════════════════════════
+   FILTER
+══════════════════════════════════════════ */
+function setFilter(f){
+  activeFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.filter===f);
+  });
+  buildFruits();
+}
+
+/* ══════════════════════════════════════════
+   SORT
+══════════════════════════════════════════ */
+function sortBySize(){
+  sortMode=sortMode==='size'?'default':'size';
+  document.getElementById('sortBtn').classList.toggle('active',sortMode==='size');
+  if(sortMode==='size'){
+    files.sort((a,b)=>b.size-a.size);
+  } else {
+    files.sort((a,b)=>RAW_FILES.findIndex(r=>r.name===a.name)-RAW_FILES.findIndex(r=>r.name===b.name));
+  }
+  buildFruits();
+  showToast(sortMode==='size'?'✦ مرتّب حسب الحجم (الأكبر أولاً)':'✦ العودة للترتيب الافتراضي');
+}
+
+/* ══════════════════════════════════════════
+   VIEW MODE
+══════════════════════════════════════════ */
+function setView(v){
+  viewMode=v;
+  document.getElementById('treeViewBtn').classList.toggle('active',v==='tree');
+  document.getElementById('listViewBtn').classList.toggle('active',v==='list');
+  cv.style.display=v==='tree'?'block':'none';
+  document.querySelector('.hint').style.display=v==='tree'?'block':'none';
+  document.getElementById('listView').classList.toggle('visible',v==='list');
+  if(v==='list') buildListView();
+}
+
+function buildListView(){
+  const tbody=document.getElementById('listBody');
+  const vf=getVisibleFiles().filter(f=>!f.dimmed);
+  const g=FILE_GROUPS;
+  tbody.innerHTML=vf.map(f=>{
+    const grp=g[f.group];
+    const compl='●'.repeat(f.complexity)+'○'.repeat(3-f.complexity);
+    return `<tr onclick="openFile('${f.name}')">
+      <td class="file-name-cell">${f.name}</td>
+      <td><span class="group-tag" style="background:${grp.color}22;color:${grp.color}">${grp.emoji} ${grp.label}</span></td>
+      <td>${f.desc}</td>
+      <td>${f.sizeLabel}</td>
+      <td style="font-family:var(--font-mono);font-size:13px;color:rgba(150,200,170,0.7)">${compl}</td>
+      <td><a class="open-link" href="${REPO_BASE+f.name}" target="_blank">فتح ⇗</a></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   GROUP PROGRESS BARS
+══════════════════════════════════════════ */
+function buildGroupProgress(){
+  const el=document.getElementById('groupProgress');
+  const groups=['hot','cold','ai','ptw','proto'];
+  const labels={hot:'🔥 Hot Work',cold:'❄ Cold Work',ai:'🤖 AI Proto',ptw:'📋 PTW',proto:'🔧 Proto'};
+  const counts={hot:3,cold:2,ai:12,ptw:1,proto:9};
+  const maxC=12;
+  el.innerHTML=groups.map(g=>{
+    const grp=FILE_GROUPS[g];
+    const cnt=counts[g];
+    const pct=(cnt/maxC*100).toFixed(0);
+    return `<div class="prog-item">
+      <span class="prog-label">${labels[g]}</span>
+      <div class="prog-bar-wrap">
+        <div class="prog-bar" style="width:${pct}%;background:${grp.color}"></div>
+      </div>
+      <span class="prog-num">${cnt}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   DAY MODE
+══════════════════════════════════════════ */
+function toggleDayMode(){
+  dayMode=!dayMode;
+  document.body.classList.toggle('day-mode',dayMode);
+  document.getElementById('dayBtn').classList.toggle('active',dayMode);
+  document.getElementById('dayBtn').innerHTML=(dayMode?'☀ ':'🌙 ')+'<span class="label">الوضع</span>';
+  showToast(dayMode?'☀ وضع النهار':'🌙 وضع الليل');
+}
+
+/* ══════════════════════════════════════════
+   ACTIONS
+══════════════════════════════════════════ */
+function openFile(name){
+  window.open(REPO_BASE+name,'_blank');
+}
+function openAll(){
+  if(!confirm(`سيتم فتح ${files.length} تاب جديد — متأكد؟`)) return;
+  files.forEach((f,i)=>setTimeout(()=>window.open(REPO_BASE+f.name,'_blank'),i*200));
+}
+function openRandom(){
+  const vis=fruits.filter(f=>!f.dimmed);
+  if(!vis.length) return;
+  const f=vis[Math.floor(Math.random()*vis.length)];
+  hoveredFruit=f;
+  showToast(`🎲 ${f.file.name}`);
+  setTimeout(()=>openFile(f.file.name),800);
+}
+function copyFileLink(name){
+  navigator.clipboard.writeText(REPO_BASE+name).then(()=>showToast('📋 تم نسخ الرابط'));
+}
+function copyClone(){
+  navigator.clipboard.writeText(`git clone ${REPO_URL}.git`).then(()=>showToast('📋 تم نسخ أمر git clone'));
+}
+function exportCSV(){
+  const hdr='Name,Group,Size,Complexity,Version,Description\n';
+  const rows=files.map(f=>`"${f.name}","${f.group}","${f.sizeLabel}",${f.complexity},"${f.version}","${f.desc}"`).join('\n');
+  const blob=new Blob(['\uFEFF'+hdr+rows],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='ptw-files.csv'; a.click();
+  showToast('⬇ تم تصدير CSV');
+}
+function showEmbed(){
+  document.getElementById('embedCode').value=
+    `<iframe src="${window.location.href}" width="100%" height="600" frameborder="0" style="border-radius:12px;overflow:hidden;"></iframe>`;
+  document.getElementById('embedModal').classList.add('open');
+}
+function closeEmbed(){ document.getElementById('embedModal').classList.remove('open'); }
+function copyEmbed(){
+  const ta=document.getElementById('embedCode');
+  ta.select(); navigator.clipboard.writeText(ta.value).then(()=>showToast('📋 تم نسخ كود التضمين'));
+}
+
+/* ══════════════════════════════════════════
+   CHANGELOG
+══════════════════════════════════════════ */
+function toggleChangelog(){
+  const p=document.getElementById('changelogPanel');
+  const b=document.getElementById('clBtn');
+  const open=p.classList.toggle('visible');
+  b.textContent=open?'إخفاء':'عرض';
+}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+/* ══════════════════════════════════════════
+   SEEDED RANDOM
+══════════════════════════════════════════ */
+function mulberry32(a){
+  return function(){
+    a|=0; a=a+0x6D2B79F5|0;
+    let t=Math.imul(a^a>>>15,1|a);
+    t=t+Math.imul(t^t>>>7,61|t)^t;
+    return((t^t>>>14)>>>0)/4294967296;
+  };
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+buildFruits();
+buildGroupProgress();
+let last=0;
+(function loop(ts){
+  if(ts-last>15){ animT+=0.015; drawScene(); last=ts; }
+  requestAnimationFrame(loop);
+})(0);
+
+// Stagger-in animation on load
+fruits.forEach((f,i)=>{
+  const orig={cy:f.cy};
+  f.cy=f.cy-60;
+  setTimeout(()=>{
+    const dur=500, start=Date.now();
+    function anim(){
+      const p=Math.min(1,(Date.now()-start)/dur);
+      const ease=1-Math.pow(1-p,3);
+      f.cy=f.cy+(orig.cy-(f.cy))*0.2;
+      if(p<1) requestAnimationFrame(anim);
+    }
+    anim();
+  },i*35);
+});
+</script>
+</body>
+</html>

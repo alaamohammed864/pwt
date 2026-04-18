@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hot Work PTW — Industrial Compliance System v3.0</title>
+  <style>
+    :root {
+      --primary: #d93025; --primary-dark: #b22219;
+      --success: #1e8e3e; --warning: #f9ab00; --danger: #ea4335;
+      --bg: #f8f9fa; --surface: #ffffff; --border: #dadce0;
+      --text: #202124; --text-secondary: #5f6368;
+      --shadow: 0 2px 8px rgba(0,0,0,0.1); --radius: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 16px; }
+    [dir="rtl"] body { direction: rtl; text-align: right; }
+    .container { max-width: 1100px; margin: 0 auto; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    header { background: var(--primary); color: white; padding: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    h1 { font-size: 1.4rem; font-weight: 600; }
+    .status-bar { display: flex; gap: 12px; font-size: 0.85rem; background: rgba(255,255,255,0.15); padding: 8px 12px; border-radius: 20px; align-items: center; }
+    .badge { padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 0.75rem; background: white; color: var(--primary); }
+    .timer { font-family: monospace; font-weight: bold; }
+    .timer.warning { color: var(--warning); }
+    .timer.critical { color: var(--danger); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.6 } }
+    .toolbar { display: flex; gap: 8px; padding: 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    button { padding: 8px 14px; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius); cursor: pointer; font-weight: 500; transition: all 0.2s; }
+    button:hover { background: #e8eaed; }
+    button.primary { background: var(--primary); color: white; border-color: var(--primary); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .workflow-steps { display: flex; padding: 12px; background: #f1f3f4; border-bottom: 1px solid var(--border); overflow-x: auto; gap: 8px; }
+    .step { flex: 1; min-width: 100px; text-align: center; padding: 8px; font-size: 0.8rem; border-radius: var(--radius); border: 2px solid transparent; transition: all 0.3s; }
+    .step.active { border-color: var(--primary); background: #fce8e6; color: var(--primary-dark); font-weight: 600; }
+    .step.completed { border-color: var(--success); background: #e6f4ea; color: var(--success); }
+    .step.locked { opacity: 0.4; }
+    section { padding: 16px; border-bottom: 1px solid var(--border); }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer; }
+    .section-header h2 { font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+    .lock-icon { font-size: 1.2rem; color: var(--text-secondary); }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px; }
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); }
+    input, select, textarea { padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(217,48,37,0.2); }
+    .signature-area { background: #f8f9fa; border: 2px dashed var(--border); border-radius: var(--radius); padding: 12px; text-align: center; margin: 12px 0; position: relative; }
+    canvas { border: 1px solid #ccc; background: white; cursor: crosshair; touch-action: none; width: 100%; max-width: 400px; height: 150px; border-radius: 4px; }
+    .sig-controls { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.85rem; }
+    th, td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+    [dir="rtl"] th, [dir="rtl"] td { text-align: right; }
+    th { background: #f1f3f4; }
+    tr.safe td { color: var(--success); }
+    tr.warning td { color: var(--warning); font-weight: 600; }
+    tr.danger td { color: var(--danger); font-weight: 700; background: #fce8e6; }
+    .audit-log { max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; background: #1e1e1e; color: #d4d4d4; padding: 12px; border-radius: 4px; margin-top: 12px; }
+    .audit-log div { margin-bottom: 4px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+    .alert { padding: 10px; border-radius: 4px; margin: 8px 0; font-size: 0.9rem; display: none; }
+    .alert.warning { background: #fef7cd; color: #664d03; border-left: 4px solid var(--warning); }
+    .alert.danger { background: #f8d7da; color: #842029; border-left: 4px solid var(--danger); }
+    .locked-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center; z-index: 10; border-radius: 4px; pointer-events: none; }
+    .locked-overlay span { background: var(--text-secondary); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; }
+    @media print {
+      .toolbar, .workflow-steps, .signature-area, .sig-controls, button { display: none !important; }
+      section { break-inside: avoid; page-break-inside: avoid; }
+      body { padding: 0; background: white; }
+      .container { box-shadow: none; max-width: 100%; }
+      .audit-log { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>🔥 Hot Work Permit System</h1>
+        <small>PTW-HW-2026-0001 • ISO 45001:2018 Compliant • v3.0</small>
+      </div>
+      <div class="status-bar">
+        <span class="badge" id="statusBadge">DRAFT</span>
+        <span id="expiryTimer" class="timer">--:--:--</span>
+        <button onclick="toggleLang()">EN/AR</button>
+        <button onclick="exportPDF()">🖨️ Print/PDF</button>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <button id="btnSave" onclick="app.save()">💾 Save</button>
+      <button id="btnClear" onclick="app.reset()">🔄 Reset</button>
+      <button id="btnSync" onclick="app.syncOffline()">📶 Sync Offline</button>
+    </div>
+
+    <div class="workflow-steps" id="workflowSteps">
+      <div class="step active" data-role="PA">👷 PA (Initiator)</div>
+      <div class="step" data-role="AA">🏭 AA (Area)</div>
+      <div class="step" data-role="HSE">🛡️ HSE Supervisor</div>
+      <div class="step" data-role="PRA">👔 PRA (Site)</div>
+      <div class="step" data-role="ACTIVE">✅ ACTIVE</div>
+    </div>
+
+    <section id="sec-info">
+      <div class="section-header"><h2>📋 Permit Header & Validity</h2></div>
+      <div class="form-grid">
+        <div class="field"><label>Valid From</label><input type="datetime-local" id="validFrom"></div>
+        <div class="field"><label>Valid Until</label><input type="datetime-local" id="validUntil"></div>
+        <div class="field"><label>Risk Level</label>
+          <select id="riskLevel"><option value="LOW">LOW</option><option value="MEDIUM">MEDIUM</option><option value="HIGH">HIGH</option></select>
+        </div>
+      </div>
+      <div id="expiryAlert" class="alert warning">⚠️ Permit expires in 30 minutes. Prepare for safe handover or extension.</div>
+    </section>
+
+    <section id="sec-hazards">
+      <div class="section-header"><h2>⚠️ Hazard Identification</h2></div>
+      <div class="form-grid">
+        <label><input type="checkbox" id="h_flammable"> Flammable/Pressurized</label>
+        <label><input type="checkbox" id="h_toxic"> Toxic Materials</label>
+        <label><input type="checkbox" id="h_electric"> Electrical</label>
+        <label><input type="checkbox" id="h_h2s"> H₂S Area</label>
+        <label><input type="checkbox" id="h_confined"> Confined Space</label>
+        <label><input type="checkbox" id="h_others"> Others: <input type="text" id="h_others_text" style="width:100px"></label>
+      </div>
+    </section>
+
+    <section id="sec-gas">
+      <div class="section-header"><h2>🧪 Gas Testing</h2></div>
+      <div class="alert danger" id="gasAlert" style="display:none">🚫 Gas readings unsafe. Permit cannot proceed.</div>
+      <table id="gasTable">
+        <tr><th>Gas Type</th><th>Reading</th><th>Limit</th><th>Status</th></tr>
+        <tr><td>O₂ (%)</td><td><input type="number" step="0.1" data-gas="O2"></td><td>19.5–23.5</td><td class="status">--</td></tr>
+        <tr><td>LEL (%)</td><td><input type="number" step="0.1" data-gas="LEL"></td><td><10</td><td class="status">--</td></tr>
+        <tr><td>H₂S (ppm)</td><td><input type="number" step="1" data-gas="H2S"></td><td><10</td><td class="status">--</td></tr>
+        <tr><td>CO (ppm)</td><td><input type="number" step="1" data-gas="CO"></td><td><25</td><td class="status">--</td></tr>
+      </table>
+    </section>
+
+    <section id="sec-sign-pa">
+      <div class="section-header"><h2>✍️ PA Signature (Performing Authority)</h2></div>
+      <div class="signature-area">
+        <canvas id="canvas-pa"></canvas>
+        <div class="sig-controls">
+          <button onclick="app.sigs['pa'].clear()">Clear</button>
+          <button class="primary" onclick="app.sigs['pa'].save('PA')">Sign & Lock</button>
+        </div>
+        <div class="locked-overlay" id="lock-pa" style="display:none"><span>🔒 LOCKED</span></div>
+      </div>
+    </section>
+
+    <section id="sec-sign-aa">
+      <div class="section-header"><h2>🏭 AA Signature (Area Authority)</h2></div>
+      <div class="signature-area">
+        <canvas id="canvas-aa"></canvas>
+        <div class="sig-controls">
+          <button onclick="app.sigs['aa'].clear()">Clear</button>
+          <button class="primary" onclick="app.sigs['aa'].save('AA')">Sign & Lock</button>
+        </div>
+        <div class="locked-overlay" id="lock-aa" style="display:none"><span>🔒 LOCKED</span></div>
+      </div>
+    </section>
+
+    <section id="sec-sign-hse">
+      <div class="section-header"><h2>🛡️ HSE Signature</h2></div>
+      <div class="signature-area">
+        <canvas id="canvas-hse"></canvas>
+        <div class="sig-controls">
+          <button onclick="app.sigs['hse'].clear()">Clear</button>
+          <button class="primary" onclick="app.sigs['hse'].save('HSE')">Sign & Lock</button>
+        </div>
+        <div class="locked-overlay" id="lock-hse" style="display:none"><span>🔒 LOCKED</span></div>
+      </div>
+    </section>
+
+    <section id="sec-sign-pra">
+      <div class="section-header"><h2>👔 PRA Signature (Site Supervisor)</h2></div>
+      <div class="signature-area">
+        <canvas id="canvas-pra"></canvas>
+        <div class="sig-controls">
+          <button onclick="app.sigs['pra'].clear()">Clear</button>
+          <button class="primary" onclick="app.sigs['pra'].save('PRA')">Sign & Lock</button>
+        </div>
+        <div class="locked-overlay" id="lock-pra" style="display:none"><span>🔒 LOCKED</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-header"><h2>📜 Audit Trail</h2></div>
+      <div class="audit-log" id="auditLog"></div>
+    </section>
+  </div>
+
+  <script>
+    // ===== CRYPTO & UTILS =====
+    const hash = async (str) => {
+      const buf = new TextEncoder().encode(str);
+      const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+      return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    };
+
+    const db = {
+      key: 'ptw_v3_state',
+      async get() { const d = await indexedDB.open('PTW',1).catch(()=>({})); return JSON.parse(localStorage.getItem(this.key)||'{}'); },
+      async save(data) { localStorage.setItem(this.key, JSON.stringify(data)); }
+    };
+
+    // ===== SIGNATURE PAD =====
+    class SignaturePad {
+      constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.drawing = false;
+        this.data = null;
+        this.setup();
+      }
+      setup() {
+        const rect = this.canvas.getBoundingClientRect();
+        this.canvas.width = rect.width; this.canvas.height = rect.height;
+        this.ctx.lineWidth = 2; this.ctx.lineCap = 'round'; this.ctx.strokeStyle = '#000';
+        this.canvas.addEventListener('pointerdown', e => { this.drawing=true; this.ctx.beginPath(); this.ctx.moveTo(e.offsetX, e.offsetY); });
+        this.canvas.addEventListener('pointermove', e => { if(!this.drawing) return; this.ctx.lineTo(e.offsetX, e.offsetY); this.ctx.stroke(); });
+        this.canvas.addEventListener('pointerup', () => this.drawing=false);
+        this.canvas.addEventListener('pointerleave', () => this.drawing=false);
+      }
+      clear() { this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height); this.data=null; }
+      async save(role) {
+        if(this.data) return alert('Already signed.');
+        this.data = this.canvas.toDataURL('image/png');
+        const ts = new Date().toISOString();
+        const payload = `${role}-${this.data.substring(0,50)}-${ts}`;
+        const h = await hash(payload);
+        this.meta = { data: this.data, timestamp: ts, hash: h, role };
+        app.lockSection(role.toLowerCase());
+        app.logAudit(`${role} signed. Hash: ${h.slice(0,8)}...`);
+      }
+    }
+
+    // ===== MAIN APP =====
+    const app = {
+      sigs: {}, state: 'DRAFT', timer: null,
+      async init() {
+        this.sigs.pa = new SignaturePad('canvas-pa');
+        this.sigs.aa = new SignaturePad('canvas-aa');
+        this.sigs.hse = new SignaturePad('canvas-hse');
+        this.sigs.pra = new SignaturePad('canvas-pra');
+        this.loadSaved();
+        this.startTimer();
+        this.bindGas();
+        this.logAudit('System initialized. v3.0');
+      },
+      bindGas() {
+        document.querySelectorAll('#gasTable input').forEach(inp => {
+          inp.addEventListener('input', () => {
+            const row = inp.closest('tr');
+            const gas = inp.dataset.gas;
+            const val = parseFloat(inp.value);
+            let status = '--', cls = '';
+            if(!isNaN(val)) {
+              const safe = { O2: v=>v>=19.5&&v<=23.5, LEL: v=>v<10, H2S: v=>v<10, CO: v=>v<25 };
+              if(safe[gas](val)) { status='SAFE'; cls='safe'; }
+              else if(val > (safe[gas].toString().match(/\d+/)||[0])[0]*1.5) { status='DANGER'; cls='danger'; }
+              else { status='WARNING'; cls='warning'; }
+            }
+            row.className = cls;
+            row.querySelector('.status').textContent = status;
+            this.validateGas();
+          });
+        });
+      },
+      validateGas() {
+        const unsafe = [...document.querySelectorAll('#gasTable .status')].some(s => s.textContent==='DANGER');
+        document.getElementById('gasAlert').style.display = unsafe ? 'block' : 'none';
+      },
+      startTimer() {
+        const untilEl = document.getElementById('validUntil');
+        const update = () => {
+          const until = new Date(untilEl.value);
+          if(isNaN(until)) return;
+          const diff = until - Date.now();
+          const pad = n => String(n).padStart(2,'0');
+          const h = Math.floor(diff/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+          const timerEl = document.getElementById('expiryTimer');
+          timerEl.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+          if(diff < 0) { timerEl.textContent = 'EXPIRED'; timerEl.classList.add('critical'); this.expire(); }
+          else if(diff < 1800000) timerEl.classList.add('warning');
+          else timerEl.classList.remove('warning','critical');
+
+          if(diff <= 1800000 && diff > 0) document.getElementById('expiryAlert').style.display='block';
+          else document.getElementById('expiryAlert').style.display='none';
+        };
+        update();
+        this.timer = setInterval(update, 1000);
+      },
+      expire() { this.lockAll(); this.logAudit('⛔ PERMIT EXPIRED AUTOMATICALLY'); clearInterval(this.timer); },
+      lockSection(role) {
+        document.getElementById(`lock-${role}`).style.display = 'flex';
+        const sec = document.getElementById(`sec-sign-${role}`);
+        sec.querySelectorAll('input,select,textarea').forEach(el => el.disabled=true);
+        sec.querySelectorAll('button:not(.primary)').forEach(el => el.disabled=true);
+        this.updateWorkflow(role);
+      },
+      lockAll() {
+        document.querySelectorAll('.locked-overlay').forEach(el => el.style.display='flex');
+        document.querySelectorAll('input,select,textarea,button').forEach(el => el.disabled=true);
+        document.getElementById('btnSave').style.display='none';
+      },
+      updateWorkflow(role) {
+        const steps = ['pa','aa','hse','pra','active'];
+        const idx = steps.indexOf(role.toLowerCase());
+        document.querySelectorAll('.workflow-steps .step').forEach((el,i) => {
+          el.classList.remove('active','completed','locked');
+          if(i < idx) el.classList.add('completed');
+          else if(i === idx+1 || (role==='pra' && i===steps.length-1)) el.classList.add('active');
+          else if(i > idx+1 && !(role==='pra')) el.classList.add('locked');
+        });
+        this.state = idx === steps.length-2 ? 'ACTIVE' : role.toUpperCase();
+        document.getElementById('statusBadge').textContent = this.state;
+      },
+      logAudit(msg) {
+        const log = document.getElementById('auditLog');
+        const ts = new Date().toLocaleString();
+        const entry = document.createElement('div');
+        entry.textContent = `[${ts}] ${msg}`;
+        log.prepend(entry);
+      },
+      async save() {
+        const data = {
+          validFrom: document.getElementById('validFrom').value,
+          validUntil: document.getElementById('validUntil').value,
+          risk: document.getElementById('riskLevel').value,
+          state: this.state,
+          signatures: Object.fromEntries(Object.entries(this.sigs).map(([k,v])=>[k, v.meta]))
+        };
+        await db.save(data);
+        this.logAudit('💾 Permit saved locally');
+        alert('Saved offline.');
+      },
+      async loadSaved() {
+        const saved = await db.get();
+        if(saved.validFrom) document.getElementById('validFrom').value = saved.validFrom;
+        if(saved.validUntil) document.getElementById('validUntil').value = saved.validUntil;
+        if(saved.state) { this.state = saved.state; document.getElementById('statusBadge').textContent = saved.state; }
+      },
+      async syncOffline() {
+        // Hook for future Service Worker + IndexedDB sync
+        this.logAudit('📶 Sync triggered. Ready for cloud API.');
+        alert('Offline sync queue ready. Connect to backend to push.');
+      },
+      reset() {
+        if(confirm('Reset entire permit? All unsaved data will be lost.')) {
+          localStorage.removeItem('ptw_v3_state');
+          location.reload();
+        }
+      }
+    };
+
+    function toggleLang() {
+      const html = document.documentElement;
+      const dir = html.getAttribute('dir')==='ltr'?'rtl':'ltr';
+      html.setAttribute('dir', dir);
+      html.setAttribute('lang', dir==='rtl'?'ar':'en');
+      app.logAudit(`🌐 Language switched to ${dir==='rtl'?'AR':'EN'}`);
+    }
+
+    function exportPDF() {
+      app.logAudit('🖨️ Exporting to PDF/Print');
+      window.print();
+    }
+
+    // IoT HOOK (Phase 4)
+    // window.addEventListener('bluetooth-device', async (e) => {
+    //   const reading = await readGasDevice(e.device);
+    //   document.querySelector(`input[data-gas="${reading.type}"]`).value = reading.value;
+    //   document.querySelector(`input[data-gas="${reading.type}"]`).dispatchEvent(new Event('input'));
+    // });
+
+    window.addEventListener('DOMContentLoaded', () => app.init());
+  </script>
+</body>
+</html>

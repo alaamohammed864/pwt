@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INDUSTRIAL PERMIT SYSTEM | HOT WORK PERMIT (HWP)</title>
+    <style>
+        /* * INDUSTRIAL DESIGN SYSTEM v5.0
+         * Engineering Standards: ISO 216 (A4), API 2009, OSHA 1910.119
+         */
+
+        :root {
+            --primary-black: #000000;
+            --border-thick: 2px solid #000;
+            --border-thin: 1px solid #000;
+            --border-dotted: 1px dotted #444;
+            --safety-red: #B22222;
+            --safety-green: #006400;
+            --warning-yellow: #FFD700;
+            --paper-white: #ffffff;
+            --header-bg: #f2f2f2;
+            --font-main: 'Roboto Mono', 'Courier New', monospace;
+        }
+
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+        }
+
+        body {
+            background-color: #555;
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Container for the Digital Document */
+        .permit-container {
+            width: 210mm;
+            min-height: 297mm;
+            background-color: var(--paper-white);
+            padding: 15mm;
+            border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* TOOLBAR - Hidden on Print */
+        .system-toolbar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+        }
+
+        .btn {
+            background: #222;
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .btn:hover { background: var(--safety-red); }
+
+        .btn-approve { background: var(--safety-green); }
+
+        /* HEADER SECTION */
+        .header-table {
+            width: 100%;
+            border: var(--border-thick);
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .header-table td {
+            border: var(--border-thin);
+            padding: 8px;
+            vertical-align: middle;
+        }
+
+        .logo-box { width: 15%; text-align: center; font-weight: 900; font-size: 24px; }
+        .title-box { width: 55%; text-align: center; }
+        .info-box { width: 30%; font-size: 10px; }
+
+        .permit-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 0;
+            text-transform: uppercase;
+            color: var(--safety-red);
+        }
+
+        /* SECTION STYLING */
+        .section-header {
+            background-color: var(--header-bg);
+            border: var(--border-thick);
+            padding: 4px 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-content {
+            border: var(--border-thick);
+            border-top: none;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* DATA GRID */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 10px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 8px;
+        }
+
+        label {
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
+        input[type="text"], input[type="datetime-local"], select, textarea {
+            border: none;
+            border-bottom: var(--border-dotted);
+            font-family: var(--font-main);
+            font-size: 12px;
+            padding: 2px 0;
+            outline: none;
+            width: 100%;
+        }
+
+        input:focus { border-bottom: 1px solid var(--safety-red); background: #fffdfd; }
+
+        /* CHECKBOXES & PPE */
+        .ppe-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            font-size: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border: 0.5px solid #eee;
+            padding: 3px;
+        }
+
+        /* TABLES - LOGS & CERTIFICATES */
+        .industrial-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        .industrial-table th, .industrial-table td {
+            border: var(--border-thin);
+            padding: 4px;
+            text-align: center;
+        }
+
+        .industrial-table th { background: #eee; text-transform: uppercase; }
+
+        /* STAMPS & APPROVALS */
+        .stamp-area {
+            position: absolute;
+            top: 150px;
+            right: 50px;
+            width: 150px;
+            height: 150px;
+            border: 4px double var(--safety-red);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--safety-red);
+            font-weight: bold;
+            transform: rotate(-15deg);
+            opacity: 0.1;
+            pointer-events: none;
+            transition: 0.5s;
+        }
+
+        .stamp-active { opacity: 0.8; }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            color: rgba(0,0,0,0.03);
+            pointer-events: none;
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+
+        /* PRINT MEDIA */
+        @media print {
+            body { background: white; padding: 0; }
+            .system-toolbar { display: none; }
+            .permit-container { box-shadow: none; border: none; padding: 0; width: 100%; }
+            input, textarea, select { border: none !important; }
+            .no-print { display: none; }
+        }
+
+        /* UTILITY */
+        .col-12 { grid-column: span 12; }
+        .col-6 { grid-column: span 6; }
+        .col-4 { grid-column: span 4; }
+        .col-3 { grid-column: span 3; }
+        .col-2 { grid-column: span 2; }
+        
+        .critical-box { border: 2px solid var(--safety-red); }
+        .bg-red-light { background-color: #fff0f0; }
+
+    </style>
+</head>
+<body>
+
+    <div class="system-toolbar">
+        <button class="btn" onclick="generateID()">Generate ID</button>
+        <button class="btn" onclick="saveData()">Save Draft</button>
+        <button class="btn btn-approve" onclick="approvePermit()">Approve & Stamp</button>
+        <button class="btn" onclick="window.print()">Print (A4 PDF)</button>
+        <button class="btn" style="background: #999;" onclick="resetForm()">Reset System</button>
+    </div>
+
+    <div class="permit-container" id="printablePermit">
+        <div class="watermark" id="watermarkText">DRAFT</div>
+        
+        <div class="stamp-area" id="authStamp">
+            <span style="font-size: 12px;">AUTHORIZED</span>
+            <span id="stampDate" style="font-size: 14px;">--/--/--</span>
+            <span style="font-size: 10px;">REFINERY OPERATIONS</span>
+        </div>
+
+        <table class="header-table">
+            <tr>
+                <td rowspan="2" class="logo-box">OIL & GAS CO.</td>
+                <td class="title-box">
+                    <h1 class="permit-title">Hot Work Permit</h1>
+                    <span style="font-size: 10px; font-weight: bold;">Work involving ignition sources, welding, or open flames</span>
+                </td>
+                <td class="info-box">
+                    <strong>Permit No:</strong> <span id="permitIdDisplay">HWP-PENDING</span><br>
+                    <strong>Facility:</strong> REFINERY-SEC-04<br>
+                    <strong>Status:</strong> <span id="statusDisplay">DRAFT</span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="font-size: 9px; text-align: center; background: #ffffcc;">
+                    WARNING: VALID FOR ONE SHIFT ONLY. MUST BE RETURNED TO PERMIT OFFICE UPON COMPLETION.
+                </td>
+            </tr>
+        </table>
+
+        <div class="section-header">
+            1. Work Identification & Scope
+        </div>
+        <div class="section-content">
+            <div class="data-grid">
+                <div class="field col-6">
+                    <label>Performing Authority (Person in charge)</label>
+                    <input type="text" id="paName" placeholder="Enter Full Name">
+                </div>
+                <div class="field col-6">
+                    <label>Contractor / Department</label>
+                    <input type="text" placeholder="e.g. Mechanical Maintenance">
+                </div>
+                <div class="field col-3">
+                    <label>Asset / Tag No.</label>
+                    <input type="text" placeholder="E-101 / P-202">
+                </div>
+                <div class="field col-3">
+                    <label>Area Classification</label>
+                    <select>
+                        <option>Non-Hazardous</option>
+                        <option>Zone 2 (Occasional)</option>
+                        <option>Zone 1 (Frequent)</option>
+                        <option>Zone 0 (Constant)</option>
+                    </select>
+                </div>
+                <div class="field col-3">
+                    <label>Start Date/Time</label>
+                    <input type="datetime-local">
+                </div>
+                <div class="field col-3">
+                    <label>Expected Completion</label>
+                    <input type="datetime-local">
+                </div>
+                <div class="field col-12">
+                    <label>Detailed Scope of Work (Step-by-Step Description)</label>
+                    <textarea rows="2" placeholder="Describe welding, grinding, or cutting activities..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            2. Safety Controls & Required PPE
+        </div>
+        <div class="section-content">
+            <div class="data-grid">
+                <div class="col-12">
+                    <label style="color: var(--safety-red); border-bottom: 1px solid #ccc; width: 100%; display: block;">Specific PPE Required</label>
+                    <div class="ppe-grid">
+                        <div class="checkbox-item"><input type="checkbox"> Face Shield / Mask</div>
+                        <div class="checkbox-item"><input type="checkbox"> Fire Retardant Suit</div>
+                        <div class="checkbox-item"><input type="checkbox"> Welding Apron</div>
+                        <div class="checkbox-item"><input type="checkbox"> Scanned SCBA</div>
+                        <div class="checkbox-item"><input type="checkbox"> Safety Harness</div>
+                        <div class="checkbox-item"><input type="checkbox"> Ear Protection</div>
+                        <div class="checkbox-item"><input type="checkbox"> Chemical Goggles</div>
+                        <div class="checkbox-item"><input type="checkbox"> Gas Detector (Portable)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            3. Linked Certificates & Isolations
+        </div>
+        <div class="section-content" style="padding: 0;">
+            <table class="industrial-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Certificate Type</th>
+                        <th style="width: 25%;">Ref Number</th>
+                        <th style="width: 20%;">Issuer ID</th>
+                        <th style="width: 15%;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align: left;">Electrical Isolation (LOTO)</td>
+                        <td><input type="text" placeholder="LOTO-XXXX"></td>
+                        <td><input type="text"></td>
+                        <td><select><option>N/A</option><option>Linked</option></select></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Mechanical Isolation / Blind List</td>
+                        <td><input type="text" placeholder="MECH-XXXX"></td>
+                        <td><input type="text"></td>
+                        <td><select><option>N/A</option><option>Linked</option></select></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Confined Space Entry (CSE)</td>
+                        <td><input type="text" placeholder="CSE-XXXX"></td>
+                        <td><input type="text"></td>
+                        <td><select><option>N/A</option><option>Linked</option></select></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">Lifting Plan / Rigging</td>
+                        <td><input type="text" placeholder="LIFT-XXXX"></td>
+                        <td><input type="text"></td>
+                        <td><select><option>N/A</option><option>Linked</option></select></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-header" style="background: var(--warning-yellow);">
+            4. Atmospheric Gas Test Record (MANDATORY)
+        </div>
+        <div class="section-content critical-box" style="padding: 0;">
+            <table class="industrial-table" id="gasTestTable">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>O2 (%)</th>
+                        <th>LEL (%)</th>
+                        <th>H2S (ppm)</th>
+                        <th>CO (ppm)</th>
+                        <th>Tester Name</th>
+                        <th>Initial</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="bg-red-light">
+                        <td><input type="text" placeholder="08:00"></td>
+                        <td><input type="text" value="20.9"></td>
+                        <td><input type="text" value="0.0"></td>
+                        <td><input type="text" value="0.0"></td>
+                        <td><input type="text" value="0.0"></td>
+                        <td><input type="text"></td>
+                        <td>[____]</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td>[____]</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td><input type="text"></td>
+                        <td>[____]</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="font-size: 8px; padding: 5px;">
+                * PERMIT VOID IF: O2 < 19.5% or > 23.5% | LEL > 5% | H2S > 10ppm | CO > 25ppm
+            </div>
+        </div>
+
+        <div class="section-header">
+            5. Authorization & Sign-Off
+        </div>
+        <div class="section-content">
+            <div class="data-grid">
+                <div class="field col-4">
+                    <label>Performing Authority Sign</label>
+                    <div style="border-bottom: 1px solid #000; height: 30px; font-style: italic; display: flex; align-items: flex-end;">
+                        <span id="paSignName"></span>
+                    </div>
+                    <span style="font-size: 8px;">(Sign on Site)</span>
+                </div>
+                <div class="field col-4">
+                    <label>Area Authority Sign</label>
+                    <div style="border-bottom: 1px solid #000; height: 30px;"></div>
+                    <span style="font-size: 8px;">(Ops Department)</span>
+                </div>
+                <div class="field col-4">
+                    <label>Issuing Authority Sign</label>
+                    <div style="border-bottom: 1px solid #000; height: 30px; display: flex; align-items: flex-end; color: var(--safety-green);">
+                        <span id="iaSignName"></span>
+                    </div>
+                    <span style="font-size: 8px;">(HSE/Control Room)</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; font-size: 8px; color: #888; margin-top: 10px;">
+            Document Generated via AXIOM-INDUSTRIAL PRO v5.0 | Industrial Security Protocol Active
+        </div>
+
+    </div>
+
+    <script>
+        /*
+         * CORE SYSTEM LOGIC
+         */
+
+        // 1. Generate Unique ID
+        function generateID() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const random = Math.floor(1000 + Math.random() * 9000);
+            const id = `HWP-${year}-${random}`;
+            document.getElementById('permitIdDisplay').innerText = id;
+            alert("New Permit ID Generated: " + id);
+        }
+
+        // 2. Approve & Stamp Logic
+        function approvePermit() {
+            const paName = document.getElementById('paName').value;
+            if (!paName) {
+                alert("CRITICAL ERROR: Performing Authority name must be filled before approval.");
+                return;
+            }
+
+            // Set Visuals
+            document.getElementById('statusDisplay').innerText = "AUTHORIZED / ACTIVE";
+            document.getElementById('statusDisplay').style.color = "green";
+            document.getElementById('watermarkText').innerText = "APPROVED";
+            document.getElementById('watermarkText').style.color = "rgba(0,100,0,0.05)";
+            
+            // Activate Stamp
+            const stamp = document.getElementById('authStamp');
+            stamp.classList.add('stamp-active');
+            
+            const now = new Date();
+            document.getElementById('stampDate').innerText = now.toLocaleDateString();
+            document.getElementById('iaSignName').innerText = "SYSTEM_AUTH_ROOT";
+            document.getElementById('paSignName').innerText = paName.toUpperCase();
+
+            alert("PERMIT AUTHORIZED. System locked for execution.");
+        }
+
+        // 3. Local Storage Save
+        function saveData() {
+            const data = {
+                id: document.getElementById('permitIdDisplay').innerText,
+                pa: document.getElementById('paName').value,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('last_permit_draft', JSON.stringify(data));
+            alert("Draft Saved to Local Storage.");
+        }
+
+        // 4. Reset
+        function resetForm() {
+            if(confirm("Are you sure? All data will be wiped.")) {
+                location.reload();
+            }
+        }
+
+        // Auto-fill Current Time logic
+        window.onload = () => {
+            console.log("Industrial System Initialized...");
+        };
+    </script>
+</body>
+</html>

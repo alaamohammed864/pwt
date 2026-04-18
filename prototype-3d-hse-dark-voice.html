@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSE PRO Digital Hot Work Permit V2.0 | Industrial System</title>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        /* ━━━━━━━━━━━━━━━━━━━━━━
+           THEME & VARIABLES
+        ━━━━━━━━━━━━━━━━━━━━━━ */
+        :root {
+            --hse-red: #D32F2F;
+            --hse-orange: #F57C00;
+            --hse-green: #2E7D32;
+            --hse-blue: #1565C0;
+            --hse-dark: #121212;
+            --panel-bg: #ffffff;
+            --text-main: #212121;
+            --text-muted: #757575;
+            --border-color: #e0e0e0;
+            --danger-glow: 0 0 10px rgba(211, 47, 47, 0.5);
+            --safe-glow: 0 0 10px rgba(46, 125, 50, 0.5);
+        }
+
+        /* High Contrast Mode (Field Work) */
+        body.high-contrast {
+            --hse-red: #FF0000;
+            --hse-orange: #FF8C00;
+            --hse-green: #00FF00;
+            --hse-blue: #0000FF;
+            --hse-dark: #000000;
+            --panel-bg: #000000;
+            --text-main: #FFFF00;
+            --text-muted: #FFFFFF;
+            --border-color: #FFFF00;
+        }
+        
+        body.high-contrast .form-container {
+            background: #000;
+            border: 2px solid #FFFF00;
+        }
+        body.high-contrast input, body.high-contrast select, body.high-contrast textarea {
+            background: #222;
+            color: #FFF;
+            border: 1px solid #FFF;
+        }
+
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background-color: var(--hse-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            height: 100vh;
+            transition: background 0.3s;
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━
+           LAYOUT & 3D
+        ━━━━━━━━━━━━━━━━━━━━━━ */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: auto; /* Enable 3D interaction */
+        }
+
+        #app-ui {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .form-container {
+            max-width: 210mm;
+            margin: 40px auto;
+            background: var(--panel-bg);
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            border-top: 6px solid var(--hse-red);
+            position: relative;
+            padding-bottom: 80px; /* Space for floating bar */
+        }
+
+        /* Watermark for Drafts */
+        .watermark-draft {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 100px;
+            color: rgba(0,0,0,0.05);
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+        }
+        body.high-contrast .watermark-draft { color: rgba(255,255,0,0.1); }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━
+           COMPONENTS
+        ━━━━━━━━━━━━━━━━━━━━━━ */
+        .section {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title {
+            color: var(--hse-red);
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        /* Timer Bar */
+        .timer-bar {
+            position: sticky;
+            top: 0;
+            background: var(--hse-dark);
+            color: #fff;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        /* Grid System */
+        .grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 10px; }
+        .grid-2 { grid-template-columns: 1fr 1fr; }
+        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        /* Inputs */
+        label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            background: #f9f9f9;
+        }
+        
+        /* Dynamic Validation Colors */
+        input.valid { border-left: 4px solid var(--hse-green); background: #e8f5e9; }
+        input.invalid { border-left: 4px solid var(--hse-red); background: #ffebee; animation: shake 0.4s; }
+        input.warning { border-left: 4px solid var(--hse-orange); background: #fff3e0; }
+
+        /* Voice Input Button */
+        .voice-btn {
+            position: absolute;
+            right: 5px;
+            top: 32px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--hse-blue);
+        }
+        .voice-btn.listening { color: var(--hse-red); animation: pulse 1s infinite; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { background: #f5f5f5; padding: 8px; text-align: left; border-bottom: 2px solid #ddd; }
+        td { padding: 8px; border-bottom: 1px solid #eee; }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+        }
+        .btn-primary { background: var(--hse-blue); color: white; }
+        .btn-success { background: var(--hse-green); color: white; }
+        .btn-danger { background: var(--hse-red); color: white; }
+        .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid #ccc; }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        /* Emergency Button */
+        .btn-emergency {
+            background: #b71c1c;
+            color: white;
+            font-weight: 900;
+            border: 2px solid white;
+            box-shadow: 0 0 15px red;
+            animation: pulse-red 2s infinite;
+        }
+
+        /* Audit Log (Hidden by default) */
+        .audit-log {
+            font-family: monospace;
+            font-size: 0.7rem;
+            background: #222;
+            color: #0f0;
+            padding: 10px;
+            max-height: 100px;
+            overflow-y: auto;
+            display: none;
+            margin-top: 20px;
+        }
+        .audit-log.open { display: block; }
+
+        /* Signature */
+        .sig-wrapper { border: 1px dashed #999; height: 100px; background: #fff; position: relative; cursor: crosshair; }
+        
+        /* ISO Badge */
+        .iso-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: 2px solid var(--text-muted);
+            color: var(--text-muted);
+            padding: 5px 10px;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 0.7rem;
+            line-height: 1.1;
+            opacity: 0.5;
+        }
+
+        /* Animations */
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(183, 28, 28, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(183, 28, 28, 0); } 100% { box-shadow: 0 0 0 0 rgba(183, 28, 28, 0); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        /* Print Override */
+        @media print {
+            #canvas-container, .timer-bar, .floating-controls, .audit-log, .voice-btn, .btn-emergency { display: none !important; }
+            body { background: white; height: auto; overflow: visible; }
+            .form-container { box-shadow: none; margin: 0; width: 100%; max-width: 100%; border: none; }
+            input, select, textarea { border: none; background: transparent; padding: 0; font-weight: bold; }
+            .section { page-break-inside: avoid; border-bottom: 1px solid #ccc; }
+            .watermark-draft { display: none; } /* Don't print watermark on final */
+        }
+
+        /* Floating Controls */
+        .floating-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 900;
+        }
+        .fab {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Background -->
+    <div id="canvas-container"></div>
+
+    <!-- UI Overlay -->
+    <div id="app-ui">
+        
+        <!-- Header Timer & Tools -->
+        <div class="timer-bar">
+            <div>
+                <span id="sys-status">SYSTEM: ONLINE</span> | 
+                <span id="location-tag">📍 Locating...</span>
+            </div>
+            <div style="text-align: right;">
+                PERMIT VALIDITY: <span id="countdown" style="color: var(--hse-orange); font-weight:bold;">08:00:00</span>
+                <span id="weather-widget" style="margin-left: 15px; font-size: 0.8rem;">☀️ 32°C</span>
+            </div>
+        </div>
+
+        <div class="form-container" id="permit-form">
+            <div class="iso-badge">ISO<br>45001</div>
+            <div class="watermark-draft" id="watermark">DRAFT</div>
+
+            <!-- Header -->
+            <header style="background: var(--hse-red); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="margin: 0; font-size: 1.8rem;">HOT WORK PERMIT</h1>
+                    <div style="font-size: 0.8rem; opacity: 0.9;">REFINERY CONTROL SYSTEM V2.0</div>
+                </div>
+                <div style="text-align: center;">
+                    <canvas id="qr-canvas" width="80" height="80" style="background: white; padding: 5px;"></canvas>
+                    <div style="font-size: 0.7rem; margin-top: 5px;">ID: <span id="display-id">GEN-...</span></div>
+                </div>
+            </header>
+
+            <!-- 1. Meta Data -->
+            <section class="section">
+                <div class="section-title">
+                    <span>📝 General Information</span>
+                    <span style="font-size: 0.7rem; font-weight: normal; color: #777;">Rev: <span id="rev-no">1.0</span></span>
+                </div>
+                <div class="grid-row grid-4">
+                    <div>
+                        <label>Permit Number (Auto)</label>
+                        <input type="text" id="permit-id" readonly style="background:#eee;">
+                    </div>
+                    <div>
+                        <label>Company</label>
+                        <input type="text" id="company" placeholder="Contractor Name">
+                    </div>
+                    <div>
+                        <label>Risk Level</label>
+                        <select id="risk-level" onchange="updateSystemState()">
+                            <option value="low">LOW</option>
+                            <option value="medium" selected>MEDIUM</option>
+                            <option value="high">HIGH</option>
+                            <option value="critical">CRITICAL</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Location (Area/Unit)</label>
+                        <input type="text" id="location">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Work Description (with Voice) -->
+            <section class="section">
+                <div class="section-title">🔧 Work Scope & Description</div>
+                <div class="grid-row grid-2">
+                    <div>
+                        <label>Equipment / Tag No.</label>
+                        <input type="text" id="equip-tag">
+                    </div>
+                    <div>
+                        <label>Work Order No.</label>
+                        <input type="text" id="wo-no">
+                    </div>
+                </div>
+                <div style="position: relative;">
+                    <label>Detailed Description of Work *</label>
+                    <button class="voice-btn" id="voice-btn" title="Click to Speak">🎤</button>
+                    <textarea rows="4" id="work-desc" placeholder="Describe work activities..."></textarea>
+                </div>
+            </section>
+
+            <!-- 3. Hazard Analysis (Smart Checkboxes) -->
+            <section class="section">
+                <div class="section-title">⚠️ Hazard Identification (JSA)</div>
+                <div class="grid-row grid-3" id="hazards-grid">
+                    <!-- JS will populate interactive hazards -->
+                </div>
+                <!-- Dynamic Section for Confined Space -->
+                <div id="confined-space-section" style="display: none; margin-top: 15px; padding: 15px; background: #fff3e0; border-left: 4px solid var(--hse-orange);">
+                    <label style="color: var(--hse-orange);">⚠️ CONFINED SPACE ENTRY REQUIRED</label>
+                    <div class="grid-row grid-2">
+                        <input type="text" placeholder="Entry Permit Reference Number">
+                        <input type="text" placeholder="Gas Test Standby Person">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Gas Testing (Logic Enforced) -->
+            <section class="section">
+                <div class="section-title">💨 Gas Testing Results (Live Logic)</div>
+                <table id="gas-table">
+                    <thead>
+                        <tr>
+                            <th>Gas</th>
+                            <th>Reading (%)</th>
+                            <th>Status</th>
+                            <th>Tester</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>O2 (Oxygen)</td>
+                            <td><input type="number" class="gas-input" id="gas-o2" placeholder="19.5-23.5" oninput="validateGas('o2')"></td>
+                            <td id="status-o2">-</td>
+                            <td><input type="text"></td>
+                            <td><input type="time"></td>
+                        </tr>
+                        <tr>
+                            <td>LEL (Flammable)</td>
+                            <td><input type="number" class="gas-input" id="gas-lel" placeholder="<10%" oninput="validateGas('lel')"></td>
+                            <td id="status-lel">-</td>
+                            <td><input type="text"></td>
+                            <td><input type="time"></td>
+                        </tr>
+                        <tr>
+                            <td>H2S (Toxic)</td>
+                            <td><input type="number" class="gas-input" id="gas-h2s" placeholder="<10ppm" oninput="validateGas('h2s')"></td>
+                            <td id="status-h2s">-</td>
+                            <td><input type="text"></td>
+                            <td><input type="time"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="gas-alert-box" style="display:none; background: #ffebee; color: #c62828; padding: 10px; margin-top: 10px; border-radius: 4px; font-weight: bold;">
+                    ⛔ GAZ TEST FAILED. WORK IS NOT PERMITTED.
+                </div>
+            </section>
+
+            <!-- 5. Signatures -->
+            <section class="section">
+                <div class="section-title">✍️ Digital Authorization</div>
+                <div class="grid-row grid-2">
+                    <div>
+                        <label>Supervisor Signature</label>
+                        <div class="sig-wrapper" id="sig-sup"></div>
+                        <input type="text" placeholder="Name & ID" style="margin-top: 5px;">
+                    </div>
+                    <div>
+                        <label>HSE Approval</label>
+                        <div class="sig-wrapper" id="sig-hse"></div>
+                        <input type="text" placeholder="Name & ID" style="margin-top: 5px;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Audit Log Toggle -->
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-ghost" onclick="toggleAudit()" style="font-size: 0.7rem;">📂 Toggle Audit Log</button>
+            </div>
+            <div id="audit-container" class="audit-log">
+                <div>> System Initialized...</div>
+            </div>
+
+        </div>
+
+        <!-- Floating Action Controls -->
+        <div class="floating-controls">
+            <button class="fab" onclick="toggleContrast()" title="High Contrast Mode">☀️</button>
+            <button class="fab btn-emergency" onclick="emergencyStop()" title="EMERGENCY STOP">🛑</button>
+            <button class="fab" onclick="window.print()" title="Print / Save PDF">🖨️</button>
+            <button class="fab btn-primary" onclick="approvePermit()" title="Final Approve">✔️</button>
+        </div>
+
+    </div>
+
+    <script>
+        /* ━━━━━━━━━━━━━━━━━━━━━━
+           CORE SYSTEM CLASS
+           Managing State, Logic, & Storage
+        ━━━━━━━━━━━━━━━━━━━━━━ */
+        class PermitSystem {
+            constructor() {
+                this.state = {
+                    id: this.generateID(),
+                    status: 'DRAFT',
+                    startTime: null,
+                    risk: 'medium',
+                    logs: []
+                };
+                this.init();
+            }
+
+            generateID() {
+                return 'HWP-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+            }
+
+            init() {
+                this.log('System initialized');
+                this.loadState();
+                this.updateUI();
+                this.startTimer();
+                this.setupVoice();
+                this.getLocation();
+                
+                // Setup Hazards
+                const hazards = [
+                    'Flammable Materials', 'Toxic Gases', 'Electricity', 
+                    'Confined Space', 'Height Work', 'Moving Parts', 'Noise', 'Radiation'
+                ];
+                const grid = document.getElementById('hazards-grid');
+                hazards.forEach(h => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `<label class="checkbox-group"><input type="checkbox" onchange="system.checkHazard(this, '${h}')"> ${h}</label>`;
+                    grid.appendChild(div);
+                });
+            }
+
+            log(action) {
+                const time = new Date().toLocaleTimeString();
+                const entry = `[${time}] ${action}`;
+                this.state.logs.push(entry);
+                
+                const logContainer = document.getElementById('audit-container');
+                const div = document.createElement('div');
+                div.innerText = `> ${entry}`;
+                logContainer.prepend(div);
+            }
+
+            checkHazard(el, name) {
+                if(el.checked) {
+                    this.log(`Hazard identified: ${name}`);
+                    if(name === 'Confined Space') {
+                        document.getElementById('confined-space-section').style.display = 'block';
+                        this.log('Confined Space Protocol Activated');
+                    }
+                } else {
+                    if(name === 'Confined Space') {
+                        document.getElementById('confined-space-section').style.display = 'none';
+                    }
+                }
+            }
+
+            updateUI() {
+                document.getElementById('display-id').innerText = this.state.id;
+                document.getElementById('permit-id').value = this.state.id;
+                this.generateQR();
+            }
+
+            generateQR() {
+                const canvas = document.getElementById('qr-canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0,0,80,80);
+                ctx.fillStyle = 'black';
+                // Simple pattern simulation
+                for(let i=0; i<300; i+=10) {
+                    if(Math.random() > 0.5) ctx.fillRect(i%8*10 + 10, Math.floor(i/8)*10 + 10, 8, 8);
+                }
+            }
+
+            // Gas Logic Validation
+            validateGas(type) {
+                const val = parseFloat(document.getElementById(`gas-${type}`).value);
+                const statusEl = document.getElementById(`status-${type}`);
+                let safe = true;
+                let msg = "OK";
+
+                if(isNaN(val)) {
+                    statusEl.innerText = "-";
+                    document.getElementById(`gas-${type}`).className = "gas-input";
+                    return;
+                }
+
+                if(type === 'o2') {
+                    if(val < 19.5 || val > 23.5) { safe = false; msg = "DANGER"; }
+                } else if (type === 'lel') {
+                    if(val > 10) { safe = false; msg = "EXPLOSION"; }
+                } else if (type === 'h2s') {
+                    if(val > 10) { safe = false; msg = "TOXIC"; }
+                }
+
+                statusEl.innerText = msg;
+                const inputEl = document.getElementById(`gas-${type}`);
+                
+                if(!safe) {
+                    statusEl.style.color = 'red';
+                    inputEl.className = "gas-input invalid";
+                    this.log(`ALERT: ${type} reading unsafe (${val})`);
+                    document.getElementById('gas-alert-box').style.display = 'block';
+                    sceneManager.setAlertMode(true);
+                } else {
+                    statusEl.style.color = 'green';
+                    inputEl.className = "gas-input valid";
+                    // Check if all safe to hide alert
+                    if(document.querySelectorAll('.gas-input.invalid').length === 0) {
+                        document.getElementById('gas-alert-box').style.display = 'none';
+                        sceneManager.setAlertMode(false);
+                    }
+                }
+            }
+
+            // Web Speech API
+            setupVoice() {
+                const btn = document.getElementById('voice-btn');
+                const desc = document.getElementById('work-desc');
+                
+                if ('webkitSpeechRecognition' in window) {
+                    const recognition = new webkitSpeechRecognition();
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
+
+                    btn.onclick = () => {
+                        recognition.start();
+                        btn.classList.add('listening');
+                        this.log('Voice input started');
+                    };
+
+                    recognition.onresult = (event) => {
+                        const text = event.results[0][0].transcript;
+                        desc.value += (desc.value ? ' ' : '') + text;
+                        btn.classList.remove('listening');
+                        this.log(`Voice input: "${text}"`);
+                    };
+                } else {
+                    btn.style.display = 'none'; // Hide if not supported
+                }
+            }
+
+            getLocation() {
+                if(navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                        document.getElementById('location-tag').innerText = `📍 ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                        this.log('GPS Location Acquired');
+                    });
+                }
+            }
+
+            startTimer() {
+                let duration = 8 * 60 * 60; // 8 hours in seconds
+                const display = document.getElementById('countdown');
+                
+                setInterval(() => {
+                    if(duration <= 0) {
+                        display.innerText = "EXPIRED";
+                        display.style.color = "red";
+                        this.emergencyProtocol();
+                        return;
+                    }
+                    duration--;
+                    let h = Math.floor(duration / 3600);
+                    let m = Math.floor((duration % 3600) / 60);
+                    let s = duration % 60;
+                    display.innerText = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                }, 1000);
+            }
+
+            emergencyProtocol() {
+                document.body.style.backgroundColor = "#500";
+                this.log("CRITICAL: PERMIT EXPIRED");
+                alert("PERMIT EXPIRED. WORK MUST STOP IMMEDIATELY.");
+            }
+
+            loadState() {
+                const saved = localStorage.getItem('hse_pro_v2');
+                if(saved) {
+                    // Simple restore logic for demo
+                    this.log('Previous session restored');
+                }
+            }
+
+            approve() {
+                if(document.querySelectorAll('.gas-input.invalid').length > 0) {
+                    alert("Cannot approve: Gas tests failed.");
+                    return;
+                }
+                this.state.status = 'ACTIVE';
+                document.getElementById('watermark').style.display = 'none';
+                document.body.classList.add('permit-active');
+                this.log('PERMIT APPROVED AND ACTIVE');
+                sceneManager.setActiveMode(true);
+            }
+        }
+
+        /* ━━━━━━━━━━━━━━━━━━━━━━
+           SCENE MANAGER (Three.js)
+           Interactive & Reactive
+        ━━━━━━━━━━━━━━━━━━━━━━ */
+        const sceneManager = {
+            init: function() {
+                const container = document.getElementById('canvas-container');
+                this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.FogExp2(0x121212, 0.02);
+
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+                this.camera.position.z = 20;
+
+                this.renderer = new THREE.WebGLRenderer({ alpha: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                container.appendChild(this.renderer.domElement);
+
+                // Core Object (Represents Site Safety)
+                const geo = new THREE.IcosahedronGeometry(8, 1);
+                this.mat = new THREE.MeshStandardMaterial({ 
+                    color: 0x555555, wireframe: true, emissive: 0x222222 
+                });
+                this.core = new THREE.Mesh(geo, this.mat);
+                this.scene.add(this.core);
+
+                // Particles
+                const pGeo = new THREE.BufferGeometry();
+                const pCount = 500;
+                const pPos = new Float32Array(pCount*3);
+                for(let i=0; i<pCount*3; i++) pPos[i] = (Math.random()-0.5)*40;
+                pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+                this.particles = new THREE.Points(pGeo, new THREE.PointsMaterial({color: 0xffaa00, size: 0.1}));
+                this.scene.add(this.particles);
+
+                // Lights
+                const ambient = new THREE.AmbientLight(0x404040);
+                this.scene.add(ambient);
+                this.light = new THREE.PointLight(0xff4500, 1, 50);
+                this.light.position.set(10,10,10);
+                this.scene.add(this.light);
+
+                // Raycaster for 3D Interaction
+                this.raycaster = new THREE.Raycaster();
+                this.mouse = new THREE.Vector2();
+
+                window.addEventListener('resize', () => this.onResize());
+                window.addEventListener('mousemove', (e) => this.onMouseMove(e));
+                window.addEventListener('click', () => this.onClick());
+
+                this.animate();
+            },
+
+            onResize: function() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            },
+
+            onMouseMove: function(e) {
+                this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                
+                // Parallax
+                this.camera.position.x += (this.mouse.x * 5 - this.camera.position.x) * 0.05;
+                this.camera.position.y += (this.mouse.y * 5 - this.camera.position.y) * 0.05;
+                this.camera.lookAt(0,0,0);
+            },
+
+            onClick: function() {
+                // If clicking on the core, scroll to top or specific section
+                this.raycaster.setFromCamera(this.mouse, this.camera);
+                const intersects = this.raycaster.intersectObjects([this.core]);
+                if(intersects.length > 0) {
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                    system.log('3D Interface: Return to Top');
+                }
+            },
+
+            setAlertMode: function(isAlert) {
+                if(isAlert) {
+                    this.mat.emissive.setHex(0xff0000);
+                    this.light.color.setHex(0xff0000);
+                    this.particles.material.color.setHex(0xff0000);
+                } else {
+                    this.mat.emissive.setHex(0x222222);
+                    this.light.color.setHex(0xff4500);
+                    this.particles.material.color.setHex(0xffaa00);
+                }
+            },
+
+            setActiveMode: function(isActive) {
+                if(isActive) {
+                    this.mat.emissive.setHex(0x00ff00);
+                    this.mat.wireframe = false; // Solid when active
+                } else {
+                    this.mat.emissive.setHex(0x222222);
+                    this.mat.wireframe = true;
+                }
+            },
+
+            animate: function() {
+                requestAnimationFrame(() => this.animate());
+                
+                this.core.rotation.x += 0.002;
+                this.core.rotation.y += 0.005;
+
+                // Particle flow
+                const positions = this.particles.geometry.attributes.position.array;
+                for(let i=1; i<positions.length; i+=3) {
+                    positions[i] += 0.1;
+                    if(positions[i] > 20) positions[i] = -20;
+                }
+                this.particles.geometry.attributes.position.needsUpdate = true;
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        };
+
+        // --- Global Functions for HTML Events ---
+
+        const system = new PermitSystem();
+
+        function updateSystemState() {
+            const risk = document.getElementById('risk-level').value;
+            system.state.risk = risk;
+            system.log(`Risk level set to: ${risk.toUpperCase()}`);
+            
+            // Update 3D rotation speed based on risk
+            if(risk === 'critical') {
+                // Faster rotation simulation (handled in animate logic ideally, simplified here)
+                system.log('CRITICAL: Additional PPE required');
+            }
+        }
+
+        function validateGas(type) {
+            system.validateGas(type);
+        }
+
+        function toggleContrast() {
+            document.body.classList.toggle('high-contrast');
+            system.log('Display mode toggled');
+        }
+
+        function emergencyStop() {
+            document.body.classList.add('high-contrast');
+            document.body.style.backgroundColor = '#330000';
+            alert("⛔ EMERGENCY STOP ACTIVATED ⛔\nALL OPERATIONS MUST CEASE.");
+            system.log('EMERGENCY STOP TRIGGERED');
+            sceneManager.setAlertMode(true);
+        }
+
+        function approvePermit() {
+            system.approve();
+        }
+
+        function toggleAudit() {
+            document.getElementById('audit-container').classList.toggle('open');
+        }
+
+        // Initialize Scene
+        sceneManager.init();
+
+        // Signature Pad Setup
+        document.querySelectorAll('.sig-wrapper').forEach(wrapper => {
+            const canvas = document.createElement('canvas');
+            canvas.width = wrapper.offsetWidth;
+            canvas.height = wrapper.offsetHeight;
+            wrapper.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+            
+            let drawing = false;
+            canvas.addEventListener('mousedown', () => drawing = true);
+            canvas.addEventListener('mouseup', () => drawing = false);
+            canvas.addEventListener('mousemove', (e) => {
+                if(!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            });
+        });
+
+    </script>
+</body>
+</html>

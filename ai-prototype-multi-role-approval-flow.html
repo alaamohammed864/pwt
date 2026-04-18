@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ZFD Cold Work Permit System - متكامل</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        /* ========== CSS VARIABLES & RESET (مثل السابق مع تحسينات) ========== */
+        :root {
+            --primary-color: #0056b3;
+            --primary-light: #e6f2ff;
+            --secondary-color: #00a8cc;
+            --accent-color: #ff9f43;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-body: #f4f7f6;
+            --bg-card: #ffffff;
+            --border-color: #dfe6e9;
+            --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
+            --shadow-md: 0 5px 15px rgba(0,0,0,0.1);
+            --radius: 8px;
+            --transition: all 0.3s ease;
+        }
+        [data-theme="dark"] {
+            --primary-color: #4a90e2;
+            --primary-light: #1e2a38;
+            --secondary-color: #50c8db;
+            --text-dark: #ecf0f1;
+            --text-light: #bdc3c7;
+            --bg-body: #1a1a2e;
+            --bg-card: #16213e;
+            --border-color: #0f3460;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Roboto', 'Cairo', sans-serif; background: var(--bg-body); color: var(--text-dark); font-size: 14px; line-height: 1.5; transition: var(--transition); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        /* Login Screen */
+        #login-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .login-card { background: var(--bg-card); padding: 30px; border-radius: var(--radius); width: 350px; text-align: center; box-shadow: var(--shadow-md); }
+        .role-btn { display: block; width: 100%; margin: 10px 0; padding: 12px; border: none; border-radius: var(--radius); background: var(--primary-light); color: var(--primary-color); font-weight: bold; cursor: pointer; transition: var(--transition); }
+        .role-btn:hover { background: var(--primary-color); color: white; transform: scale(1.02); }
+        /* Main App */
+        #main-app { display: none; }
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--bg-card); border-left: 1px solid var(--border-color); height: 100vh; position: fixed; top:0; right:0; overflow-y: auto; transition: var(--transition); z-index: 100; }
+        .brand { padding: 20px; text-align: center; border-bottom: 1px solid var(--border-color); }
+        .nav-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: var(--text-light); transition: var(--transition); border-right: 3px solid transparent; }
+        .nav-item:hover, .nav-item.active { background: var(--primary-light); color: var(--primary-color); border-right-color: var(--primary-color); }
+        /* Main content */
+        .main-content { margin-right: 260px; padding: 20px; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; }
+        .progress-bar-bg { background: #ddd; height: 8px; border-radius: 4px; overflow: hidden; width: 200px; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--secondary-color), var(--primary-color)); width: 0%; }
+        .section-card { background: var(--bg-card); border-radius: var(--radius); margin-bottom: 25px; border: 1px solid var(--border-color); }
+        .section-header { padding: 15px 20px; background: var(--primary-light); border-bottom: 1px solid var(--border-color); font-weight: bold; display: flex; justify-content: space-between; }
+        .section-body { padding: 20px; }
+        .form-grid { display: grid; gap: 15px; }
+        .grid-2 { grid-template-columns: repeat(2,1fr); }
+        .grid-3 { grid-template-columns: repeat(3,1fr); }
+        .grid-4 { grid-template-columns: repeat(4,1fr); }
+        .input-control, select, textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-body); color: var(--text-dark); font-size: 13px; }
+        .input-control:focus { border-color: var(--primary-color); outline: none; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 10px; }
+        .custom-check { display: flex; align-items: center; gap: 8px; padding: 5px; border-radius: 4px; cursor: pointer; }
+        .custom-check.checked { background: var(--primary-light); }
+        .btn { padding: 8px 16px; border-radius: var(--radius); border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-secondary { background: #ccc; color: black; }
+        .btn-success { background: var(--success-color); color: white; }
+        .disabled-input { background: #f0f0f0; pointer-events: none; opacity: 0.7; }
+        .field-owner { font-size: 10px; color: var(--text-light); margin-right: 5px; }
+        .audit-log { max-height: 200px; overflow-y: auto; background: var(--bg-body); padding: 10px; border-radius: var(--radius); font-size: 11px; }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(100%); width: 250px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-right: 0; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+        @media print {
+            .sidebar, .top-bar, .action-buttons, .no-print { display: none !important; }
+            .main-content { margin: 0; padding: 0; }
+            .section-card { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+<div id="login-screen">
+    <div class="login-card">
+        <i class="fas fa-hard-hat fa-3x" style="color: var(--primary-color);"></i>
+        <h2>ZFD Cold Work Permit</h2>
+        <p>اختر دورك للدخول</p>
+        <button class="role-btn" data-role="SCE">SCE - منشئ أمر العمل</button>
+        <button class="role-btn" data-role="PA">PA - منفذ العمل</button>
+        <button class="role-btn" data-role="AA">AA - مسؤول المنطقة</button>
+        <button class="role-btn" data-role="PRA">PRA - مشرف الموقع</button>
+    </div>
+</div>
+
+<div id="main-app">
+    <div class="sidebar" id="sidebar">
+        <div class="brand"><h3>ZFD Permit System</h3><span>إدارة التصاريح</span></div>
+        <div class="nav-links">
+            <div class="nav-item active" data-section="permits-list"><i class="fas fa-list"></i> قائمة التصاريح</div>
+            <div class="nav-item" data-section="permit-form"><i class="fas fa-file-alt"></i> تصريح جديد</div>
+            <div class="nav-item" data-section="audit"><i class="fas fa-history"></i> سجل التدقيق</div>
+            <div class="nav-item" data-section="backup"><i class="fas fa-database"></i> نسخ احتياطي</div>
+        </div>
+        <div class="sidebar-footer" style="padding:20px; border-top:1px solid var(--border-color);">
+            <button class="btn btn-secondary" onclick="toggleTheme()"><i class="fas fa-moon"></i> الوضع المظلم</button>
+            <button class="btn btn-secondary" onclick="logout()" style="margin-top:10px;"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar no-print">
+            <div><span id="current-user-role"></span> <i class="fas fa-user-circle"></i></div>
+            <div class="progress-container"><div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div><span id="progress-text">0%</span></div>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="window.print()"><i class="fas fa-print"></i> طباعة</button>
+                <button class="btn btn-primary" onclick="saveCurrentPermit()"><i class="fas fa-save"></i> حفظ</button>
+                <button class="btn btn-success" onclick="issuePermit()"><i class="fas fa-check-circle"></i> إصدار التصريح</button>
+                <button class="btn btn-secondary" onclick="resetForm()"><i class="fas fa-undo"></i> إعادة تعيين</button>
+            </div>
+        </div>
+
+        <!-- شاشة قائمة التصاريح -->
+        <div id="permits-list-section" class="section-card">
+            <div class="section-header">قائمة التصاريح المحفوظة <input type="text" id="search-permit" placeholder="بحث..." class="input-control" style="width:200px;"></div>
+            <div class="section-body"><div id="permits-table" class="table-responsive">...</div></div>
+        </div>
+
+        <!-- نموذج التصريح الرئيسي -->
+        <div id="permit-form-section" style="display:none;">
+            <form id="permitForm">
+                <!-- القسم 1: معلومات عامة (SCE) -->
+                <section class="section-card" data-role="SCE">
+                    <div class="section-header">1. معلومات عامة <span class="field-owner">(مسؤول: SCE)</span></div>
+                    <div class="section-body">
+                        <div class="form-grid grid-4">
+                            <div><label>رقم التصريح الرئيسي</label><input type="text" name="main_permit_no" class="input-control"></div>
+                            <div><label>رقم أمر العمل <span class="field-owner">(تعبئة تلقائية)</span></label><input type="text" name="work_order_no" id="work_order_no" class="input-control" list="wo-list" autocomplete="off"><datalist id="wo-list"></datalist></div>
+                            <div><label>التاريخ</label><input type="date" name="permit_date" class="input-control"></div>
+                            <div><label>فئة الخطر</label><select name="risk_category"><option value="">اختر</option><option value="H">High</option><option value="L">Low</option></select></div>
+                        </div>
+                        <div><label>الجهة المنفذة</label><select name="work_by"><option value="ZFOD">ZFOD</option><option value="Contractor">مقاول</option></select></div>
+                        <div><label>اسم المقاول</label><input name="contractor_name" class="input-control"></div>
+                    </div>
+                </section>
+
+                <!-- القسم 2: وصف العمل (PA) -->
+                <section class="section-card" data-role="PA">
+                    <div class="section-header">2. وصف العمل <span class="field-owner">(مسؤول: PA)</span></div>
+                    <div class="section-body">
+                        <div class="grid-2"><div><label>مكان العمل</label><input name="work_site" class="input-control"></div><div><label>الموقع المحدد</label><input name="work_location" class="input-control"></div></div>
+                        <div><label>اسم المعدة</label><input name="equipment_name" class="input-control"></div>
+                        <div><label>وصف مفصل</label><textarea name="work_desc" rows="3" class="input-control"></textarea></div>
+                        <div class="grid-3"><div><label>رقم اللوحة</label><input name="vehicle_plate" class="input-control"></div><div><label>عدد العمال</label><input type="number" name="people_no" class="input-control"></div><div><label>المرفقات</label><input type="file" multiple id="attachments" accept=".pdf,.jpg,.png"></div></div>
+                    </div>
+                </section>
+
+                <!-- القسم 3: المخاطر (PA) مع ربط تلقائي -->
+                <section class="section-card" data-role="PA">
+                    <div class="section-header">3. المخاطر (اختيار يؤدي إلى تفعيل شروط السلامة)</div>
+                    <div class="section-body"><div class="checkbox-grid" id="hazards-container"></div><div><label>مخاطر أخرى</label><input name="other_hazards" class="input-control"></div></div>
+                </section>
+
+                <!-- القسم 4: شروط السلامة (تتغير ديناميكياً) -->
+                <section class="section-card" data-role="PA">
+                    <div class="section-header">4. شروط السلامة</div>
+                    <div class="section-body"><div class="checkbox-grid" id="safety-conditions-container"></div></div>
+                </section>
+
+                <!-- القسم 5: HSE Requirements -->
+                <section class="section-card" data-role="PA">
+                    <div class="section-header">5. متطلبات PPE و HSE</div>
+                    <div class="section-body"><div class="checkbox-grid" id="hse-container"></div><textarea name="additional_hse" class="input-control" placeholder="متطلبات إضافية"></textarea></div>
+                </section>
+
+                <!-- القسم 6: اختبارات الغاز مع تحقق -->
+                <section class="section-card" data-role="PA">
+                    <div class="section-header">6. اختبارات الغاز</div>
+                    <div class="section-body"><div id="gas-tests-table"></div></div>
+                </section>
+
+                <!-- القسم 7: التوقيعات والموافقات -->
+                <section class="section-card">
+                    <div class="section-header">7. التوقيعات والموافقات</div>
+                    <div class="section-body">
+                        <div id="aa-approval" style="margin-bottom:15px;"><label>موافقة AA: <select id="aa_decision"><option value="">--</option><option value="Y">نعم أوافق</option><option value="N">لا أوافق</option></select></label><textarea id="aa_comment" placeholder="سبب الرفض" style="display:none;"></textarea></div>
+                        <div class="grid-3"><div><label>PA - الاسم</label><input name="pa_name" class="input-control"></div><div><label>التوقيع</label><input name="pa_sign" class="input-control"></div><div><label>التاريخ/الوقت</label><input type="datetime-local" name="pa_datetime" class="input-control"></div></div>
+                        <div class="grid-3"><div><label>AA - الاسم</label><input name="aa_name" class="input-control"></div><div><label>التوقيع</label><input name="aa_sign" class="input-control"></div><div><label>التاريخ/الوقت</label><input type="datetime-local" name="aa_datetime" class="input-control"></div></div>
+                        <div class="grid-3"><div><label>PRA - الاسم</label><input name="pra_name" class="input-control"></div><div><label>التوقيع</label><input name="pra_sign" class="input-control"></div><div><label>التاريخ/الوقت</label><input type="datetime-local" name="pra_datetime" class="input-control"></div></div>
+                    </div>
+                </section>
+            </form>
+        </div>
+
+        <div id="audit-section" style="display:none;"><div class="section-card"><div class="section-header">سجل التدقيق</div><div class="section-body"><div id="audit-log-list" class="audit-log"></div></div></div></div>
+        <div id="backup-section" style="display:none;"><div class="section-card"><div class="section-header">النسخ الاحتياطي</div><div class="section-body"><button class="btn btn-primary" onclick="exportBackup()">تصدير JSON</button><button class="btn btn-secondary" onclick="importBackup()">استيراد JSON</button><input type="file" id="backup-file" accept=".json" style="display:none;"></div></div></div>
+    </div>
+</div>
+
+<script>
+    // ---------------------------------- البيانات الأساسية ----------------------------------
+    let currentUserRole = null;
+    let currentPermitId = null; // للتصريح الجاري تحريره
+    let permitsDB = JSON.parse(localStorage.getItem('permitsDB')) || [];
+    let workOrdersDB = JSON.parse(localStorage.getItem('workOrdersDB')) || [{ number: "WO-001", details: "صيانة دورية" }, { number: "WO-002", details: "تركيب معدات" }];
+    let auditLog = JSON.parse(localStorage.getItem('auditLog')) || [];
+
+    // تعريف قوائم الخيارات
+    const hazardsList = [
+        "Liquid or gas under pressure", "Flying Particles", "Scaffolding required", "Toxic materials", "Electricity", "Wind/Weather status",
+        "Corrosive materials", "Radioactivity", "Confined Space Entry", "Flammable Materials", "Rotating Machinery", "Noisy area (>85db)",
+        "Possible H2S Area", "Danger of Falling", "Hot Materials"
+    ];
+    const safetyConditions = ["In Service", "Shut Down", "Depressurized", "Drained", "Gas Free", "Ventilated", "Electrical Isolation", "Mechanical Isolation", "Fire Extinguisher Available", "Barricades", "Warning Signs", "Confined Space Cert.", "Hot Work Cert.", "Excavation Cert.", "Scaffolding Tag"];
+    const ppeList = ["Safety Helmet", "Safety Shoes", "Safety Glasses", "Gloves", "High-Vis Vest", "Ear Protection", "Face Shield", "Respirator", "Harness", "Fire Watch"];
+
+    // ربط المخاطر بالإجراءات المطلوبة
+    const hazardToActions = {
+        "Confined Space Entry": ["Confined Space Cert.", "Ventilated", "Gas Free"],
+        "Possible H2S Area": ["Respirator", "Gas Free", "Fire Extinguisher Available"],
+        "Flammable Materials": ["Fire Extinguisher Available", "Warning Signs"],
+        "Danger of Falling": ["Harness", "Barricades"],
+        "Electricity": ["Electrical Isolation"]
+    };
+
+    // دوال مساعدة
+    function addAudit(action, details) {
+        auditLog.unshift({ time: new Date().toISOString(), user: currentUserRole, action, details });
+        localStorage.setItem('auditLog', JSON.stringify(auditLog.slice(0, 100)));
+        renderAuditLog();
+    }
+
+    function renderAuditLog() {
+        const container = document.getElementById('audit-log-list');
+        if(container) container.innerHTML = auditLog.map(l => `<div><strong>${new Date(l.time).toLocaleString()}</strong> [${l.user}] ${l.action}: ${l.details}</div>`).join('');
+    }
+
+    // تعبئة تلقائية لأمر العمل
+    function initWorkOrderAutocomplete() {
+        const woInput = document.getElementById('work_order_no');
+        const datalist = document.getElementById('wo-list');
+        datalist.innerHTML = workOrdersDB.map(wo => `<option value="${wo.number}">${wo.number} - ${wo.details}</option>`).join('');
+        woInput.addEventListener('change', function() {
+            if(!workOrdersDB.find(wo => wo.number === this.value)) {
+                if(confirm("إضافة رقم أمر عمل جديد؟")) {
+                    workOrdersDB.push({ number: this.value, details: "تمت الإضافة يدوياً" });
+                    localStorage.setItem('workOrdersDB', JSON.stringify(workOrdersDB));
+                    initWorkOrderAutocomplete();
+                }
+            }
+        });
+    }
+
+    // ربط المخاطر: عند تغيير أي خطر، نفعّل الإجراءات
+    function bindHazards() {
+        document.querySelectorAll('.hazard-check').forEach(cb => {
+            cb.addEventListener('change', function() {
+                const hazardName = this.getAttribute('data-hazard');
+                const actions = hazardToActions[hazardName] || [];
+                actions.forEach(action => {
+                    const targetCheck = document.querySelector(`.safety-check[data-safety="${action}"]`);
+                    if(targetCheck && this.checked) targetCheck.checked = true;
+                    else if(!this.checked && targetCheck) targetCheck.checked = false;
+                    updateCheckStyle(targetCheck);
+                });
+                saveCurrentPermit();
+            });
+        });
+    }
+
+    function updateCheckStyle(el) { if(el) el.closest('.custom-check')?.classList.toggle('checked', el.checked); }
+
+    // تحميل واجهة النموذج بناءً على الصلاحيات
+    function loadFormBasedOnRole() {
+        const allSections = document.querySelectorAll('.section-card');
+        allSections.forEach(section => {
+            const requiredRole = section.getAttribute('data-role');
+            if(requiredRole && requiredRole !== currentUserRole) {
+                section.querySelectorAll('input, select, textarea, button:not(.no-disable)').forEach(field => field.disabled = true);
+                section.style.opacity = '0.6';
+            } else {
+                section.querySelectorAll('input, select, textarea').forEach(field => field.disabled = false);
+                section.style.opacity = '1';
+            }
+        });
+        // AA يمكنه فقط تغيير الموافقة
+        if(currentUserRole !== 'AA') document.getElementById('aa_decision').disabled = true;
+        else document.getElementById('aa_decision').disabled = false;
+    }
+
+    // توليد الجداول الديناميكية
+    function generateChecklist(containerId, items, className, dataAttr) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        container.innerHTML = items.map(item => `<label class="custom-check"><input type="checkbox" class="${className}" ${dataAttr ? `data-${dataAttr}="${item}"` : ''}> ${item}</label>`).join('');
+    }
+
+    function generateGasTests() {
+        const html = `<table class="table"><thead><tr><th>الوقت</th><th>LEL (%)</th><th>O2 (%)</th><th>H2S (ppm)</th><th>CO (ppm)</th><th>الاسم</th></tr></thead><tbody>
+            ${[1,2,3].map(() => `<tr>${['time','lel','o2','h2s','co','name'].map(t => `<td><input type="${t==='time'?'time':'text'}" class="input-control gas-test" ${t==='o2'?'min="19" max="23"':''}></td>`).join('')}</tr>`).join('')}
+        </tbody></table>`;
+        document.getElementById('gas-tests-table').innerHTML = html;
+    }
+
+    // حفظ التصريح الحالي
+    function saveCurrentPermit() {
+        if(!currentPermitId) currentPermitId = Date.now().toString();
+        const formData = new FormData(document.getElementById('permitForm'));
+        let permit = { id: currentPermitId, status: 'draft', lastModified: new Date().toISOString(), createdBy: currentUserRole, data: {} };
+        for(let [key,val] of formData.entries()) permit.data[key] = val;
+        // حفظ المخاطر المختارة
+        permit.data.hazards = [...document.querySelectorAll('.hazard-check:checked')].map(cb => cb.getAttribute('data-hazard'));
+        permit.data.safety = [...document.querySelectorAll('.safety-check:checked')].map(cb => cb.getAttribute('data-safety'));
+        permit.data.ppe = [...document.querySelectorAll('.ppe-check:checked')].map(cb => cb.getAttribute('data-ppe'));
+        const index = permitsDB.findIndex(p => p.id === currentPermitId);
+        if(index>=0) permitsDB[index] = permit;
+        else permitsDB.push(permit);
+        localStorage.setItem('permitsDB', JSON.stringify(permitsDB));
+        addAudit('حفظ', `تم حفظ التصريح ${currentPermitId}`);
+        updateProgress();
+    }
+
+    function updateProgress() { /* بسيط */ }
+
+    // إصدار التصريح
+    function issuePermit() {
+        if(currentUserRole !== 'AA' && currentUserRole !== 'PRA') { alert("فقط AA أو PRA يمكنه إصدار التصريح"); return; }
+        const aaDecision = document.getElementById('aa_decision').value;
+        if(aaDecision === 'N') { alert("لا يمكن الإصدار بسبب رفض AA: "+document.getElementById('aa_comment').value); return; }
+        if(aaDecision !== 'Y') { alert("يجب موافقة AA أولاً"); return; }
+        // التحقق من اختبارات الغاز
+        let gasValid = true;
+        document.querySelectorAll('.gas-test').forEach(inp => { if(inp.value==='' && inp.closest('tr').querySelector('input[type="time"]').value) gasValid=false; });
+        if(!gasValid) { alert("يرجى إكمال اختبارات الغاز"); return; }
+        const permit = permitsDB.find(p => p.id === currentPermitId);
+        if(permit) { permit.status = 'issued'; permit.issuedDate = new Date().toISOString(); localStorage.setItem('permitsDB', JSON.stringify(permitsDB)); addAudit('إصدار', `تم إصدار التصريح ${currentPermitId}`); alert("تم إصدار التصريح وقفل التعديلات"); loadPermitForEditing(currentPermitId); }
+    }
+
+    function loadPermitForEditing(id) {
+        const permit = permitsDB.find(p => p.id == id);
+        if(!permit) return;
+        currentPermitId = id;
+        for(let key in permit.data) {
+            let el = document.querySelector(`[name="${key}"]`);
+            if(el) el.value = permit.data[key];
+        }
+        // إعادة تعيين checkboxes
+        document.querySelectorAll('.hazard-check').forEach(cb => cb.checked = permit.data.hazards?.includes(cb.getAttribute('data-hazard')));
+        document.querySelectorAll('.safety-check').forEach(cb => cb.checked = permit.data.safety?.includes(cb.getAttribute('data-safety')));
+        document.querySelectorAll('.ppe-check').forEach(cb => cb.checked = permit.data.ppe?.includes(cb.getAttribute('data-ppe')));
+        if(permit.status === 'issued') document.querySelectorAll('input, select, textarea').forEach(i => i.disabled = true);
+        loadFormBasedOnRole();
+    }
+
+    function resetForm() { if(confirm("مسح البيانات؟")) { document.getElementById('permitForm').reset(); currentPermitId = null; } }
+
+    // عرض قائمة التصاريح
+    function renderPermitsList() {
+        const container = document.getElementById('permits-table');
+        if(!container) return;
+        let search = document.getElementById('search-permit')?.value.toLowerCase() || '';
+        let filtered = permitsDB.filter(p => p.data.work_order_no?.toLowerCase().includes(search) || p.id.includes(search));
+        container.innerHTML = `<table class="table"><thead><tr><th>رقم التصريح</th><th>رقم أمر العمل</th><th>الحالة</th><th>تاريخ التعديل</th><th></th></tr></thead><tbody>
+            ${filtered.map(p => `<tr><td>${p.id}</td><td>${p.data.work_order_no || ''}</td><td>${p.status}</td><td>${new Date(p.lastModified).toLocaleString()}</td><td><button class="btn btn-secondary" onclick="loadPermitForEditing('${p.id}'); showSection('permit-form');">فتح</button></td></tr>`).join('')}
+        </tbody></table>`;
+    }
+
+    function exportBackup() { let dataStr = JSON.stringify({permitsDB, workOrdersDB, auditLog}); let blob = new Blob([dataStr], {type:"application/json"}); let url = URL.createObjectURL(blob); let a = document.createElement('a'); a.href = url; a.download = 'zfd_backup.json'; a.click(); URL.revokeObjectURL(url); }
+    function importBackup() { document.getElementById('backup-file').click(); document.getElementById('backup-file').onchange = e => { let file = e.target.files[0]; let reader = new FileReader(); reader.onload = ev => { let data = JSON.parse(ev.target.result); permitsDB = data.permitsDB || []; workOrdersDB = data.workOrdersDB || []; auditLog = data.auditLog || []; localStorage.setItem('permitsDB', JSON.stringify(permitsDB)); localStorage.setItem('workOrdersDB', JSON.stringify(workOrdersDB)); localStorage.setItem('auditLog', JSON.stringify(auditLog)); alert("تم الاستيراد"); renderPermitsList(); renderAuditLog(); }; reader.readAsText(file); }; }
+
+    function showSection(sectionName) {
+        document.getElementById('permits-list-section').style.display = sectionName === 'permits-list' ? 'block' : 'none';
+        document.getElementById('permit-form-section').style.display = sectionName === 'permit-form' ? 'block' : 'none';
+        document.getElementById('audit-section').style.display = sectionName === 'audit' ? 'block' : 'none';
+        document.getElementById('backup-section').style.display = sectionName === 'backup' ? 'block' : 'none';
+        if(sectionName === 'permits-list') renderPermitsList();
+        if(sectionName === 'audit') renderAuditLog();
+    }
+
+    function logout() { localStorage.removeItem('currentUserRole'); location.reload(); }
+
+    function toggleTheme() { let theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.body.setAttribute('data-theme', theme); localStorage.setItem('theme', theme); }
+
+    // بدء التشغيل بعد اختيار الدور
+    document.querySelectorAll('.role-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentUserRole = btn.getAttribute('data-role');
+            localStorage.setItem('currentUserRole', currentUserRole);
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('current-user-role').innerText = `الدور: ${currentUserRole}`;
+            // تهيئة الواجهات
+            generateChecklist('hazards-container', hazardsList, 'hazard-check', 'hazard');
+            generateChecklist('safety-conditions-container', safetyConditions, 'safety-check', 'safety');
+            generateChecklist('hse-container', ppeList, 'ppe-check', 'ppe');
+            generateGasTests();
+            initWorkOrderAutocomplete();
+            bindHazards();
+            loadFormBasedOnRole();
+            showSection('permits-list');
+            // تحميل آخر تصريح إذا وجد
+            if(permitsDB.length) loadPermitForEditing(permitsDB[0].id);
+            addAudit('تسجيل دخول', `دور ${currentUserRole}`);
+        });
+    });
+
+    if(localStorage.getItem('currentUserRole')) { currentUserRole = localStorage.getItem('currentUserRole'); document.querySelector('.role-btn[data-role="'+currentUserRole+'"]')?.click(); }
+    if(localStorage.getItem('theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
+</script>
+</body>
+</html>

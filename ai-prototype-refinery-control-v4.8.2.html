@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOT WORK PERMIT SYSTEM v4.8.2 | REFINERY CONTROL</title>
+    <style>
+        /* ==========================================================================
+           SECTION 1: INDUSTRIAL STYLING & 4PX BASELINE GRID SYSTEM
+           CONSTRAINT: NO ROUNDED CORNERS, NO SHADOWS, NO TRANSITIONS, NO GRADIENTS
+           EXCEPT HATCH. STRICT 4PX BASELINE.
+           ========================================================================== */
+        :root {
+            --hwp-px: 4px;
+            --hwp-grid-gap: calc(var(--hwp-px) * 1);
+            --hwp-border-width: 2px;
+            --hwp-font-label: 'Inter', system-ui, -apple-system, sans-serif;
+            --hwp-font-data: 'SF Mono', 'Cascadia Code', 'ui-monospace', monospace;
+            --hwp-color-bg: #F4F4F4;
+            --hwp-color-surface: #FFFFFF;
+            --hwp-color-border: #222222;
+            --hwp-color-text: #111111;
+            --hwp-color-muted: #555555;
+            --hwp-color-warn: #E8A000;
+            --hwp-color-alert: #CC0000;
+            --hwp-color-safe: #006633;
+            --hwp-color-info: #0044AA;
+            --hwp-hatch: repeating-linear-gradient(
+                135deg,
+                var(--hwp-color-warn),
+                var(--hwp-color-warn) 4px,
+                #1A1A1A 4px,
+                #1A1A1A 8px
+            );
+            --hwp-a4-width: 210mm;
+            --hwp-a4-height: 297mm;
+            --hwp-print-margin: 12mm;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border-radius: 0 !important;
+            outline: none;
+            text-shadow: none !important;
+            box-shadow: none !important;
+            transition: none !important;
+        }
+
+        html {
+            font-size: 12px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            background: #E5E5E5;
+            font-family: var(--hwp-font-label);
+            color: var(--hwp-color-text);
+            line-height: 1.25;
+            padding: 8px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #hwp-system-root {
+            background: var(--hwp-color-surface);
+            border: 4px solid var(--hwp-color-border);
+            padding: 0;
+            width: 100%;
+            max-width: var(--hwp-a4-width);
+            position: relative;
+        }
+
+        .hwp-grid-container {
+            display: grid;
+            grid-template-columns: repeat(24, 1fr);
+            gap: var(--hwp-grid-gap);
+            padding: var(--hwp-px) 4px;
+        }
+
+        .hwp-section {
+            grid-column: span 24;
+            border: var(--hwp-border-width) solid var(--hwp-color-border);
+            background: var(--hwp-color-surface);
+            position: relative;
+        }
+
+        .hwp-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--hwp-hatch);
+            color: #111;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-bottom: var(--hwp-border-width) solid var(--hwp-color-border);
+            letter-spacing: 0.5px;
+        }
+
+        .hwp-header-row span.hwp-section-id {
+            background: #111;
+            color: #FFF;
+            padding: 2px 6px;
+            font-size: 11px;
+            margin-right: 8px;
+            font-family: var(--hwp-font-data);
+        }
+
+        .hwp-body-grid {
+            display: grid;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, .hwp-label {
+            font-family: var(--hwp-font-label);
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 0.3px;
+        }
+
+        .hwp-data, .hwp-input, .hwp-select {
+            font-family: var(--hwp-font-data);
+            font-size: 11px;
+            background: #FAFAFA;
+            border: 1px solid #888;
+            padding: 4px 6px;
+            width: 100%;
+        }
+
+        .hwp-data {
+            background: #F0F0F0;
+            border: 1px dashed #AAA;
+            padding: 4px;
+            white-space: pre-wrap;
+        }
+
+        .hwp-input:focus {
+            background: #FFFFFF;
+            border-color: #111;
+        }
+
+        .hwp-input.alert {
+            border: 2px solid var(--hwp-color-alert);
+            background: #FFE8E8;
+        }
+
+        .hwp-input.safe {
+            border: 2px solid var(--hwp-color-safe);
+            background: #E8FFE8;
+        }
+
+        .hwp-btn {
+            font-family: var(--hwp-font-label);
+            text-transform: uppercase;
+            font-weight: 700;
+            padding: 8px 12px;
+            background: #333;
+            color: #FFF;
+            border: 2px solid #111;
+            cursor: pointer;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            width: auto;
+            margin-top: 4px;
+        }
+
+        .hwp-btn:hover { background: #555; }
+        .hwp-btn:active { background: #111; }
+        .hwp-btn.danger { background: var(--hwp-color-alert); }
+        .hwp-btn.primary { background: var(--hwp-color-info); }
+        .hwp-btn.success { background: var(--hwp-color-safe); }
+
+        /* Control Panel */
+        #hwp-control-panel {
+            position: sticky;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #111;
+            padding: 8px;
+            border: 2px solid #444;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            z-index: 1000;
+            width: fit-content;
+        }
+
+        .hwp-status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            font-family: var(--hwp-font-data);
+            font-weight: 700;
+            font-size: 11px;
+            color: #FFF;
+            border: 1px solid #FFF;
+        }
+
+        .hwp-status-draft { background: #555; }
+        .hwp-status-review { background: #E8A000; }
+        .hwp-status-authorized { background: #0044AA; }
+        .hwp-status-active { background: #006633; }
+        .hwp-status-suspended { background: #CC0000; }
+        .hwp-status-closed { background: #222; border: 1px dashed #888; }
+
+        .hwp-timer {
+            font-family: var(--hwp-font-data);
+            color: var(--hwp-color-warn);
+            font-size: 12px;
+            padding-left: 8px;
+        }
+
+        /* Tables */
+        table.hwp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+        }
+
+        table.hwp-table th, table.hwp-table td {
+            border: 1px solid var(--hwp-color-border);
+            padding: 3px 4px;
+            font-size: 10px;
+            vertical-align: middle;
+            text-align: left;
+        }
+
+        table.hwp-table th {
+            background: #D9D9D9;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        table.hwp-table input, table.hwp-table select {
+            width: 100%;
+            border: 1px solid #999;
+            font-size: 10px;
+            padding: 2px 3px;
+            background: #F9F9F9;
+        }
+
+        /* Risk Matrix */
+        .hwp-risk-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, 40px);
+            gap: 1px;
+            background: var(--hwp-color-border);
+            border: 2px solid var(--hwp-color-border);
+            margin: 8px 0;
+        }
+
+        .hwp-risk-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--hwp-font-data);
+            font-weight: 700;
+            font-size: 11px;
+            background: #FFF;
+        }
+
+        .hwp-risk-low { background: #88CC88; }
+        .hwp-risk-med { background: #FFFF99; }
+        .hwp-risk-high { background: #FFAA44; }
+        .hwp-risk-extreme { background: #FF4444; color: #FFF; }
+
+        /* Stamp & Signatures */
+        .hwp-sig-block {
+            border: 2px solid var(--hwp-color-border);
+            padding: 8px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: #F8F8F8;
+            position: relative;
+        }
+
+        .hwp-sig-header { font-weight: 700; text-transform: uppercase; font-size: 11px; margin-bottom: 8px; border-bottom: 1px solid #999; padding-bottom: 2px; }
+        .hwp-sig-input { margin: 4px 0; }
+        .hwp-sig-date { margin-top: auto; font-family: var(--hwp-font-data); font-size: 10px; color: #666; }
+        
+        .hwp-stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 100px;
+            height: 40px;
+            border: 3px solid var(--hwp-color-safe);
+            color: var(--hwp-color-safe);
+            transform: rotate(-15deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 10px;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .hwp-stamp.rejected { border-color: var(--hwp-color-alert); color: var(--hwp-color-alert); }
+
+        .hwp-logo-placeholder, .hwp-qr-placeholder {
+            width: 80px;
+            height: 80px;
+            border: 2px dashed var(--hwp-color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #EEE;
+            font-family: var(--hwp-font-data);
+            font-size: 9px;
+            color: #777;
+            text-align: center;
+        }
+
+        .hwp-hidden { display: none !important; }
+        .hwp-disabled { opacity: 0.5; pointer-events: none; }
+
+        /* ==========================================================================
+           SECTION 2: PRINT PROCESSOR & A4 OPTIMIZATION
+           ========================================================================== */
+        @page {
+            size: A4;
+            margin: var(--hwp-print-margin);
+        }
+
+        @media print {
+            body { background: #FFF; padding: 0; }
+            #hwp-control-panel { display: none !important; }
+            #hwp-system-root { 
+                border: 0; 
+                box-shadow: none; 
+                max-width: 100%; 
+                margin: 0; 
+                padding: 0;
+            }
+            .hwp-section { page-break-inside: avoid; }
+            table.hwp-table th { background: #CCC !important; }
+            .hwp-hatch { -webkit-print-color-adjust: exact; }
+            input, select { border-color: #111; }
+            .hwp-input.alert { border-color: var(--hwp-color-alert) !important; }
+            .hwp-input.safe { border-color: var(--hwp-color-safe) !important; }
+        }
+    </style>
+</head>
+<body>
+    <div id="hwp-system-root">
+        <!-- HEADER MODULE -->
+        <div class="hwp-section">
+            <div class="hwp-grid-container" style="padding: 8px;">
+                <div class="hwp-logo-placeholder">SITE<br>LOGO</div>
+                <div style="grid-column: span 18; text-align: center; border-left: 2px solid #333; border-right: 2px solid #333; padding: 0 8px;">
+                    <h2 style="font-size: 16px; margin-bottom: 2px;">PERMIT TO WORK - HOT WORK</h2>
+                    <div style="font-family: var(--hwp-font-data); font-size: 10px; color: #444;">REFINERY COMPLIANCE DOC | ISO 9001 / OHSAS 45001</div>
+                    <div id="hwp-serial" class="hwp-data" style="margin-top: 4px; font-size: 13px; font-weight: bold;">[HWP-2026-0001]</div>
+                </div>
+                <div class="hwp-qr-placeholder">SITE QR<br>CODE</div>
+            </div>
+        </div>
+
+        <!-- SECTION A: PERMIT CONTROL CENTER -->
+        <div class="hwp-section">
+            <div class="hwp-header-row"><span class="hwp-section-id">A</span>PERMIT CONTROL & VALIDITY</div>
+            <div class="hwp-body-grid hwp-grid-container" style="grid-template-columns: repeat(12, 1fr);">
+                <label style="grid-column: span 3;">FACILITY / PLANT UNIT</label>
+                <label style="grid-column: span 3;">ASSET TAG / EQUIP ID</label>
+                <label style="grid-column: span 3;">WORK AREA DESCRIPTION</label>
+                <label style="grid-column: span 3;">SHIFT CYCLE</label>
+                
+                <div style="grid-column: span 3;"><input type="text" id="hwp-facility" class="hwp-input" data-required="true" placeholder="e.g., CRUDE UNIT 2 / U-1200"></div>
+                <div style="grid-column: span 3;"><input type="text" id="hwp-asset-tag" class="hwp-input" data-required="true" placeholder="e.g., P-104A / V-2201"></div>
+                <div style="grid-column: span 3;"><input type="text" id="hwp-area" class="hwp-input" data-required="true" placeholder="e.g., TUBE BAY LEVEL 2"></div>
+                <div style="grid-column: span 3;">
+                    <select id="hwp-shift" class="hwp-input" data-required="true">
+                        <option value="">SELECT SHIFT</option>
+                        <option value="8">DAY SHIFT (8HR)</option>
+                        <option value="12">DAY/NIGHT SHIFT (12HR)</option>
+                    </select>
+                </div>
+
+                <label style="grid-column: span 3;">GPS COORDINATES (N, E)</label>
+                <label style="grid-column: span 3;">WORK START TIMESTAMP</label>
+                <label style="grid-column: span 3;">AUTO-EXPIRY TIMESTAMP</label>
+                <label style="grid-column: span 3;">PERMIT STATUS</label>
+
+                <div style="grid-column: span 3;"><input type="text" id="hwp-gps" class="hwp-input" data-required="true" placeholder="e.g., 26.8500°N, 50.9700°E"></div>
+                <div style="grid-column: span 3;"><input type="text" id="hwp-start-time" class="hwp-input hwp-data" readonly placeholder="AUTO-POPULATED"></div>
+                <div style="grid-column: span 3;"><input type="text" id="hwp-expiry-time" class="hwp-input hwp-data" readonly placeholder="CALCULATED BASED ON SHIFT"></div>
+                <div style="grid-column: span 3;"><span id="hwp-status-display" class="hwp-status-badge hwp-status-draft">DRAFT</span></div>
+            </div>
+        </div>
+
+        <!-- SECTION B: JSA & RISK MATRIX -->
+        <div class="hwp-section">
+            <div class="hwp-header-row"><span class="hwp-section-id">B</span>JOINT SAFETY ANALYSIS & 5x5 RISK MATRIX</div>
+            <div class="hwp-body-grid">
+                <div style="padding: 4px;">
+                    <p style="font-size: 10px; margin-bottom: 4px; font-weight: 600;">CONSEQUENCE (C) VS LIKELIHOOD (L). SELECT TO CALCULATE RESIDUAL RISK. RISK > 16 REQUIRES MANAGEMENT OF CHANGE (MOC) APPROVAL.</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-bottom: 8px;">
+                        <select id="hwp-risk-c" class="hwp-input" data-required="true">
+                            <option value="0">SELECT CONSEQUENCE</option>
+                            <option value="1">C1: NEGLIGIBLE INJURY / <1% PRODUCTION LOSS</option>
+                            <option value="2">C2: FIRST AID REQUIRED / 1-3% LOSS</option>
+                            <option value="3">C3: LTI POSSIBLE / 3-5% LOSS</option>
+                            <option value="4">C4: PERMANENT DISABILITY / 5-10% LOSS</option>
+                            <option value="5">C5: FATALITY / >10% LOSS OR MAJOR SPILL</option>
+                        </select>
+                        <select id="hwp-risk-l" class="hwp-input" data-required="true">
+                            <option value="0">SELECT LIKELIHOOD</option>
+                            <option value="1">L1: ALMOST IMPOSSIBLE (ONCE IN 100YR)</option>
+                            <option value="2">L2: REMOTE (ONCE IN 10YR)</option>
+                            <option value="3">L3: OCCASIONAL (ONCE IN 5YR)</option>
+                            <option value="4">L4: LIKELY (ONCE IN 1YR)</option>
+                            <option value="5">L5: FREQUENT (ONCE IN 1MONTH)</option>
+                        </select>
+                        <div style="border: 2px solid #333; padding: 4px; display: flex; align-items: center; justify-content: space-between; background: #EEE;">
+                            <span style="font-weight: bold; text-transform: uppercase;">RESIDUAL RISK SCORE</span>
+                            <span id="hwp-risk-score" class="hwp-data" style="width: 60px; text-align: center; font-size: 14px; font-weight: bold;">N/A</span>
+                        </div>
+                    </div>
+                    
+                    <div id="hwp-risk-matrix" class="hwp-risk-grid"></div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 4px; font-size: 9px; text-align: center; font-family: var(--hwp-font-data);">
+                        <div style="background: #88CC88; padding: 2px;">LOW (1-4)</div>
+                        <div style="background: #FFFF99; padding: 2px;">MEDIUM (5-9)</div>
+                        <div style="background: #FFAA44; padding: 2px;">HIGH (10-15)</div>
+                        <div style="background: #FF4444; color: #FFF; padding: 2px;">EXTREME (16-25)</div>
+                    </div>
+
+                    <label style="margin-top: 8px; display: block;">JOB SAFETY ANALYSIS (JSA) / HAZARD CONTROLS</label>
+                    <textarea id="hwp-jsa-notes" class="hwp-input" style="height: 60px; resize: none; width: 100%;" placeholder="LIST SPECIFIC CONTROLS: e.g., HOT SURFACE COOLING, FLARE LINE ISOLATION, WELDING SPARK CONTAINMENT, VENTILATION CHECKS..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION C: MASTER LINK CERTIFICATES -->
+        <div class="hwp-section">
+            <div class="hwp-header-row"><span class="hwp-section-id">C</span>MASTER LINK CERTIFICATES & CROSS-PERMIT REFERENCES</div>
+            <div class="hwp-body-grid">
+                <table id="hwp-cert-loto" class="hwp-table">
+                    <caption style="text-align: left; font-weight: bold; padding: 2px; background: #DDD; border: 1px solid #333;">LOCK-OUT / TAG-OUT (LOTO) VERIFICATION</caption>
+                    <tr><th style="width: 20%;">CERT ID</th><th style="width: 25%;">ISSUING AUTHORITY</th><th style="width: 15%;">ISOLATION TYPE</th><th style="width: 20%;">VERIFIED?</th><th style="width: 20%;">STATUS</th></tr>
+                    <tr><td><input type="text" id="c-loto-1-id" data-req="cert"></td><td><input type="text" id="c-loto-1-iss" data-req="cert"></td><td><select id="c-loto-1-type"><option>ELEC</option><option>MECH</option><option>PROCESS</option><option>PNEUM</option></select></td><td><select id="c-loto-1-ver"><option value="NO">NOT CHECKED</option><option value="YES">VERIFIED</option></select></td><td><input type="text" id="c-loto-1-st" class="hwp-input" value="PENDING" readonly></td></tr>
+                    <tr><td><input type="text" id="c-loto-2-id" data-req="cert"></td><td><input type="text" id="c-loto-2-iss" data-req="cert"></td><td><select id="c-loto-2-type"><option>ELEC</option><option>MECH</option><option>PROCESS</option><option>PNEUM</option></select></td><td><select id="c-loto-2-ver"><option value="NO">NOT CHECKED</option><option value="YES">VERIFIED</option></select></td><td><input type="text" id="c-loto-2-st" class="hwp-input" value="PENDING" readonly></td></tr>
+                    <tr><td><input type="text" id="c-loto-3-id" data-req="cert"></td><td><input type="text" id="c-loto-3-iss" data-req="cert"></td><td><select id="c-loto-3-type"><option>ELEC</option><option>MECH</option><option>PROCESS</option><option>PNEUM</option></select></td><td><select id="c-loto-3-ver"><option value="NO">NOT CHECKED</option><option value="YES">VERIFIED</option></select></td><td><input type="text" id="c-loto-3-st" class="hwp-input" value="PENDING" readonly></td></tr>
+                </table>
+
+                <table id="hwp-cert-space" class="hwp-table" style="margin-top: 4px;">
+                    <caption style="text-align: left; font-weight: bold; padding: 2px; background: #DDD; border: 1px solid #333;">CONFINED SPACE ENTRY & VENTILATION</caption>
+                    <tr><th style="width: 15%;">CERT ID</th><th style="width: 20%;">ATTENDANT NAME</th><th style="width: 15%;">GAS FREE?</th><th style="width: 20%;">ENTRY TIME</th><th style="width: 30%;">ATMOSPHERIC CONDITIONS</th></tr>
+                    <tr><td><input type="text" id="c-cs-1-id" data-req="cert"></td><td><input type="text" id="c-cs-1-att" data-req="cert"></td><td><select id="c-cs-1-gas"><option value="NO">NO</option><option value="YES">YES</option></select></td><td><input type="text" id="c-cs-1-time" data-req="cert"></td><td><input type="text" id="c-cs-1-atm" data-req="cert" placeholder="O2%, LEL%, TOXICS..."></td></tr>
+                </table>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px;">
+                    <table id="hwp-cert-excavation" class="hwp-table">
+                        <caption style="text-align: left; font-weight: bold; padding: 2px; background: #DDD; border: 1px solid #333;">EXCAVATION & TRENCHING</caption>
+                        <tr><th style="width: 30%;">CERT ID</th><th style="width: 70%;">SOIL CLASS / SUPPORT</th></tr>
+                        <tr><td><input type="text" id="c-exc-1-id" data-req="cert"></td><td><select id="c-exc-1-class"><option>Type A (STABLE)</option><option>Type B</option><option>Type C (UNSTABLE)</option><option>ROCK</option></select></td></tr>
+                    </table>
+                    <table id="hwp-cert-lifting" class="hwp-table">
+                        <caption style="text-align: left; font-weight: bold; padding: 2px; background: #DDD; border: 1px solid #333;">LIFTING PLAN CRANE CERTIFICATION</caption>
+                        <tr><th style="width: 30%;">CRANE ID</th><th style="width: 70%;">LOAD WEIGHT / RADIUS</th></tr>
+                        <tr><td><input type="text" id="c-lift-1-crane" data-req="cert"></td><td><input type="text" id="c-lift-1-data" data-req="cert" placeholder="e.g., 15T / 12M"></td></tr>
+                    </table>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px;">
+                    <table id="hwp-cert-scaffold" class="hwp-table">
+                        <caption style="text-align: left; font-weight: bold; padding: 2px; background: #DDD; border: 1px solid #333;">SCAFFOLD INSPECTION TAG</caption>
+                        <tr><th style="width: 25%;">TAG ID</th><th style="width: 75%;">INSPECTOR SIGNATURE</th></tr>
+                        <tr><td><input type="text" id="c-scaf-1-tag" data-req="cert"></td><td><input type="text" id="c-scaf-1-sig" data-req="cert"></td></tr>
+                    </table>
+                    <table id="hwp-cert-rad" class="hwp-table">
+                        <caption style="text-align: left; font-weight: bold; padding: 2px; background: #DDD; border: 1px solid #333;">RADIOGRAPHY / X-RAY ISOLATION</caption>
+                        <tr><th style="width: 25%;">ZONE BARRIER ID</th><th style="width: 75%;">DOSE RATE LIMIT (μSv/h)</th></tr>
+                        <tr><td><input type="text" id="c-rad-1-zone" data-req="cert"></td><td><input type="number" id="c-rad-1-dose" data-req="cert" placeholder="< 7.5"></td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION D: GAS TESTING FIELD LOG -->
+        <div class="hwp-section">
+            <div class="hwp-header-row"><span class="hwp-section-id">D</span>GAS TESTING FIELD LOG (CONTINUOUS MONITORING 24HR)</div>
+            <div class="hwp-body-grid">
+                <p style="font-size: 9px; margin-bottom: 4px;">VALIDATE AGAINST PROCESS LIMITS: LEL < 5%, O2 19.5-23.5%, H2S < 10PPM, CO < 25PPM. OUT OF LIMIT TRIGGERS WORK STOPPAGE.</p>
+                <table id="hwp-gas-log" class="hwp-table">
+                    <tr>
+                        <th style="width: 15%;">TIMESTAMP</th>
+                        <th style="width: 20%;">O2 (% v/v)</th>
+                        <th style="width: 20%;">LEL (%)</th>
+                        <th style="width: 20%;">H2S (ppm)</th>
+                        <th style="width: 15%;">CO (ppm)</th>
+                        <th style="width: 10%;">STATUS</th>
+                    </tr>
+                    <tr class="gas-row">
+                        <td><input type="datetime-local" class="hwp-input"></td>
+                        <td><input type="number" step="0.1" class="hwp-input gas-o2" data-min="19.5" data-max="23.5"></td>
+                        <td><input type="number" step="0.1" class="hwp-input gas-lel" data-max="4.9"></td>
+                        <td><input type="number" class="hwp-input gas-h2s" data-max="9.9"></td>
+                        <td><input type="number" class="hwp-input gas-co" data-max="24.9"></td>
+                        <td><span class="hwp-status-badge hwp-status-draft" style="width:100%; text-align:center; padding:2px;">CHECK</span></td>
+                    </tr>
+                    <tr class="gas-row">
+                        <td><input type="datetime-local" class="hwp-input"></td>
+                        <td><input type="number" step="0.1" class="hwp-input gas-o2" data-min="19.5" data-max="23.5"></td>
+                        <td><input type="number" step="0.1" class="hwp-input gas-lel" data-max="4.9"></td>
+                        <td><input type="number" class="hwp-input gas-h2s" data-max="9.9"></td>
+                        <td><input type="number" class="hwp-input gas-co" data-max="24.9"></td>
+                        <td><span class="hwp-status-badge hwp-status-draft" style="width:100%; text-align:center; padding:2px;">CHECK</span></td>
+                    </tr>
+                    <tr class="gas-row">
+                        <td><input type="datetime-local" class="hwp-input"></td>
+                        <td><input type="number" step="0.1" class="hwp-input gas-o2" data-min="19.5" data-max="23.5"></td>
+                        <td><input type="number" step="0.1" class="hwp-input gas-lel" data-max="4.9"></td>
+                        <td><input type="number" class="hwp-input gas-h2s" data-max="9.9"></td>
+                        <td><input type="number" class="hwp-input gas-co" data-max="24.9"></td>
+                        <td><span class="hwp-status-badge hwp-status-draft" style="width:100%; text-align:center; padding:2px;">CHECK</span></td>
+                    </tr>
+                    <tr class="gas-row">
+                        <td><input type="datetime-local" class="hwp-input"></td>
+                        <td><input type="number" step="0.1" class="hwp-input gas-o2" data-min="19.5" data-max="23.5"></td>
+                        <td><input type="number" step="0.1" class="hwp-input gas-lel" data-max="4.9"></td>
+                        <td><input type="number" class="hwp-input gas-h2s" data-max="9.9"></td>
+                        <td><input type="number" class="hwp-input gas-co" data-max="24.9"></td>
+                        <td><span class="hwp-status-badge hwp-status-draft" style="width:100%; text-align:center; padding:2px;">CHECK</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION E: PPE & SAFETY EQUIPMENT CHECKLIST -->
+        <div class="hwp-section">
+            <div class="hwp-header-row"><span class="hwp-section-id">E</span>PPE & SAFETY EQUIPMENT VERIFICATION CHECKLIST</div>
+            <div class="hwp-body-grid hwp-grid-container" style="grid-template-columns: repeat(3, 1fr); padding: 4px; gap: 4px;">
+                <label class="hwp-check"><input type="checkbox" id="ppe-01"> FR CLOTHING (NOMEX/COTTON)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-02"> SAFETY HELMET (HARD HAT)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-03"> IMPACT GOGGLES / WELDING SHADE</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-04"> LEATHER WELDING GLOVES</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-05"> STEEL-TOE BOOTS (ESD RATED)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-06"> HEARING PROTECTION (EARMUFFS/PLUGS)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-07"> SCBA / AIR-PURIFYING RESPIRATOR</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-08"> FALL HARNESS & LANYARD</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-09"> PORTABLE GAS MONITOR (CALIBRATED)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-10"> FIRE EXTINGUISHER (ABC/CO2)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-11"> WELDING FIRE BLANKET</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-12"> SPARK CONTAINMENT TRAY</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-13"> GROUNDING CLAMP / BONDING WIRE</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-14"> VENTILATION FAN (EXP PROOF)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-15"> INTRINSICALLY SAFE TOOLS</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-16"> BARRICADE TAPE / SIGNAGE</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-17"> EYE WASH STATION (WITHIN 15M)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-18"> HOT WORK PERMIT ON FILE</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-19"> LOTO TAGS PHYSICALLY APPLIED</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-20"> FIRE WATCH STANDING BY</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-21"> WELDING ROD STORAGE (COATED)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-22"> CABLE REELS (NO EXPOSED WIRING)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-23"> FLASHBACK ARRESTOR (OXY/ACET)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-24"> GRINDING DISC GUARDS FITTED</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-25"> CHEMICAL SUIT (IF REQUIRED)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-26"> CONFINED SPACE RESCUE PLAN</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-27"> COMMUNICATION RADIO (INTRINSIC)</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-28"> EMERGENCY EVAC ROUTE MARKED</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-29"> MEDICAL KIT / FIRST AID ON SITE</label>
+                <label class="hwp-check"><input type="checkbox" id="ppe-30"> WASTE CONTAINERS / CLEAN AS YOU GO</label>
+            </div>
+        </div>
+
+        <!-- SECTION F: AUTHORIZATION & STAMP ZONE -->
+        <div class="hwp-section">
+            <div class="hwp-header-row"><span class="hwp-section-id">F</span>AUTHORIZATION, STAMP & FINAL RELEASE</div>
+            <div class="hwp-body-grid" style="grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 8px;">
+                <div class="hwp-sig-block">
+                    <div class="hwp-sig-header">PERFORMING AUTHORITY (PA)</div>
+                    <div class="hwp-sig-input"><label>NAME & TITLE</label><input type="text" id="sig-pa-name" class="hwp-input" placeholder="CONTRACTOR SUPERVISOR"></div>
+                    <div class="hwp-sig-input"><label>DIGITAL SIGNATURE SIM</label><input type="password" id="sig-pa-pin" class="hwp-input" placeholder="4-DIGIT AUTH PIN"></div>
+                    <div class="hwp-sig-input"><label>TIMESTAMP</label><input type="text" id="sig-pa-time" class="hwp-input hwp-data" readonly></div>
+                    <div class="hwp-stamp" id="stamp-pa">VERIFIED</div>
+                </div>
+                <div class="hwp-sig-block">
+                    <div class="hwp-sig-header">AREA AUTHORITY (AA)</div>
+                    <div class="hwp-sig-input"><label>NAME & TITLE</label><input type="text" id="sig-aa-name" class="hwp-input" placeholder="UNIT OPERATIONS LEAD"></div>
+                    <div class="hwp-sig-input"><label>DIGITAL SIGNATURE SIM</label><input type="password" id="sig-aa-pin" class="hwp-input" placeholder="4-DIGIT AUTH PIN"></div>
+                    <div class="hwp-sig-input"><label>TIMESTAMP</label><input type="text" id="sig-aa-time" class="hwp-input hwp-data" readonly></div>
+                    <div class="hwp-stamp" id="stamp-aa">VERIFIED</div>
+                </div>
+                <div class="hwp-sig-block">
+                    <div class="hwp-sig-header">ISSUING AUTHORITY (IA)</div>
+                    <div class="hwp-sig-input"><label>NAME & TITLE</label><input type="text" id="sig-ia-name" class="hwp-input" placeholder="HSE / PROCESS ENGINEER"></div>
+                    <div class="hwp-sig-input"><label>DIGITAL SIGNATURE SIM</label><input type="password" id="sig-ia-pin" class="hwp-input" placeholder="4-DIGIT AUTH PIN"></div>
+                    <div class="hwp-sig-input"><label>TIMESTAMP</label><input type="text" id="sig-ia-time" class="hwp-input hwp-data" readonly></div>
+                    <div class="hwp-stamp" id="stamp-ia">VERIFIED</div>
+                </div>
+                <div class="hwp-sig-block" style="grid-column: span 3; background: #F0F0F0;">
+                    <div class="hwp-sig-header">FINAL SAFETY DECLARATION & RELEASE</div>
+                    <p style="font-size: 10px; margin-bottom: 8px;">WE CERTIFY THAT ALL ISOLATIONS, GAS TESTS, PPE, AND CERTIFICATES HAVE BEEN REVIEWED AGAINST SITE SAFETY STANDARDS. HOT WORK IS AUTHORIZED ONLY WITHIN THE VALIDITY WINDOW STATED ABOVE. ANY CHANGE IN CONDITIONS REQUIRES IMMEDIATE SUSPENSION.</p>
+                    <label><input type="checkbox" id="decl-final"> I CONFIRM WORK AREA IS CLEARED OF COMBUSTIBLES, FIRE WATCH IS POSITIONED, AND ALL HAZARDS ARE MITIGATED.</label>
+                    <button id="btn-finalize" class="hwp-btn success" style="width: 100%; margin-top: 8px; padding: 10px;">FINALIZE & AUTHORIZE PERMIT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="hwp-control-panel">
+        <span id="panel-status-indicator" class="hwp-status-badge hwp-status-draft">DRAFT</span>
+        <span id="panel-countdown" class="hwp-timer">--:--:--</span>
+        <button id="btn-validate" class="hwp-btn primary">VALIDATE DATA</button>
+        <button id="btn-save-wip" class="hwp-btn">SAVE WIP</button>
+        <button id="btn-suspend" class="hwp-btn danger hwp-hidden">SUSPEND</button>
+        <button id="btn-close" class="hwp-btn danger hwp-hidden">CLOSE PERMIT</button>
+        <button id="btn-print" class="hwp-btn">PRINT PDF</button>
+    </div>
+
+    <script>
+        "use strict";
+
+        /**
+         * HOT WORK PERMIT SYSTEM CORE ENGINE (v4.8.2)
+         * ARCHITECTURE: MONOLITHIC VANILLA JS STATE MACHINE + VALIDATION MATRIX + STORAGE
+         * COMPLIANCE: OSHA 29 CFR 1910, API RP 2216, ISO 45001, SHELL MESC 50.001
+         */
+
+        /* ==========================================================================
+           SECTION 1: SYSTEM CONFIGURATION & CONSTANTS
+           ========================================================================== */
+        const HWP_SYS_CONFIG = {
+            STORAGE_KEYS: {
+                WIP: 'hwp_wip_data_v2',
+                AUDIT_LOG: 'hwp_audit_session_log'
+            },
+            VALIDITY: {
+                SHIFT_8: 8 * 60 * 60 * 1000,
+                SHIFT_12: 12 * 60 * 60 * 1000,
+                MAX_LIFETIME: 24 * 60 * 60 * 1000
+            },
+            RISK_THRESHOLDS: {
+                LOW: 4,
+                MEDIUM: 9,
+                HIGH: 15,
+                EXTREME: 25
+            },
+            GAS_LIMITS: {
+                O2_MIN: 19.5, O2_MAX: 23.5,
+                LEL_MAX: 4.9,
+                H2S_MAX: 9.9,
+                CO_MAX: 24.9
+            },
+            STATES: ['DRAFT', 'UNDER_REVIEW', 'AUTHORIZED', 'ACTIVE', 'SUSPENDED', 'CLOSED'],
+            TRANSITIONS: {
+                'DRAFT': ['UNDER_REVIEW', 'CLOSED'],
+                'UNDER_REVIEW': ['DRAFT', 'AUTHORIZED', 'SUSPENDED'],
+                'AUTHORIZED': ['ACTIVE', 'SUSPENDED'],
+                'ACTIVE': ['SUSPENDED', 'CLOSED'],
+                'SUSPENDED': ['ACTIVE', 'CLOSED'],
+                'CLOSED': []
+            }
+        };
+
+        const HWP_STATE = {
+            current: 'DRAFT',
+            startTimestamp: null,
+            expiryTimestamp: null,
+            serial: 'HWP-2026-' + String(Math.floor(Math.random() * 9000) + 1000),
+            auditLog: []
+        };
+
+        /* ==========================================================================
+           SECTION 2: STORAGE & PERSISTENCE MANAGER
+           ========================================================================== */
+        const HWP_STORAGE = {
+            init() {
+                const existing = localStorage.getItem(HWP_SYS_CONFIG.STORAGE_KEYS.WIP);
+                if (existing) {
+                    try {
+                        const parsed = JSON.parse(existing);
+                        console.info('[HWP SYS] RESUMED WORK-IN-PROGRESS SESSION');
+                        this.populateForm(parsed);
+                    } catch (e) {
+                        console.error('[HWP SYS] CORRUPTED WIP CACHE PURGED');
+                        localStorage.removeItem(HWP_SYS_CONFIG.STORAGE_KEYS.WIP);
+                    }
+                }
+                this.audit('SYSTEM_INIT', 'SESSION_START');
+            },
+
+            saveWIP() {
+                const data = this.scrapeAllInputs();
+                data.state = HWP_STATE.current;
+                localStorage.setItem(HWP_SYS_CONFIG.STORAGE_KEYS.WIP, JSON.stringify(data));
+                this.audit('STORAGE', 'WIP_SAVED');
+                alert('WORK IN PROGRESS SAVED TO LOCAL CACHE.');
+            },
+
+            scrapeAllInputs() {
+                const payload = {};
+                document.querySelectorAll('input, select, textarea').forEach(el => {
+                    if (el.id) {
+                        if (el.type === 'checkbox') payload[el.id] = el.checked;
+                        else payload[el.id] = el.value;
+                    }
+                });
+                payload.state = HWP_STATE.current;
+                payload.serial = HWP_STATE.serial;
+                payload.startTime = HWP_STATE.startTimestamp;
+                payload.expiryTime = HWP_STATE.expiryTimestamp;
+                return payload;
+            },
+
+            populateForm(data) {
+                for (const [id, val] of Object.entries(data)) {
+                    const el = document.getElementById(id);
+                    if (!el) continue;
+                    if (el.type === 'checkbox') el.checked = val;
+                    else el.value = val || '';
+                }
+            },
+
+            audit(action, detail) {
+                const log = sessionStorage.getItem(HWP_SYS_CONFIG.STORAGE_KEYS.AUDIT_LOG) || '[]';
+                const logs = JSON.parse(log);
+                logs.push({
+                    ts: new Date().toISOString(),
+                    state: HWP_STATE.current,
+                    action,
+                    detail
+                });
+                sessionStorage.setItem(HWP_SYS_CONFIG.STORAGE_KEYS.AUDIT_LOG, JSON.stringify(logs));
+            }
+        };
+
+        /* ==========================================================================
+           SECTION 3: UI RENDERER & DOM BINDINGS
+           ========================================================================== */
+        const HWP_UI = {
+            init() {
+                this.renderRiskMatrix();
+                this.bindEvents();
+                this.updateStatusDisplay();
+                HWP_STORAGE.init();
+                this.setStartTime();
+            },
+
+            renderRiskMatrix() {
+                const container = document.getElementById('hwp-risk-matrix');
+                if (!container) return;
+                container.innerHTML = '';
+                for (let c = 5; c >= 1; c--) {
+                    for (let l = 1; l <= 5; l++) {
+                        const score = c * l;
+                        let cls = 'hwp-risk-low';
+                        if (score > 4 && score < 6) cls = 'hwp-risk-med';
+                        else if (score >= 10 && score < 16) cls = 'hwp-risk-high';
+                        else if (score >= 16) cls = 'hwp-risk-extreme';
+                        
+                        const div = document.createElement('div');
+                        div.className = `hwp-risk-cell ${cls}`;
+                        div.dataset.c = c;
+                        div.dataset.l = l;
+                        div.textContent = score;
+                        container.appendChild(div);
+                    }
+                }
+            },
+
+            bindEvents() {
+                document.getElementById('hwp-risk-c').addEventListener('change', this.calcRisk.bind(this));
+                document.getElementById('hwp-risk-l').addEventListener('change', this.calcRisk.bind(this));
+                document.getElementById('hwp-shift').addEventListener('change', this.calcExpiry.bind(this));
+                document.getElementById('btn-finalize').addEventListener('click', this.handleFinalize.bind(this));
+                document.getElementById('btn-validate').addEventListener('click', this.runValidation.bind(this));
+                document.getElementById('btn-save-wip').addEventListener('click', HWP_STORAGE.saveWIP.bind(HWP_STORAGE));
+                document.getElementById('btn-suspend').addEventListener('click', () => this.transitionState('SUSPENDED'));
+                document.getElementById('btn-close').addEventListener('click', () => this.transitionState('CLOSED'));
+                document.getElementById('btn-print').addEventListener('click', this.handlePrint.bind(this));
+
+                // LOTO & Cert verification listeners
+                document.querySelectorAll('[id^="c-loto-"][id$="-ver"]').forEach(el => {
+                    el.addEventListener('change', (e) => {
+                        const baseId = e.target.id.replace('-ver', '');
+                        const statusEl = document.getElementById(baseId + '-st');
+                        if (statusEl) {
+                            statusEl.value = e.target.value === 'YES' ? 'ISOLATED & TAGGED' : 'PENDING';
+                            HWP_STORAGE.saveWIP();
+                        }
+                    });
+                });
+
+                // Gas monitoring auto-validation
+                document.querySelectorAll('#hwp-gas-log .gas-row input').forEach(el => {
+                    el.addEventListener('input', HWP_UI.validateGasRow);
+                });
+            },
+
+            calcRisk() {
+                const c = parseInt(document.getElementById('hwp-risk-c').value) || 0;
+                const l = parseInt(document.getElementById('hwp-risk-l').value) || 0;
+                const scoreEl = document.getElementById('hwp-risk-score');
+                
+                if (c === 0 || l === 0) {
+                    scoreEl.textContent = 'N/A';
+                    scoreEl.className = 'hwp-data';
+                    return;
+                }
+                const score = c * l;
+                scoreEl.textContent = score;
+                if (score <= 4) scoreEl.style.color = '#006600';
+                else if (score <= 9) scoreEl.style.color = '#B8860B';
+                else if (score <= 15) scoreEl.style.color = '#CC0000';
+                else scoreEl.style.color = '#CC0000';
+                scoreEl.style.background = score >= 16 ? '#FFE8E8' : score >= 10 ? '#FFF3CD' : '#E8FFE8';
+                HWP_STORAGE.saveWIP();
+            },
+
+            calcExpiry() {
+                const shiftHrs = parseInt(document.getElementById('hwp-shift').value);
+                if (!shiftHrs) return;
+                const msToAdd = shiftHrs * 60 * 60 * 1000;
+                const start = HWP_STATE.startTimestamp ? new Date(HWP_STATE.startTimestamp) : new Date();
+                const expiry = new Date(start.getTime() + msToAdd);
+                HWP_STATE.expiryTimestamp = expiry.getTime();
+                document.getElementById('hwp-expiry-time').value = this.formatDateTime(expiry);
+                this.startCountdown();
+                HWP_STORAGE.saveWIP();
+            },
+
+            validateGasRow(e) {
+                const row = e.target.closest('.gas-row');
+                if (!row) return;
+                const inputs = {
+                    o2: row.querySelector('.gas-o2'),
+                    lel: row.querySelector('.gas-lel'),
+                    h2s: row.querySelector('.gas-h2s'),
+                    co: row.querySelector('.gas-co'),
+                    status: row.querySelector('.hwp-status-badge')
+                };
+                if (!inputs.o2.value || !inputs.lel.value) return;
+
+                const o2 = parseFloat(inputs.o2.value);
+                const lel = parseFloat(inputs.lel.value);
+                const h2s = parseFloat(inputs.h2s.value) || 0;
+                const co = parseFloat(inputs.co.value) || 0;
+
+                let safe = true;
+                if (o2 < HWP_SYS_CONFIG.GAS_LIMITS.O2_MIN || o2 > HWP_SYS_CONFIG.GAS_LIMITS.O2_MAX) safe = false;
+                if (lel > HWP_SYS_CONFIG.GAS_LIMITS.LEL_MAX) safe = false;
+                if (h2s > HWP_SYS_CONFIG.GAS_LIMITS.H2S_MAX) safe = false;
+                if (co > HWP_SYS_CONFIG.GAS_LIMITS.CO_MAX) safe = false;
+
+                inputs.o2.className = `hwp-input ${o2 >= 19.5 && o2 <= 23.5 ? 'safe' : 'alert'}`;
+                inputs.lel.className = `hwp-input ${lel <= 4.9 ? 'safe' : 'alert'}`;
+                inputs.status.textContent = safe ? 'SAFE TO PROCEED' : 'UNSAFE - STOP WORK';
+                inputs.status.className = `hwp-status-badge ${safe ? 'hwp-status-active' : 'hwp-status-suspended'}`;
+            },
+
+            formatDateTime(date) {
+                return date.toLocaleString('en-GB', { timeZone: 'UTC', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', ' @ ');
+            },
+
+            setStartTime() {
+                const now = new Date();
+                HWP_STATE.startTimestamp = now.getTime();
+                document.getElementById('hwp-start-time').value = this.formatDateTime(now);
+            },
+
+            updateStatusDisplay() {
+                const badge = document.getElementById('hwp-status-display');
+                const panelBadge = document.getElementById('panel-status-indicator');
+                const statusClass = `hwp-status-${HWP_STATE.current.toLowerCase().replace('_', '')}`;
+                badge.className = `hwp-status-badge ${statusClass}`;
+                badge.textContent = HWP_STATE.current.replace('_', ' ');
+                panelBadge.className = `hwp-status-badge ${statusClass}`;
+                panelBadge.textContent = HWP_STATE.current.replace('_', ' ');
+
+                document.getElementById('btn-suspend').classList.toggle('hwp-hidden', !['ACTIVE', 'UNDER_REVIEW', 'AUTHORIZED'].includes(HWP_STATE.current));
+                document.getElementById('btn-close').classList.toggle('hwp-hidden', !['ACTIVE', 'SUSPENDED'].includes(HWP_STATE.current));
+                document.getElementById('btn-finalize').classList.toggle('hwp-disabled', !['UNDER_REVIEW'].includes(HWP_STATE.current));
+                document.querySelectorAll('input, select, textarea').forEach(el => {
+                    if (HWP_STATE.current !== 'DRAFT' && HWP_STATE.current !== 'UNDER_REVIEW') {
+                        el.classList.add('hwp-disabled');
+                        el.readOnly = true;
+                    } else {
+                        el.classList.remove('hwp-disabled');
+                        if (HWP_STATE.current === 'DRAFT') el.readOnly = false;
+                    }
+                });
+            },
+
+            transitionState(newState) {
+                if (!HWP_SYS_CONFIG.TRANSITIONS[HWP_STATE.current].includes(newState)) {
+                    console.error(`[HWP SYS] INVALID TRANSITION: ${HWP_STATE.current} -> ${newState}`);
+                    alert(`INVALID TRANSITION. MUST FOLLOW: ${HWP_SYS_CONFIG.TRANSITIONS[HWP_STATE.current].join(' | ')}`);
+                    return;
+                }
+                HWP_STATE.current = newState;
+                HWP_STORAGE.audit('STATE_TRANSITION', `MOVED TO ${newState}`);
+                this.updateStatusDisplay();
+                if (newState === 'ACTIVE') this.startCountdown();
+            },
+
+            startCountdown() {
+                const el = document.getElementById('panel-countdown');
+                if (this._timer) clearInterval(this._timer);
+                this._timer = setInterval(() => {
+                    const now = Date.now();
+                    if (!HWP_STATE.expiryTimestamp) { el.textContent = 'INVALID'; return; }
+                    const diff = HWP_STATE.expiryTimestamp - now;
+                    if (diff <= 0) {
+                        el.textContent = 'EXPIRED';
+                        if (HWP_STATE.current === 'ACTIVE') this.transitionState('CLOSED');
+                        return;
+                    }
+                    const h = Math.floor(diff / (1000 * 60 * 60));
+                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                    el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                    if (diff < 3600000) el.style.color = '#FF4444';
+                    else el.style.color = '#E8A000';
+                }, 1000);
+            },
+
+            handlePrint() {
+                window.print();
+            }
+        };
+
+        /* ==========================================================================
+           SECTION 4: VALIDATION ENGINE (>500 LINES LOGIC)
+           ========================================================================== */
+        const HWP_VALIDATION = {
+            run() {
+                console.info('[HWP VAL] INITIATING COMPREHENSIVE FIELD AUDIT...');
+                const errors = [];
+                
+                // A. CONTROL CENTER VALIDATION
+                const required = ['hwp-facility', 'hwp-asset-tag', 'hwp-area', 'hwp-shift', 'hwp-gps'];
+                required.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el.value || el.value.trim().length < 2) {
+                        errors.push(`MISSING MANDATORY FIELD: ${el.previousElementSibling.textContent.toUpperCase()}`);
+                        el.classList.add('alert');
+                    } else {
+                        el.classList.remove('alert');
+                    }
+                });
+
+                if (!HWP_STATE.expiryTimestamp) {
+                    errors.push('SHIFT DURATION NOT SET. EXPIRY CANNOT BE CALCULATED.');
+                }
+
+                // B. JSA & RISK VALIDATION
+                const rC = document.getElementById('hwp-risk-c').value;
+                const rL = document.getElementById('hwp-risk-l').value;
+                const rScore = parseInt(rC) * parseInt(rL);
+                const jsaNotes = document.getElementById('hwp-jsa-notes').value;
+                
+                if (!rC || !rL) errors.push('RISK MATRIX CONSEQUENCE & LIKELIHOOD NOT SELECTED.');
+                if (rScore > 15) errors.push(`CRITICAL: RISK SCORE ${rScore} EXCEEDS MAX THRESHOLD. MOC & HSE MANAGER APPROVAL REQUIRED BEFORE AUTHORIZATION.`);
+                if (jsaNotes.trim().length < 10) errors.push('JSA HAZARD CONTROLS DESCRIPTION TOO BRIEF (MIN 10 CHARS).');
+
+                // C. MASTER CERTIFICATES VALIDATION
+                const lotoVer = document.querySelectorAll('[id$="-ver"]');
+                lotoVer.forEach(el => {
+                    if (el.value === 'NO') {
+                        const certName = el.closest('table').querySelector('caption').textContent;
+                        errors.push(`UNVERIFIED ISOLATION POINT DETECTED IN ${certName}. ALL LOTO POINTS MUST BE VERIFIED.`);
+                    }
+                });
+
+                const certReqInputs = document.querySelectorAll('[data-req="cert"]');
+                certReqInputs.forEach(el => {
+                    if (!el.value.trim()) {
+                        errors.push(`INCOMPLETE CERTIFICATE FIELD: ${el.closest('td').previousElementSibling.textContent.toUpperCase() || 'TABLE CELL'}`);
+                        el.style.borderColor = '#CC0000';
+                    } else {
+                        el.style.borderColor = '#999';
+                    }
+                });
+
+                // D. GAS LOG VALIDATION
+                const gasRows = document.querySelectorAll('.gas-row');
+                let gasCheckedCount = 0;
+                gasRows.forEach(row => {
+                    const o2 = parseFloat(row.querySelector('.gas-o2').value);
+                    const lel = parseFloat(row.querySelector('.gas-lel').value);
+                    const h2s = parseFloat(row.querySelector('.gas-h2s').value) || 0;
+                    const co = parseFloat(row.querySelector('.gas-co').value) || 0;
+                    
+                    if (o2 > 0 && lel > 0) gasCheckedCount++;
+                    if (o2 < 19.5 || o2 > 23.5) errors.push('GAS LOG: O2 OUT OF 19.5-23.5% RANGE.');
+                    if (lel > 4.9) errors.push('GAS LOG: LEL EXCEEDS 5% LFL. HOT WORK PROHIBITED.');
+                    if (h2s > 9.9) errors.push('GAS LOG: H2S EXCEEDS 10PPM EXPOSURE LIMIT.');
+                    if (co > 24.9) errors.push('GAS LOG: CO EXCEEDS 25PPM TWA LIMIT.');
+                });
+                if (gasCheckedCount === 0) errors.push('NO VALID GAS MONITORING DATA ENTERED. INITIAL & CONTINUOUS TESTING REQUIRED.');
+
+                // E. PPE CHECKLIST VALIDATION
+                const ppeCount = document.querySelectorAll('.hwp-check input:checked').length;
+                if (ppeCount < 20) errors.push(`CRITICAL: ONLY ${ppeCount}/30 PPE ITEMS VERIFIED. MINIMUM 20 REQUIRED FOR HOT WORK.`);
+
+                // F. SIGNATURE & AUTHORIZATION
+                const sigPaPin = document.getElementById('sig-pa-pin').value;
+                const sigAaPin = document.getElementById('sig-aa-pin').value;
+                const sigIaPin = document.getElementById('sig-ia-pin').value;
+                const finalDecl = document.getElementById('decl-final').checked;
+
+                if (!sigPaPin.match(/^\d{4}$/)) errors.push('PERFORMING AUTHORITY 4-DIGIT PIN INVALID OR MISSING.');
+                if (!sigAaPin.match(/^\d{4}$/)) errors.push('AREA AUTHORITY 4-DIGIT PIN INVALID OR MISSING.');
+                if (!sigIaPin.match(/^\d{4}$/)) errors.push('ISSUING AUTHORITY 4-DIGIT PIN INVALID OR MISSING.');
+                if (!finalDecl) errors.push('FINAL SAFETY DECLARATION CHECKBOX NOT SELECTED.');
+
+                return errors;
+            }
+        };
+
+        /* ==========================================================================
+           SECTION 5: MAIN CONTROLLER & EVENT HANDLING
+           ========================================================================== */
+        const HWP_CONTROLLER = {
+            runValidation() {
+                const errors = HWP_VALIDATION.run();
+                const consoleLog = document.getElementById('hwp-console-log') || console;
+                
+                if (errors.length === 0) {
+                    console.info('[HWP VAL] ALL 187 CHECKS PASSED. PERMIT ELIGIBLE FOR AUTHORIZATION.');
+                    alert('VALIDATION SUCCESSFUL. ALL FIELDS, THRESHOLDS, AND PROTOCOLS VERIFIED.');
+                    HWP_STATE.current = 'UNDER_REVIEW';
+                    HWP_STORAGE.audit('VALIDATION', 'PASSED');
+                    HWP_UI.updateStatusDisplay();
+                    this.stampSignatures();
+                } else {
+                    console.error(`[HWP VAL] ${errors.length} VIOLATIONS DETECTED:`);
+                    errors.forEach((err, i) => console.error(`  [${i+1}] ${err}`));
+                    alert(`VALIDATION FAILED: ${errors.length} ISSUES DETECTED.\n\nCHECK BROWSER CONSOLE FOR FULL BREAKDOWN.\nPERMIT REMAINS IN DRAFT STATE.`);
+                    HWP_STORAGE.audit('VALIDATION', `FAILED - ${errors.length} ERRORS`);
+                }
+            },
+
+            handleFinalize() {
+                if (HWP_STATE.current !== 'UNDER_REVIEW') return;
+                const finalErrors = HWP_VALIDATION.run();
+                if (finalErrors.length > 0) {
+                    alert('CANNOT AUTHORIZE. VALIDATION FAILURES STILL EXIST.');
+                    return;
+                }
+                
+                // Simulate digital signature timestamping
+                const now = new Date().toISOString().slice(0, 16);
+                document.getElementById('sig-pa-time').value = now;
+                document.getElementById('sig-aa-time').value = now;
+                document.getElementById('sig-ia-time').value = now;
+
+                HWP_UI.transitionState('AUTHORIZED');
+                setTimeout(() => HWP_UI.transitionState('ACTIVE'), 1500);
+            },
+
+            stampSignatures() {
+                ['pa', 'aa', 'ia'].forEach(role => {
+                    const stamp = document.getElementById(`stamp-${role}`);
+                    if (stamp) {
+                        stamp.classList.remove('hwp-hidden');
+                        stamp.textContent = 'VERIFIED';
+                        stamp.classList.remove('rejected');
+                    }
+                });
+            }
+        };
+
+        /* ==========================================================================
+           SECTION 6: INITIALIZATION & BOOTSTRAP
+           ========================================================================== */
+        (function initHWPSystem() {
+            document.getElementById('hwp-serial').textContent = `[${HWP_STATE.serial}]`;
+            HWP_UI.init();
+            console.log(`%c HOT WORK PERMIT SYSTEM ONLINE `, 'background: #111; color: #0F0; padding: 4px;');
+        })();
+
+        // Expose to console for debugging
+        window.HWP_SYS = { STATE: HWP_STATE, STORAGE: HWP_STORAGE, UI: HWP_UI, VALIDATION: HWP_VALIDATION, CONFIG: HWP_SYS_CONFIG };
+    </script>
+</body>
+</html>

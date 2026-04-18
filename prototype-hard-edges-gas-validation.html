@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HWP-SYS // INDUSTRIAL HOT WORK PERMIT</title>
+    <style>
+        /* 
+        ========================================
+        🔷 CORE ARCHITECTURE & RESET
+        ========================================
+        */
+        :root {
+            --c-black: #000000;
+            --c-dark-gray: #333333;
+            --c-med-gray: #777777;
+            --c-light-gray: #e0e0e0;
+            --c-white: #ffffff;
+            --c-risk-low: #e6f4ea; /* Green tint */
+            --c-risk-med: #fff7e0; /* Yellow tint */
+            --c-risk-high: #fce8e6; /* Red tint */
+            --c-risk-crit: #dadce0; /* Black tint base */
+            
+            --f-mono: 'Courier New', Courier, monospace;
+            --f-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            
+            --grid-baseline: 4px;
+            --border-light: 1px solid var(--c-med-gray);
+            --border-heavy: 2px solid var(--c-black);
+            --hatch-pattern: repeating-linear-gradient(
+                45deg,
+                var(--c-white),
+                var(--c-white) 2px,
+                var(--c-light-gray) 2px,
+                var(--c-light-gray) 4px
+            );
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0; /* Desk background */
+            font-family: var(--f-sans);
+            color: var(--c-black);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* 
+        ========================================
+        🔷 A4 DOCUMENT CONTAINER (ISO 216)
+        ========================================
+        */
+        .a4-document {
+            width: 210mm;
+            min-height: 297mm;
+            background: var(--c-white);
+            padding: 10mm;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); /* Only shadow on screen, removed in print */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border: 1px solid #ccc;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+                display: block;
+            }
+            .a4-document {
+                box-shadow: none;
+                border: none;
+                width: 100%;
+                height: auto;
+                page-break-after: always;
+            }
+            .no-print {
+                display: none !important;
+            }
+            input, textarea, select {
+                border: none;
+                background: transparent;
+                resize: none;
+            }
+        }
+
+        /* 
+        ========================================
+        🔷 TYPOGRAPHY & GRID UTILS
+        ========================================
+        */
+        h1, h2, h3, h4 {
+            margin: 0;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .txt-mono { font-family: var(--f-mono); }
+        .txt-sm { font-size: 10px; }
+        .txt-xs { font-size: 8px; }
+        .txt-bold { font-weight: 700; }
+        .uppercase { text-transform: uppercase; }
+        .center { text-align: center; }
+        .right { text-align: right; }
+
+        /* Layout Grids */
+        .row { display: flex; flex-direction: row; }
+        .col { display: flex; flex-direction: column; }
+        .gap-4 { gap: calc(var(--grid-baseline) * 1); }
+        .gap-8 { gap: calc(var(--grid-baseline) * 2); }
+        .gap-16 { gap: calc(var(--grid-baseline) * 4); }
+        
+        .flex-1 { flex: 1; }
+        .flex-2 { flex: 2; }
+        .flex-3 { flex: 3; }
+
+        /* 
+        ========================================
+        🔷 HARD INDUSTRIAL UI COMPONENTS
+        ========================================
+        */
+        
+        /* Inputs */
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            background: #fdfdfd;
+            border: 1px dotted var(--c-med-gray);
+            padding: 4px;
+            font-family: var(--f-mono);
+            font-size: 11px;
+            color: var(--c-black);
+            transition: background 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            background: #fffbe6; /* Slight yellow focus like paper under light */
+            border-style: solid;
+            border-color: var(--c-black);
+        }
+
+        input[readonly], textarea[readonly], select[disabled] {
+            background: #eeeeee;
+            color: #555;
+            border: 1px solid #ddd;
+        }
+
+        /* Buttons (Hard Edges) */
+        .btn {
+            background: var(--c-white);
+            border: 2px solid var(--c-black);
+            padding: 8px 16px;
+            font-family: var(--f-sans);
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn:hover { background: var(--c-black); color: var(--c-white); }
+        .btn:active { background: var(--c-med-gray); }
+        .btn:disabled { background: #ddd; color: #999; border-color: #ccc; cursor: not-allowed; }
+        
+        .btn-primary { background: var(--c-black); color: var(--c-white); }
+        .btn-primary:hover { background: #333; }
+
+        .btn-danger { border-color: #8b0000; color: #8b0000; }
+        .btn-danger:hover { background: #8b0000; color: white; }
+
+        /* Sections */
+        .section-box {
+            border: var(--border-heavy);
+            padding: 8px;
+            position: relative;
+            background: white;
+            margin-top: 16px;
+        }
+
+        .section-header {
+            position: absolute;
+            top: -12px;
+            left: 8px;
+            background: var(--c-black);
+            color: var(--c-white);
+            padding: 2px 8px;
+            font-size: 10px;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        /* Tables (Engineering Style) */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+        }
+        
+        th, td {
+            border: 1px solid var(--c-black);
+            padding: 4px;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f0f0f0;
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Checkbox Grid */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 4px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 9px;
+            border: 1px solid #eee;
+            padding: 2px;
+        }
+        .checkbox-item input { width: auto; }
+
+        /* Risk Matrix Visualization */
+        .risk-matrix-container {
+            display: grid;
+            grid-template-columns: 30px repeat(5, 1fr);
+            grid-template-rows: repeat(5, 25px) 30px;
+            width: 250px;
+            border: 2px solid black;
+        }
+        .risk-cell {
+            border: 1px solid #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 10px;
+        }
+        .risk-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: bold;
+            transform-origin: center;
+        }
+        .label-y { writing-mode: vertical-rl; transform: rotate(180deg); }
+
+        /* Colors for Risk */
+        .bg-low { background-color: var(--c-risk-low); }
+        .bg-med { background-color: var(--c-risk-med); }
+        .bg-high { background-color: var(--c-risk-high); }
+        .bg-crit { background-color: #333; color: white; }
+
+        /* Visual Stamps */
+        .stamp-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            border: 5px double;
+            padding: 10px 20px;
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+            letter-spacing: 2px;
+            mix-blend-mode: multiply;
+        }
+        .stamp-visible { opacity: 0.7; }
+        .stamp-approved { border-color: #2e7d32; color: #2e7d32; }
+        .stamp-rejected { border-color: #c62828; color: #c62828; }
+        .stamp-expired { border-color: #555; color: #555; }
+
+        /* Signature Canvas */
+        .sig-wrapper {
+            border: 1px dashed #ccc;
+            background: #fafafa;
+            height: 60px;
+            width: 100%;
+            position: relative;
+        }
+        .sig-canvas {
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        /* System Status Bar (No-Print) */
+        .sys-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #222;
+            color: #fff;
+            padding: 10px 20px;
+            font-family: var(--f-mono);
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            border-top: 4px solid var(--c-black);
+        }
+        .sys-status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #555;
+            margin-right: 8px;
+            border-radius: 0; /* Square indicator */
+        }
+        .sys-status-indicator.draft { background: #9e9e9e; }
+        .sys-status-indicator.active { background: #2e7d32; }
+        .sys-status-indicator.blocked { background: #c62828; animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Simulated Barcode */
+        .barcode {
+            height: 25px;
+            background: repeating-linear-gradient(
+                90deg,
+                #000 0px, #000 2px,
+                transparent 2px, transparent 4px,
+                #000 4px, #000 5px,
+                transparent 5px, transparent 9px
+            );
+            width: 150px;
+            margin-top: 4px;
+        }
+
+        /* QR Placeholder */
+        .qr-placeholder {
+            width: 50px;
+            height: 50px;
+            border: 2px solid black;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-family: var(--f-mono);
+        }
+        .qr-placeholder::after {
+            content: "QR-ID";
+            font-weight: bold;
+        }
+
+        /* Utility specific for Gas Table */
+        .gas-warning { background-color: #fff3e0; color: #ef6c00; font-weight: bold; }
+        .gas-critical { background-color: #ffebee; color: #c62828; font-weight: bold; text-decoration: line-through; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <!-- 
+    ========================================
+    🔷 MAIN DOCUMENT STRUCTURE (A4)
+    ========================================
+    -->
+    <div class="a4-document" id="permitDocument">
+        
+        <!-- 🅐 HEADER & CONTROL CENTER -->
+        <header style="border-bottom: 4px solid black; padding-bottom: 10px; margin-bottom: 10px;">
+            <div class="row" style="justify-content: space-between; align-items: flex-start;">
+                <!-- Logo & ID -->
+                <div class="col">
+                    <div style="width: 80px; height: 80px; background: var(--hatch-pattern); border: 2px solid black; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px;">LOGO</div>
+                </div>
+                
+                <!-- Title Block -->
+                <div class="col center flex-1" style="align-items: center;">
+                    <h1 style="font-size: 24px; letter-spacing: 2px;">Hot Work Permit</h1>
+                    <div style="font-size: 10px; margin-top: 4px;">DOCUMENT CONTROL REF: ISO-45001-HWP-REV04</div>
+                    <div style="font-weight: bold; font-size: 14px; margin-top: 4px;" id="displayPermitID">DRAFT-ID</div>
+                </div>
+
+                <!-- QR & Barcode -->
+                <div class="col right">
+                    <div class="qr-placeholder"></div>
+                    <div class="barcode" style="margin-left: auto;"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Meta Data Grid -->
+        <div class="row gap-4" style="border: 2px solid black; padding: 8px;">
+            <div class="flex-1 col gap-4">
+                <label class="txt-xs uppercase txt-bold">Facility / Unit</label>
+                <input type="text" id="facilityName" placeholder="e.g. REFINERY-TR1">
+            </div>
+            <div class="flex-1 col gap-4">
+                <label class="txt-xs uppercase txt-bold">Specific Area</label>
+                <input type="text" id="areaName" placeholder="e.g. PIPE-RACK 04-B">
+            </div>
+            <div class="flex-1 col gap-4">
+                <label class="txt-xs uppercase txt-bold">GPS Coordinates</label>
+                <input type="text" id="gpsCoords" placeholder="LAT, LONG (Decimal)">
+            </div>
+            <div class="flex-1 col gap-4">
+                <label class="txt-xs uppercase txt-bold">Shift Duration</label>
+                <select id="shiftDuration">
+                    <option value="8">08 HOURS</option>
+                    <option value="12">12 HOURS</option>
+                </select>
+            </div>
+            <div class="flex-1 col gap-4">
+                <label class="txt-xs uppercase txt-bold">Permit Status</label>
+                <input type="text" id="permitStatusDisplay" value="DRAFT" readonly class="center txt-bold" style="background: #eee; font-weight: 900;">
+            </div>
+        </div>
+
+        <!-- Description & Controls -->
+        <div class="row gap-4" style="margin-top: 8px;">
+            <div class="flex-3">
+                <label class="txt-xs uppercase txt-bold">Work Description (Engineering Scope)</label>
+                <textarea id="workDesc" rows="2" placeholder="Describe the exact nature of hot work, equipment involved, and boundaries..."></textarea>
+            </div>
+            <div class="flex-1 col">
+                <label class="txt-xs uppercase txt-bold">Countdown Timer</label>
+                <div id="timerDisplay" style="font-family: var(--f-mono); font-size: 24px; text-align: center; padding: 4px; border: 1px solid #ccc;">00:00:00</div>
+                <label class="txt-xs uppercase txt-bold">Expiry Time</label>
+                <input type="text" id="expiryTimeDisplay" readonly value="--:--">
+            </div>
+        </div>
+
+        <!-- 🅑 JSA + RISK MATRIX ENGINE -->
+        <div class="section-box">
+            <div class="section-header">🅑 JSA & RISK ASSESSMENT</div>
+            
+            <div class="row gap-16">
+                <!-- Matrix Visualization -->
+                <div class="col">
+                    <label class="txt-xs uppercase txt-bold" style="margin-bottom: 4px; display:block;">Risk Matrix (C x L)</label>
+                    <div class="risk-matrix-container">
+                        <!-- Row Headers (Consequence) -->
+                        <div class="risk-label label-y">Catastrophic (5)</div>
+                        <div class="risk-cell bg-high">5</div>
+                        <div class="risk-cell bg-crit">10</div>
+                        <div class="risk-cell bg-crit">15</div>
+                        <div class="risk-cell bg-crit">20</div>
+                        <div class="risk-cell bg-crit">25</div>
+
+                        <div class="risk-label label-y">Major (4)</div>
+                        <div class="risk-cell bg-med">4</div>
+                        <div class="risk-cell bg-high">8</div>
+                        <div class="risk-cell bg-high">12</div>
+                        <div class="risk-cell bg-crit">16</div>
+                        <div class="risk-cell bg-crit">20</div>
+
+                        <div class="risk-label label-y">Moderate (3)</div>
+                        <div class="risk-cell bg-low">3</div>
+                        <div class="risk-cell bg-med">6</div>
+                        <div class="risk-cell bg-high">9</div>
+                        <div class="risk-cell bg-high">12</div>
+                        <div class="risk-cell bg-crit">15</div>
+
+                        <div class="risk-label label-y">Minor (2)</div>
+                        <div class="risk-cell bg-low">2</div>
+                        <div class="risk-cell bg-med">4</div>
+                        <div class="risk-cell bg-med">6</div>
+                        <div class="risk-cell bg-high">8</div>
+                        <div class="risk-cell bg-high">10</div>
+
+                        <div class="risk-label label-y">Insignificant (1)</div>
+                        <div class="risk-cell bg-low">1</div>
+                        <div class="risk-cell bg-low">2</div>
+                        <div class="risk-cell bg-med">3</div>
+                        <div class="risk-cell bg-med">4</div>
+                        <div class="risk-cell bg-high">5</div>
+
+                        <!-- Col Headers (Likelihood) -->
+                        <div></div>
+                        <div class="risk-label">Rare (1)</div>
+                        <div class="risk-label">Unlikely (2)</div>
+                        <div class="risk-label">Possible (3)</div>
+                        <div class="risk-label">Likely (4)</div>
+                        <div class="risk-label">Almost Certain (5)</div>
+                    </div>
+                </div>
+
+                <!-- Risk Calculation Input -->
+                <div class="flex-1 col gap-8">
+                    <div class="row gap-8">
+                        <div class="flex-1">
+                            <label class="txt-xs uppercase">Initial Consequence (1-5)</label>
+                            <input type="number" id="riskConsequence" min="1" max="5" value="1">
+                        </div>
+                        <div class="flex-1">
+                            <label class="txt-xs uppercase">Initial Likelihood (1-5)</label>
+                            <input type="number" id="riskLikelihood" min="1" max="5" value="1">
+                        </div>
+                    </div>
+                    
+                    <div class="section-box" style="margin-top:0; min-height: 80px; background: var(--hatch-pattern);">
+                        <label class="txt-xs uppercase txt-bold">Specific Hazard Details</label>
+                        <textarea id="hazardDetails" rows="2" placeholder="List specific hazards (e.g., Flammable vapors, Dust)..."></textarea>
+                    </div>
+
+                    <div class="row gap-8">
+                        <div class="flex-1">
+                            <label class="txt-xs uppercase">Mitigation Controls</label>
+                            <textarea id="mitigationControls" rows="2" placeholder="Controls to reduce risk..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row gap-8" style="border-top: 2px solid black; padding-top: 4px;">
+                        <div class="flex-1">
+                            <label class="txt-xs uppercase txt-bold">Residual Risk Score</label>
+                            <input type="text" id="residualRiskScore" readonly value="CALCULATING..." style="text-align: center; font-weight: bold; font-size: 14px;">
+                        </div>
+                        <div class="flex-1">
+                            <label class="txt-xs uppercase txt-bold">Risk Level</label>
+                            <input type="text" id="riskLevelText" readonly value="LOW" style="text-align: center; font-weight: bold; font-size: 14px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🅒 MASTER LINKED CERTIFICATES -->
+        <div class="section-box">
+            <div class="section-header">🅒 MASTER LINKED CERTIFICATES (PRE-REQUISITES)</div>
+            <table id="certTable">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">Cert Type</th>
+                        <th style="width: 15%;">Cert ID</th>
+                        <th style="width: 15%;">Issuer Dept</th>
+                        <th style="width: 15%;">Gas Free?</th>
+                        <th style="width: 20%;">Valid Period</th>
+                        <th style="width: 10%;">Verified</th>
+                        <th style="width: 15%;">Inspector</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- LOTO -->
+                    <tr>
+                        <td class="txt-bold">LOTO</td>
+                        <td><input type="text" placeholder="ISO-XXX"></td>
+                        <td><input type="text" placeholder="Maintenance"></td>
+                        <td><select><option>Yes</option><option>No</option></select></td>
+                        <td><input type="text" placeholder="From - To"></td>
+                        <td class="center"><input type="checkbox" class="cert-verify-check" data-req="true"></td>
+                        <td><input type="text" class="sig-input"></td>
+                    </tr>
+                    <!-- Confined Space -->
+                    <tr>
+                        <td class="txt-bold">Conf. Space</td>
+                        <td><input type="text" placeholder="CSE-XXX"></td>
+                        <td><input type="text" placeholder="Safety"></td>
+                        <td><select><option>Yes</option><option>No</option></select></td>
+                        <td><input type="text" placeholder="From - To"></td>
+                        <td class="center"><input type="checkbox" class="cert-verify-check" data-req="true"></td>
+                        <td><input type="text" class="sig-input"></td>
+                    </tr>
+                    <!-- Excavation -->
+                    <tr>
+                        <td class="txt-bold">Excavation</td>
+                        <td><input type="text" placeholder="EXC-XXX"></td>
+                        <td><input type="text" placeholder="Civil"></td>
+                        <td><select><option>N/A</option><option>Yes</option><option>No</option></select></td>
+                        <td><input type="text" placeholder="From - To"></td>
+                        <td class="center"><input type="checkbox" class="cert-verify-check"></td>
+                        <td><input type="text" class="sig-input"></td>
+                    </tr>
+                    <!-- Scaffolding -->
+                    <tr>
+                        <td class="txt-bold">Scaffold</td>
+                        <td><input type="text" placeholder="SCF-XXX"></td>
+                        <td><input type="text" placeholder="Scaffolding"></td>
+                        <td><select><option>N/A</option><option>Yes</option><option>No</option></select></td>
+                        <td><input type="text" placeholder="Green Tag"></td>
+                        <td class="center"><input type="checkbox" class="cert-verify-check" data-req="true"></td>
+                        <td><input type="text" class="sig-input"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 🅓 GAS TESTING FIELD MONITORING -->
+        <div class="section-box">
+            <div class="section-header">🅓 GAS TESTING LOG (24 HOUR)</div>
+            <div style="font-size: 9px; margin-bottom: 4px;">
+                THRESHOLDS: LEL > 0% (WARN), LEL ≥ 5% (CRITICAL BLOCK) | O2 (19.5-23.5%) | H2S > 10PPM (BLOCK) | CO > 35PPM (BLOCK)
+            </div>
+            <table id="gasTable">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Time</th>
+                        <th style="width: 15%;">O2 (%)</th>
+                        <th style="width: 15%;">LEL (%)</th>
+                        <th style="width: 15%;">H2S (ppm)</th>
+                        <th style="width: 15%;">CO (ppm)</th>
+                        <th style="width: 25%;">Tester Name/ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- JS will generate rows or we hardcode 24 rows for strict structure -->
+                    <!-- Row 1 -->
+                    <tr class="gas-row">
+                        <td><input type="time" class="gas-time"></td>
+                        <td><input type="number" step="0.1" class="gas-o2"></td>
+                        <td><input type="number" step="0.1" class="gas-lel"></td>
+                        <td><input type="number" class="gas-h2s"></td>
+                        <td><input type="number" class="gas-co"></td>
+                        <td><input type="text" class="gas-tester"></td>
+                    </tr>
+                    <tr class="gas-row">
+                        <td><input type="time" class="gas-time"></td>
+                        <td><input type="number" step="0.1" class="gas-o2"></td>
+                        <td><input type="number" step="0.1" class="gas-lel"></td>
+                        <td><input type="number" class="gas-h2s"></td>
+                        <td><input type="number" class="gas-co"></td>
+                        <td><input type="text" class="gas-tester"></td>
+                    </tr>
+                    <tr class="gas-row">
+                        <td><input type="time" class="gas-time"></td>
+                        <td><input type="number" step="0.1" class="gas-o2"></td>
+                        <td><input type="number" step="0.1" class="gas-lel"></td>
+                        <td><input type="number" class="gas-h2s"></td>
+                        <td><input type="number" class="gas-co"></td>
+                        <td><input type="text" class="gas-tester"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="row gap-4" style="margin-top: 4px;">
+                <button type="button" class="btn no-print" style="font-size: 9px;" onclick="addGasRow()">+ ADD GAS ENTRY</button>
+                <div id="gasSystemStatus" class="txt-xs txt-bold flex-1 right" style="padding: 4px;">STATUS: OK</div>
+            </div>
+        </div>
+
+        <!-- 🅔 PPE MATRIX -->
+        <div class="section-box">
+            <div class="section-header">🅔 PPE & SAFETY EQUIPMENT VERIFICATION</div>
+            <div class="checkbox-grid" id="ppeGrid">
+                <!-- Generated via JS for precision -->
+            </div>
+            <div style="margin-top: 8px; border-top: 1px dotted #000; padding-top: 4px;">
+                <label class="txt-xs uppercase">Additional Equipment:</label>
+                <input type="text" id="additionalPPE" placeholder="List any other equipment...">
+            </div>
+        </div>
+
+        <!-- 🅕 AUTHORIZATION ZONE -->
+        <div class="section-box" style="margin-top: auto; min-height: 150px;">
+            <div class="section-header">🅕 AUTHORIZATION & CONTROL SIGN-OFF</div>
+            
+            <!-- Stamps Area -->
+            <div id="stampContainer" class="stamp-overlay"></div>
+
+            <div class="row gap-8">
+                <!-- Performing Authority -->
+                <div class="flex-1" style="border: 1px solid #000; padding: 4px;">
+                    <div class="txt-xs uppercase txt-bold center">Performing Authority (PA)</div>
+                    <div class="sig-wrapper">
+                        <canvas id="sigPA" class="sig-canvas"></canvas>
+                        <button type="button" class="btn no-print" style="position: absolute; bottom: 2px; right: 2px; font-size: 8px; padding: 2px 4px;" onclick="clearSig('sigPA')">Clear</button>
+                    </div>
+                    <div class="row gap-4" style="margin-top: 4px;">
+                        <input type="text" placeholder="Print Name" id="paName">
+                        <input type="text" placeholder="Emp ID" id="paID">
+                    </div>
+                </div>
+
+                <!-- Area Authority -->
+                <div class="flex-1" style="border: 1px solid #000; padding: 4px;">
+                    <div class="txt-xs uppercase txt-bold center">Area Authority (AA)</div>
+                    <div class="sig-wrapper">
+                        <canvas id="sigAA" class="sig-canvas"></canvas>
+                        <button type="button" class="btn no-print" style="position: absolute; bottom: 2px; right: 2px; font-size: 8px; padding: 2px 4px;" onclick="clearSig('sigAA')">Clear</button>
+                    </div>
+                    <div class="row gap-4" style="margin-top: 4px;">
+                        <input type="text" placeholder="Print Name" id="aaName">
+                        <input type="text" placeholder="Emp ID" id="aaID">
+                    </div>
+                </div>
+
+                <!-- Issuing Authority -->
+                <div class="flex-1" style="border: 1px solid #000; padding: 4px;">
+                    <div class="txt-xs uppercase txt-bold center">Issuing Authority (IA)</div>
+                    <div class="sig-wrapper">
+                        <canvas id="sigIA" class="sig-canvas"></canvas>
+                        <button type="button" class="btn no-print" style="position: absolute; bottom: 2px; right: 2px; font-size: 8px; padding: 2px 4px;" onclick="clearSig('sigIA')">Clear</button>
+                    </div>
+                    <div class="row gap-4" style="margin-top: 4px;">
+                        <input type="text" placeholder="Print Name" id="iaName">
+                        <input type="text" placeholder="Emp ID" id="iaID">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCUMENT FOOTER -->
+        <div style="margin-top: 10px; border-top: 2px solid black; padding-top: 5px; display: flex; justify-content: space-between; font-size: 9px;">
+            <div>
+                ISSUE DATE: <span id="issueDate">--</span><br>
+                SHIFT: <span id="shiftDisplay">--</span>
+            </div>
+            <div class="center">
+                CONFIDENTIAL INDUSTRIAL DOCUMENT - DO NOT DISTRIBUTE
+            </div>
+            <div class="right">
+                PAGE 1 OF 1<br>
+                SYS REF: <span id="sysRef">HWP-V4.2</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 
+    ========================================
+    🔷 SYSTEM TOOLBAR (NO-PRINT)
+    ========================================
+    -->
+    <div class="sys-bar no-print">
+        <div class="row" style="align-items: center;">
+            <div id="sysStatusLight" class="sys-status-indicator draft"></div>
+            <div>
+                <div id="sysStatusText" class="txt-bold">SYSTEM STATE: DRAFT</div>
+                <div id="sysLastAction" class="txt-xs" style="color: #aaa;">Ready for input</div>
+            </div>
+        </div>
+        <div class="row gap-8">
+            <button class="btn" onclick="savePermit()">SAVE DRAFT</button>
+            <button class="btn btn-primary" onclick="transitionPermit('REVIEW')">SUBMIT REVIEW</button>
+            <button class="btn btn-danger" onclick="printPermit()">PRINT / EXPORT PDF</button>
+        </div>
+    </div>
+
+    <!-- 
+    ========================================
+    🔷 CORE ENGINE (VANILLA JS)
+    ========================================
+    -->
+    <script>
+        /**
+         * 🔷 HWP SYSTEM CONFIGURATION
+         * Centralized constants for the industrial system.
+         */
+        const HWP_SYS_CONFIG = {
+            STORAGE_KEY: 'HWP_PERMIT_DATA_V1',
+            SESSION_KEY: 'HWP_AUDIT_TRAIL',
+            GAS_THRESHOLDS: {
+                LEL_WARN: 0,
+                LEL_CRIT: 5.0,
+                O2_MIN: 19.5,
+                O2_MAX: 23.5,
+                H2S_MAX: 10,
+                CO_MAX: 35
+            },
+            PPE_ITEMS: [
+                "Fire Retardant Coveralls", "Safety Helmet", "Safety Goggles", "Face Shield",
+                "Welding Gloves", "Leather Apron", "Safety Shoes", "Hearing Protection",
+                "Respirator (P100)", "SCBA (Self-Contained)", "Portable Gas Detector", "Fire Extinguisher (ABC)",
+                "Fire Blanket", "Flashlight (Explosion Proof)", "First Aid Kit", "Safety Harness",
+                "Lanyard", "Barricade Tape", "Warning Signs", "Spill Kit",
+                "Ventilation Blower", "Hot Work Curtain", "Flame Resistant Blanket", "Grounding Cable"
+            ],
+            RISK_MATRIX: {
+                LOW: 1,
+                MEDIUM: 6,
+                HIGH: 10,
+                CRITICAL: 15
+            }
+        };
+
+        /**
+         * 🔷 STATE MACHINE
+         * Manages the lifecycle of the Hot Work Permit.
+         */
+        const STATE_MACHINE = {
+            DRAFT: 'DRAFT',
+            UNDER_REVIEW: 'UNDER REVIEW',
+            AUTHORIZED: 'AUTHORIZED',
+            ACTIVE: 'ACTIVE',
+            SUSPENDED: 'SUSPENDED',
+            CLOSED: 'CLOSED',
+            
+            transitions: {
+                'DRAFT': ['UNDER_REVIEW', 'CLOSED'],
+                'UNDER_REVIEW': ['AUTHORIZED', 'DRAFT', 'CLOSED'],
+                'AUTHORIZED': ['ACTIVE', 'SUSPENDED', 'CLOSED'],
+                'ACTIVE': ['SUSPENDED', 'CLOSED'],
+                'SUSPENDED': ['ACTIVE', 'CLOSED'],
+                'CLOSED': []
+            }
+        };
+
+        let currentState = STATE_MACHINE.DRAFT;
+        let permitTimerInterval = null;
+        let expiryTimestamp = null;
+
+        // Initialize System
+        document.addEventListener('DOMContentLoaded', () => {
+            initSystem();
+            loadPermitData();
+            setupValidationListeners();
+            setupSignaturePads();
+            generatePermitID();
+        });
+
+        function initSystem() {
+            // Render PPE Grid
+            const ppeContainer = document.getElementById('ppeGrid');
+            HWP_SYS_CONFIG.PPE_ITEMS.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'checkbox-item';
+                div.innerHTML = `<input type="checkbox" class="ppe-check" id="ppe_${item.replace(/\s/g, '')}"> <label>${item}</label>`;
+                ppeContainer.appendChild(div);
+            });
+
+            // Set Initial Date
+            document.getElementById('issueDate').textContent = new Date().toISOString().split('T')[0];
+            
+            // Auto-fill first gas test time
+            document.querySelector('.gas-time').value = getCurrentTime();
+        }
+
+        /**
+         * 🔷 LOGIC: PERMIT CONTROL CENTER
+         */
+        function generatePermitID() {
+            const year = new Date().getFullYear();
+            const random = Math.floor(1000 + Math.random() * 9000);
+            const id = `HWP-${year}-${random}`;
+            document.getElementById('displayPermitID').textContent = id;
+            return id;
+        }
+
+        function startCountdown() {
+            const durationHours = parseInt(document.getElementById('shiftDuration').value);
+            const now = new Date();
+            expiryTimestamp = new Date(now.getTime() + (durationHours * 60 * 60 * 1000));
+            
+            document.getElementById('expiryTimeDisplay').textContent = formatTime(expiryTimestamp);
+            
+            if (permitTimerInterval) clearInterval(permitTimerInterval);
+            
+            permitTimerInterval = setInterval(() => {
+                const current = new Date();
+                const diff = expiryTimestamp - current;
+
+                if (diff <= 0) {
+                    clearInterval(permitTimerInterval);
+                    document.getElementById('timerDisplay').textContent = "EXPIRED";
+                    transitionPermit('CLOSED'); // Auto-close on expiry
+                    return;
+                }
+
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('timerDisplay').textContent = 
+                    `${pad(h)}:${pad(m)}:${pad(s)}`;
+            }, 1000);
+        }
+
+        /**
+         * 🔷 LOGIC: RISK MATRIX ENGINE
+         */
+        function calculateRisk() {
+            const consequence = parseInt(document.getElementById('riskConsequence').value) || 1;
+            const likelihood = parseInt(document.getElementById('riskLikelihood').value) || 1;
+            const rawScore = consequence * likelihood;
+            
+            const mitigationInput = document.getElementById('mitigationControls').value;
+            // Simple logic: if mitigation is present, reduce likelihood by 1 (min 1)
+            const effectiveLikelihood = mitigationInput.length > 10 ? Math.max(1, likelihood - 1) : likelihood;
+            const residualScore = consequence * effectiveLikelihood;
+
+            document.getElementById('residualRiskScore').value = residualScore;
+            
+            let level = "LOW";
+            let color = "green";
+
+            if (residualScore >= HWP_SYS_CONFIG.RISK_MATRIX.CRITICAL) {
+                level = "CRITICAL";
+                color = "black";
+            } else if (residualScore >= HWP_SYS_CONFIG.RISK_MATRIX.HIGH) {
+                level = "HIGH";
+                color = "red";
+            } else if (residualScore >= HWP_SYS_CONFIG.RISK_MATRIX.MEDIUM) {
+                level = "MEDIUM";
+                color = "orange";
+            }
+
+            const output = document.getElementById('riskLevelText');
+            output.value = level;
+            output.style.color = color === 'black' ? 'black' : color;
+            output.style.backgroundColor = color === 'black' ? '#dadce0' : 'transparent';
+        }
+
+        /**
+         * 🔷 LOGIC: GAS TESTING VALIDATION
+         */
+        function validateGasThresholds() {
+            const rows = document.querySelectorAll('.gas-row');
+            let isSafe = true;
+            let statusMsg = "GAS ENVIRONMENT: NORMAL";
+
+            rows.forEach(row => {
+                const o2 = parseFloat(row.querySelector('.gas-o2').value);
+                const lel = parseFloat(row.querySelector('.gas-lel').value);
+                const h2s = parseFloat(row.querySelector('.gas-h2s').value);
+                const co = parseFloat(row.querySelector('.gas-co').value);
+                
+                // Reset classes
+                row.querySelectorAll('input').forEach(inp => {
+                    inp.classList.remove('gas-warning', 'gas-critical');
+                });
+
+                // Logic
+                const inputs = row.querySelectorAll('input');
+                if (isNaN(o2) || isNaN(lel)) return; // Skip empty rows
+
+                if (lel >= HWP_SYS_CONFIG.GAS_THRESHOLDS.LEL_CRIT ||
+                    h2s > HWP_SYS_CONFIG.GAS_THRESHOLDS.H2S_MAX ||
+                    co > HWP_SYS_CONFIG.GAS_THRESHOLDS.CO_MAX ||
+                    (o2 < HWP_SYS_CONFIG.GAS_THRESHOLDS.O2_MIN || o2 > HWP_SYS_CONFIG.GAS_THRESHOLDS.O2_MAX)) {
+                    
+                    inputs.forEach(inp => inp.classList.add('gas-critical'));
+                    isSafe = false;
+                    statusMsg = "CRITICAL GAS LEVEL DETECTED - WORK BLOCKED";
+                } else if (lel > HWP_SYS_CONFIG.GAS_THRESHOLDS.LEL_WARN) {
+                    inputs.forEach(inp => inp.classList.add('gas-warning'));
+                    statusMsg = "WARNING: LEL DETECTED";
+                }
+            });
+
+            const statusEl = document.getElementById('gasSystemStatus');
+            statusEl.textContent = statusMsg;
+            statusEl.style.color = isSafe ? 'green' : 'red';
+            
+            return isSafe;
+        }
+
+        function addGasRow() {
+            const tbody = document.querySelector('#gasTable tbody');
+            const tr = document.createElement('tr');
+            tr.className = 'gas-row';
+            tr.innerHTML = `
+                <td><input type="time" class="gas-time"></td>
+                <td><input type="number" step="0.1" class="gas-o2"></td>
+                <td><input type="number" step="0.1" class="gas-lel"></td>
+                <td><input type="number" class="gas-h2s"></td>
+                <td><input type="number" class="gas-co"></td>
+                <td><input type="text" class="gas-tester"></td>
+            `;
+            tbody.appendChild(tr);
+            // Add listener to new inputs
+            tr.querySelectorAll('input').forEach(input => {
+                input.addEventListener('input', validateGasThresholds);
+            });
+        }
+
+        /**
+         * 🔷 LOGIC: VALIDATION ENGINE (THE BLOCKER)
+         */
+        function validateEntirePermit() {
+            const errors = [];
+            
+            // 1. Facility Info
+            if (!document.getElementById('facilityName').value) errors.push("Facility Name Missing");
+            if (!document.getElementById('areaName').value) errors.push("Area Name Missing");
+
+            // 2. Risk
+            const riskLevel = document.getElementById('riskLevelText').value;
+            if (riskLevel === 'CRITICAL' || riskLevel === 'HIGH') {
+                 // Depending on strictness, might block. Here we warn but allow override if IA signs, 
+                 // but for safety, let's block CRITICAL.
+                 if (riskLevel === 'CRITICAL') errors.push("CRITICAL RISK NOT ACCEPTABLE");
+            }
+
+            // 3. Certificates
+            const certChecks = document.querySelectorAll('.cert-verify-check[data-req="true"]');
+            certChecks.forEach(chk => {
+                if (!chk.checked) errors.push("Missing Required Certificate Verification");
+            });
+
+            // 4. Gas (At least one reading)
+            const gasReadings = document.querySelectorAll('.gas-row');
+            let hasValidGas = false;
+            gasReadings.forEach(row => {
+                if (row.querySelector('.gas-o2').value !== "") hasValidGas = true;
+            });
+            if (!hasValidGas) errors.push("Initial Gas Test Required");
+
+            // 5. Gas Safety
+            if (!validateGasThresholds()) errors.push("Gas Levels Unsafe");
+
+            return {
+                isValid: errors.length === 0,
+                errors: errors
+            };
+        }
+
+        /**
+         * 🔷 LOGIC: STATE MACHINE CONTROLLER
+         */
+        function transitionPermit(newStateKey) {
+            // Check if transition is legal
+            const allowedTransitions = STATE_MACHINE.transitions[currentState];
+            // Convert string key to object key if needed, simple map here
+            const target = Object.keys(STATE_MACHINE).find(k => STATE_MACHINE[k] === newStateKey) 
+                           ? newStateKey 
+                           : STATE_MACHINE[newStateKey]; // Handle direct string input
+
+            if (!allowedTransitions.includes(newStateKey)) {
+                alert(`ILLEGAL TRANSITION: Cannot move from ${currentState} to ${newStateKey}`);
+                return;
+            }
+
+            // Hard Pre-checks
+            if (newStateKey === 'AUTHORIZED' || newStateKey === 'ACTIVE') {
+                const validation = validateEntirePermit();
+                if (!validation.isValid) {
+                    alert(`AUTHORIZATION BLOCKED:\n\n- ${validation.errors.join('\n- ')}`);
+                    logSystemAction("AUTHORIZATION FAILED VALIDATION");
+                    return;
+                }
+            }
+
+            // Execute Transition
+            currentState = newStateKey;
+            updateUIState();
+            logSystemAction(`STATE TRANSITION: ${currentState}`);
+
+            // Side effects
+            if (currentState === 'ACTIVE') {
+                startCountdown();
+                applyStamp('APPROVED');
+                disableInputs();
+            } else if (currentState === 'CLOSED') {
+                applyStamp('EXPIRED');
+                clearInterval(permitTimerInterval);
+            } else if (currentState === 'UNDER_REVIEW') {
+                applyStamp(null); // Clear stamps
+            }
+            
+            savePermitData();
+        }
+
+        function updateUIState() {
+            const display = document.getElementById('permitStatusDisplay');
+            display.value = currentState;
+            
+            const sysText = document.getElementById('sysStatusText');
+            sysText.textContent = `SYSTEM STATE: ${currentState}`;
+            
+            const light = document.getElementById('sysStatusLight');
+            light.className = `sys-status-indicator ${currentState.toLowerCase()}`;
+
+            // Button State Logic
+            const btnReview = document.querySelector('button[onclick="transitionPermit(\'REVIEW\')"]');
+            if (currentState !== 'DRAFT') {
+                btnReview.disabled = true;
+                btnReview.textContent = "LOCKED";
+            } else {
+                btnReview.disabled = false;
+                btnReview.textContent = "SUBMIT REVIEW";
+            }
+        }
+
+        function disableInputs() {
+            const inputs = document.querySelectorAll('input:not([type="checkbox"]), textarea, select');
+            inputs.forEach(el => el.readOnly = true);
+            document.querySelectorAll('input[type="checkbox"]').forEach(el => el.disabled = true);
+        }
+
+        /**
+         * 🔷 VISUALS: STAMP & SIGNATURES
+         */
+        function applyStamp(type) {
+            const stamp = document.getElementById('stampContainer');
+            stamp.className = 'stamp-overlay'; // Reset
+            if (!type) return;
+            
+            stamp.classList.add('stamp-visible');
+            if (type === 'APPROVED') stamp.classList.add('stamp-approved');
+            if (type === 'REJECTED') stamp.classList.add('stamp-rejected');
+            if (type === 'EXPIRED') stamp.classList.add('stamp-expired');
+            stamp.textContent = type;
+        }
+
+        function setupSignaturePads() {
+            ['sigPA', 'sigAA', 'sigIA'].forEach(id => {
+                const canvas = document.getElementById(id);
+                const ctx = canvas.getContext('2d');
+                let drawing = false;
+
+                // Set resolution
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'square';
+                ctx.strokeStyle = '#0000FF'; // Blue ink
+
+                const getPos = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                    const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                    return {x, y};
+                }
+
+                const start = (e) => {
+                    e.preventDefault();
+                    drawing = true;
+                    const pos = getPos(e);
+                    ctx.beginPath();
+                    ctx.moveTo(pos.x, pos.y);
+                };
+
+                const move = (e) => {
+                    if (!drawing) return;
+                    e.preventDefault();
+                    const pos = getPos(e);
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.stroke();
+                };
+
+                const end = () => { drawing = false; };
+
+                // Mouse
+                canvas.addEventListener('mousedown', start);
+                canvas.addEventListener('mousemove', move);
+                canvas.addEventListener('mouseup', end);
+                // Touch
+                canvas.addEventListener('touchstart', start);
+                canvas.addEventListener('touchmove', move);
+                canvas.addEventListener('touchend', end);
+            });
+        }
+
+        function clearSig(id) {
+            const canvas = document.getElementById(id);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        /**
+         * 🔷 UTILS & STORAGE
+         */
+        function setupValidationListeners() {
+            // Risk
+            document.getElementById('riskConsequence').addEventListener('input', calculateRisk);
+            document.getElementById('riskLikelihood').addEventListener('input', calculateRisk);
+            document.getElementById('mitigationControls').addEventListener('input', calculateRisk);
+            
+            // Gas
+            document.querySelectorAll('#gasTable input').forEach(inp => {
+                inp.addEventListener('input', validateGasThresholds);
+            });
+
+            // Auto Time on Gas
+            document.querySelectorAll('.gas-tester').forEach(inp => {
+                inp.addEventListener('change', (e) => {
+                    const row = e.target.closest('tr');
+                    if(!row.querySelector('.gas-time').value) {
+                        row.querySelector('.gas-time').value = getCurrentTime();
+                    }
+                });
+            });
+        }
+
+        function savePermitData() {
+            const data = {
+                id: document.getElementById('displayPermitID').textContent,
+                status: currentState,
+                facility: document.getElementById('facilityName').value,
+                area: document.getElementById('areaName').value,
+                workDesc: document.getElementById('workDesc').value,
+                expiry: expiryTimestamp
+            };
+            localStorage.setItem(HWP_SYS_CONFIG.STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function savePermit() {
+            savePermitData();
+            alert("PERMIT DATA SAVED TO LOCAL STORAGE");
+            logSystemAction("USER SAVED DRAFT");
+        }
+
+        function loadPermitData() {
+            const saved = localStorage.getItem(HWP_SYS_CONFIG.STORAGE_KEY);
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('displayPermitID').textContent = data.id;
+                document.getElementById('facilityName').value = data.facility || '';
+                document.getElementById('areaName').value = data.area || '';
+                document.getElementById('workDesc').value = data.workDesc || '';
+                if (data.status) {
+                    currentState = data.status;
+                    updateUIState();
+                    if(currentState === 'ACTIVE' || currentState === 'CLOSED') disableInputs();
+                }
+            }
+        }
+
+        function logSystemAction(msg) {
+            const logs = JSON.parse(sessionStorage.getItem(HWP_SYS_CONFIG.SESSION_KEY) || '[]');
+            logs.push({ time: new Date().toISOString(), msg: msg });
+            sessionStorage.setItem(HWP_SYS_CONFIG.SESSION_KEY, JSON.stringify(logs));
+            document.getElementById('sysLastAction').textContent = msg;
+        }
+
+        function printPermit() {
+            window.print();
+        }
+
+        function getCurrentTime() {
+            const now = new Date();
+            return `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+        }
+
+        function pad(n) { return n < 10 ? '0' + n : n; }
+        function formatTime(d) { return `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+
+    </script>
+</body>
+</html>

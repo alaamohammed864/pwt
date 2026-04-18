@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>شجرة المستودع | Repository Tree</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --bg-soft: rgba(20, 27, 42, 0.75);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --hot: #f97316;
+      --cold: #06b6d4;
+      --ptw: #10b981;
+      --ai: #8b5cf6;
+      --proto: #f59e0b;
+      --accent: #3b82f6;
+      --glass: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Cairo', 'Inter', system-ui, sans-serif;
+      background: radial-gradient(circle at 50% 25%, #111827, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      perspective: 1400px;
+    }
+    /* خلفية شبكية صناعية خفيفة */
+    .grid-bg {
+      position: fixed; inset: 0; z-index: -1; opacity: 0.15;
+      background-image: 
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    header {
+      position: sticky; top: 0; z-index: 20;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 1rem;
+      text-align: center;
+    }
+    header h1 { font-size: 1.8rem; margin-bottom: 0.3rem; letter-spacing: -0.5px; }
+    header p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0.2rem; }
+    header small { font-size: 0.8rem; opacity: 0.7; }
+
+    #scene {
+      position: relative;
+      width: 100%;
+      height: 65vh;
+      display: flex; justify-content: center; align-items: center;
+      transform-style: preserve-3d;
+      animation: floatScene 24s linear infinite;
+    }
+    @keyframes floatScene {
+      0%, 100% { transform: rotateY(0deg) rotateX(3deg); }
+      50% { transform: rotateY(12deg) rotateX(-2deg); }
+    }
+
+    .trunk {
+      position: absolute; width: 14px; height: 260px;
+      background: linear-gradient(to bottom, #374151, #111827);
+      border-radius: 8px; transform: translateZ(0);
+      box-shadow: 0 0 20px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.1);
+    }
+
+    .fruit {
+      position: absolute; width: 32px; height: 32px;
+      border-radius: 50%; cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s, filter 0.3s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.35);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #000;
+      border: 2px solid rgba(255,255,255,0.4);
+    }
+    .fruit:hover, .fruit:focus-visible {
+      transform: scale(1.7) translateZ(25px) !important;
+      box-shadow: 0 0 22px currentColor, 0 0 40px rgba(255,255,255,0.25);
+      filter: brightness(1.15);
+      outline: none;
+    }
+
+    .tooltip {
+      position: fixed; background: #111827;
+      border: 1px solid var(--border);
+      padding: 0.8rem 1.1rem; border-radius: 10px;
+      pointer-events: none; opacity: 0; transition: opacity 0.2s, transform 0.2s;
+      z-index: 1000; font-size: 0.88rem; max-width: 280px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+      direction: ltr; text-align: center;
+      transform: translateY(6px);
+    }
+    .tooltip.show { opacity: 1; transform: translateY(0); }
+    .tooltip .badge {
+      display: inline-block; padding: 0.15rem 0.5rem; border-radius: 20px;
+      font-size: 0.75rem; font-weight: 600; margin-bottom: 0.4rem;
+      color: #000;
+    }
+
+    .legend {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem;
+      padding: 1.2rem 1rem; margin-top: -1.5rem; position: relative; z-index: 5;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--text-muted); }
+    .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+    footer {
+      text-align: center; padding: 2rem 1rem 3rem;
+      color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+
+    /* إمكانية الوصول والأداء */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      #scene { animation: none; }
+    }
+    @media (max-width: 768px) {
+      header h1 { font-size: 1.4rem; }
+      #scene { height: 55vh; }
+      .fruit { width: 28px; height: 28px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <header>
+    <h1>🌳 شجرة مستودع GitHub</h1>
+    <p>مرّر المؤشر أو استخدم لوحة المفاتيح لاستعراض الملفات · انقر للفتح مباشرة</p>
+    <p>✨ كل ثمرة تمثل ملفاً · الألوان تُصنّف النوع تلقائياً</p>
+    <small>تصميم تفاعلي ثلاثي الأبعاد · متوافق مع GitHub Pages</small>
+  </header>
+
+  <div id="scene">
+    <div class="trunk"></div>
+  </div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="dot" style="background:var(--hot)"></span> Hot Work</div>
+    <div class="legend-item"><span class="dot" style="background:var(--cold)"></span> Cold Work</div>
+    <div class="legend-item"><span class="dot" style="background:var(--ptw)"></span> PTW / Roadmap</div>
+    <div class="legend-item"><span class="dot" style="background:var(--ai)"></span> AI Prototype</div>
+    <div class="legend-item"><span class="dot" style="background:var(--proto)"></span> Prototype</div>
+  </div>
+
+  <footer>
+    تم الإنشاء لربط المستودع بواجهات تصاريح العمل ونماذج الذكاء الاصطناعي<br>
+    <span dir="ltr">v2.0 · Industrial HSE × AI Identity</span>
+  </footer>
+
+  <script>
+    const files = [
+      "hot-work-permit-basic-bilingual-v1.0.html",
+      "hot-work-permit-react-spa-v2.0.html",
+      "hot-work-permit-industrial-offline-v3.0.html",
+      "cold-work-permit-advanced-dashboard-v4.0.html",
+      "cold-work-permit-enhanced-rtl-v2.0.html",
+      "ptw-improvement-roadmap-v1.0.html",
+      "ai-prototype-refinery-control-v4.8.2.html",
+      "ai-prototype-role-based-cold-work.html",
+      "ai-prototype-multi-role-approval-flow.html",
+      "ai-prototype-dark-industrial-3d-hwp.html",
+      "ai-prototype-cold-work-simple-bilingual.html",
+      "ai-prototype-zfd-cold-work-pro.html",
+      "ai-prototype-certificates-gas-log-table.html",
+      "ai-prototype-master-certificates-ppe-matrix.html",
+      "ai-prototype-file-uploads-risk-matrix.html",
+      "ai-prototype-cold-work-3d-viewer.html",
+      "ai-prototype-hot-work-rtl-arabic.html",
+      "ai-prototype-workflow-progress-qr.html",
+      "prototype-industrial-simple-stamp.html",
+      "prototype-hard-edges-gas-validation.html",
+      "prototype-3d-sparks-background.html",
+      "prototype-3d-hse-dark-voice.html",
+      "prototype-sidebar-file-manager.html",
+      "prototype-comprehensive-100-files.html",
+      "prototype-workflow-signature-pads.html",
+      "prototype-5x5-matrix-audit-trail.html",
+      "prototype-a4-print-optimized-hatch.html"
+    ];
+
+    const getType = (n) => {
+      if (n.includes('hot-work')) return { label: 'Hot Work', color: 'var(--hot)' };
+      if (n.includes('cold-work')) return { label: 'Cold Work', color: 'var(--cold)' };
+      if (n.includes('ptw') || n.includes('roadmap')) return { label: 'PTW / Roadmap', color: 'var(--ptw)' };
+      if (n.includes('ai-prototype')) return { label: 'AI Prototype', color: 'var(--ai)' };
+      return { label: 'Prototype', color: 'var(--proto)' };
+    };
+
+    const scene = document.getElementById('scene');
+    const tooltip = document.getElementById('tooltip');
+    const count = files.length;
+
+    files.forEach((file, i) => {
+      const type = getType(file);
+      const el = document.createElement('button');
+      el.className = 'fruit';
+      el.style.background = type.color;
+      el.setAttribute('aria-label', file);
+      el.setAttribute('tabindex', '0');
+
+      const phi = Math.acos(-1 + (2 * i) / count);
+      const theta = Math.sqrt(count * Math.PI) * phi;
+      const r = 150 + (i % 5) * 22;
+      const x = r * Math.cos(theta) * Math.sin(phi);
+      const y = r * Math.cos(phi) + 50;
+      const z = r * Math.sin(theta) * Math.sin(phi);
+
+      el.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
+      el.style.left = '50%';
+      el.style.top = '50%';
+      el.style.margin = '-16px';
+
+      scene.appendChild(el);
+
+      const showTip = (e) => {
+        tooltip.innerHTML = `<span class="badge" style="background:${type.color}">${type.label}</span><br>${file}`;
+        tooltip.classList.add('show');
+        tooltip.style.left = `${e.clientX || e.pageX} + 15px`;
+        tooltip.style.top = `${e.clientY || e.pageY} + 15px`;
+      };
+      const hideTip = () => tooltip.classList.remove('show');
+
+      el.addEventListener('mouseenter', showTip);
+      el.addEventListener('mousemove', (e) => {
+        tooltip.style.left = e.clientX + 15 + 'px';
+        tooltip.style.top = e.clientY + 15 + 'px';
+      });
+      el.addEventListener('mouseleave', hideTip);
+      el.addEventListener('focus', showTip);
+      el.addEventListener('blur', hideTip);
+
+      el.addEventListener('click', () => window.location.href = `./${file}`);
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          window.location.href = `./${file}`;
+        }
+      });
+    });
+
+    scene.addEventListener('mouseenter', () => scene.style.animationPlayState = 'paused');
+    scene.addEventListener('mouseleave', () => scene.style.animationPlayState = 'running');
+    scene.addEventListener('focusin', () => scene.style.animationPlayState = 'paused');
+    scene.addEventListener('focusout', () => scene.style.animationPlayState = 'running');
+  </script>
+</body>
+</html>

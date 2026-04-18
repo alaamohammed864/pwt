@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOT WORK PERMIT SYSTEM | O&G INDUSTRIAL STANDARD</title>
+<style>
+  :root {
+    --bg-paper: #ffffff;
+    --bg-page: #e8e8e8;
+    --border-color: #2c3e50;
+    --border-light: #9ca3af;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --header-bg: #7f1d1d;
+    --header-text: #ffffff;
+    --highlight-critical: #fca5a5;
+    --highlight-safe: #86efac;
+    --input-bg: #fafafa;
+    --stamp-color: rgba(185, 28, 28, 0.85);
+    --font-eng: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-data: "Consolas", "Menlo", "Courier New", monospace;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  body {
+    background: var(--bg-page);
+    font-family: var(--font-eng);
+    font-size: 11px;
+    color: var(--text-primary);
+    line-height: 1.25;
+    padding: 15px;
+  }
+
+  .ui-controls {
+    max-width: 210mm;
+    margin: 0 auto 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #fff;
+    border: 2px solid var(--border-color);
+  }
+
+  .ui-controls h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+  .status-tracker { display: flex; gap: 6px; align-items: center; }
+  .status-step {
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+    background: #f3f4f6;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  .status-step.active { background: var(--header-bg); color: #fff; border-color: var(--header-bg); }
+  .status-step.disabled { opacity: 0.4; }
+  .btn {
+    padding: 5px 12px;
+    border: 1px solid var(--border-color);
+    background: #fff;
+    cursor: pointer;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .btn:hover { background: #f3f4f6; }
+  .btn.primary { background: var(--header-bg); color: #fff; }
+  .btn.primary:hover { background: #601515; }
+
+  .permit-sheet {
+    background: var(--bg-paper);
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    border: 2px solid #000;
+    padding: 10mm;
+    position: relative;
+  }
+
+  /* HEADER */
+  .permit-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border-color);
+    margin-bottom: 8px;
+  }
+  .header-block { padding: 6px; border-right: 1px solid var(--border-color); }
+  .header-block:last-child { border-right: none; }
+  .company-name { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .form-title { font-size: 12px; font-weight: 700; background: var(--header-bg); color: #fff; padding: 6px; text-align: center; letter-spacing: 1px; margin-bottom: 8px; }
+  .permit-meta { display: flex; gap: 15px; flex-wrap: wrap; font-size: 11px; }
+  .meta-item span { font-weight: 700; margin-right: 4px; }
+
+  /* SECTIONS */
+  .section { border: 1px solid var(--border-color); margin-bottom: 8px; }
+  .section-header {
+    background: var(--header-bg);
+    color: var(--header-text);
+    padding: 4px 8px;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .section-body { padding: 0; }
+
+  /* TABLES */
+  table.form-grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10.5px;
+  }
+  table.form-grid th, table.form-grid td {
+    border: 1px solid var(--border-color);
+    padding: 4px 6px;
+    vertical-align: middle;
+    text-align: left;
+  }
+  table.form-grid th {
+    background: #f3f4f6;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.3px;
+  }
+  table.form-grid td.label-col { background: #f9fafb; width: 15%; font-weight: 600; }
+  table.form-grid td.cross-col { border-bottom: none; }
+
+  /* INPUTS */
+  input[type="text"], input[type="date"], input[type="time"], input[type="number"], select, textarea {
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
+    font-family: var(--font-data);
+    font-size: 10.5px;
+    padding: 3px;
+    outline: none;
+  }
+  input:hover, input:focus, textarea:hover, textarea:focus {
+    border-color: #9ca3af;
+    background: var(--input-bg);
+  }
+  textarea { resize: vertical; min-height: 40px; line-height: 1.3; }
+  .check-group { display: flex; gap: 8px; align-items: center; }
+  .check-group input[type="checkbox"] { margin: 0; cursor: pointer; }
+  .check-group label { font-size: 10px; cursor: pointer; white-space: nowrap; }
+
+  /* HIGHLIGHTS */
+  .hl-critical { background-color: var(--highlight-critical); }
+  .hl-safe { background-color: var(--highlight-safe); }
+  .disabled-field { opacity: 0.5; pointer-events: none; }
+
+  /* SIGNATURES */
+  .sig-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
+  .sig-block { padding: 8px; border-right: 1px solid var(--border-color); }
+  .sig-block:last-child { border-right: none; }
+  .sig-line { border-bottom: 1px solid #000; height: 30px; margin-bottom: 4px; }
+  .sig-meta { display: flex; justify-content: space-between; font-size: 9px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* STAMP */
+  .approval-stamp {
+    position: absolute;
+    top: 45mm;
+    right: 25mm;
+    transform: rotate(-12deg);
+    border: 4px double var(--stamp-color);
+    padding: 8px 20px;
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: var(--stamp-color);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    letter-spacing: 2px;
+  }
+  .approval-stamp.visible { opacity: 0.85; }
+
+  /* FOOTER */
+  .permit-footer {
+    margin-top: 10px;
+    border-top: 2px solid var(--border-color);
+    padding-top: 6px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+
+  /* PRINT */
+  @media print {
+    @page { size: A4; margin: 0; }
+    body { background: none; padding: 0; }
+    .ui-controls { display: none !important; }
+    .permit-sheet { width: 100%; min-height: auto; border: none; padding: 0; }
+    .approval-stamp { opacity: 0.8 !important; }
+    input, textarea, select { border: none !important; background: transparent !important; }
+    .hl-critical { background-color: #f8d7da !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    .hl-safe { background-color: #d1e7dd !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    th, td { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ui-controls" id="control-panel">
+  <div>
+    <h3>System Control</h3>
+    <span id="sys-status" style="font-size:11px; color:#555;">Status: DRAFT</span>
+  </div>
+  <div class="status-tracker" id="status-tracker">
+    <div class="status-step active" data-status="DRAFT">DRAFT</div>
+    <div class="status-step disabled" data-status="APPROVED">APPROVED</div>
+    <div class="status-step disabled" data-status="ACTIVE">ACTIVE</div>
+    <div class="status-step disabled" data-status="SUSPENDED">SUSPENDED</div>
+    <div class="status-step disabled" data-status="CLOSED">CLOSED</div>
+  </div>
+  <div style="display:flex; gap:6px;">
+    <button class="btn" onclick="saveForm()">SAVE</button>
+    <button class="btn primary" onclick="validateAndPrint()">VALIDATE & PRINT</button>
+  </div>
+</div>
+
+<main class="permit-sheet" id="permit-sheet">
+  <div class="approval-stamp" id="approval-stamp">APPROVED FOR HOT WORK</div>
+
+  <div class="form-title">PERMIT TO PERFORM HOT WORK</div>
+
+  <div class="permit-header">
+    <div class="header-block">
+      <div class="company-name">GLOBAL PETROCHEMICALS INC.</div>
+      <div style="font-size:10px; color:var(--text-secondary);">HSE MANAGEMENT SYSTEM</div>
+      <div style="margin-top:8px; font-size:10px;">Form Ref: HWP-ENG-04 Rev.3</div>
+    </div>
+    <div class="header-block" style="display:grid; grid-template-rows: auto 1fr auto;">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
+        <div>Permit No: <span id="disp-permit-no">HWP-2026-0000</span></div>
+        <div>Date Issued: <input type="date" id="f-issue-date" style="width:100px;"></div>
+      </div>
+      <div style="margin-top:6px;">
+        <textarea id="f-work-desc" placeholder="Brief description of hot work activity..." style="height:42px;"></textarea>
+      </div>
+      <div class="sig-meta" style="justify-content:flex-end; margin-top:4px;">
+        <span>Permit Valid Until: <input type="datetime-local" id="f-expiry" style="width:160px;"></span>
+      </div>
+    </div>
+    <div class="header-block">
+      <div class="permit-meta">
+        <div class="meta-item"><span>Location/Area:</span><input type="text" id="f-location" placeholder="Unit / Plot"></div>
+        <div class="meta-item"><span>Equipment ID:</span><input type="text" id="f-equip-id" placeholder="Tag No."></div>
+        <div class="meta-item"><span>Contractor:</span><input type="text" id="f-contractor" placeholder="Company Name"></div>
+        <div class="meta-item"><span>Job Ref:</span><input type="text" id="f-job-ref" placeholder="WO / PR No."></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORK HAZARDS & PRECAUTIONS -->
+  <div class="section">
+    <div class="section-header">1. HAZARD IDENTIFICATION & CONTROL MEASURES</div>
+    <div class="section-body">
+      <table class="form-grid">
+        <tr>
+          <th width="5%" class="hl-critical">ITEM</th>
+          <th width="35%">POTENTIAL HAZARDS</th>
+          <th width="10%">CHK</th>
+          <th class="hl-safe">CONTROL MEASURE REQUIRED</th>
+          <th width="10%">CONFIRM</th>
+        </tr>
+        <tr>
+          <td style="text-align:center;">1</td>
+          <td><input type="text" value="Flammable atmosphere / Gas release"></td>
+          <td style="text-align:center;"><input type="checkbox"></td>
+          <td><input type="text" value="Continuous gas monitoring & ventilation"></td>
+          <td style="text-align:center;"><input type="checkbox"></td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">2</td>
+          <td><input type="text" value="Sparks / Heat propagation"></td>
+          <td style="text-align:center;"><input type="checkbox"></td>
+          <td><input type="text" value="Fire blankets / Weld screens / Remove combustibles"></td>
+          <td style="text-align:center;"><input type="checkbox"></td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">3</td>
+          <td><input type="text" value="Confined space / Oxygen deficiency"></td>
+          <td style="text-align:center;"><input type="checkbox"></td>
+          <td><input type="text" value="Forced ventilation & entry permit required"></td>
+          <td style="text-align:center;"><input type="checkbox"></td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">4</td>
+          <td><input type="text" value="Live electrical equipment nearby"></td>
+          <td style="text-align:center;"><input type="checkbox"></td>
+          <td><input type="text" value="LOTO verification & insulation mats"></td>
+          <td style="text-align:center;"><input type="checkbox"></td>
+        </tr>
+        <tr>
+          <td style="text-align:center;">5</td>
+          <td><input type="text" placeholder="Additional hazard..."></td>
+          <td style="text-align:center;"><input type="checkbox"></td>
+          <td><input type="text" placeholder="Specify control measure..."></td>
+          <td style="text-align:center;"><input type="checkbox"></td>
+        </tr>
+        <tr>
+          <td colspan="5" style="padding:6px; background:#f9fafb;">
+            <strong>PPE REQUIRED:</strong> 
+            <span class="check-group">
+              <label><input type="checkbox" checked> FR Coverall</label>
+              <label><input type="checkbox" checked> Safety Boots</label>
+              <label><input type="checkbox" checked> Safety Glasses</label>
+              <label><input type="checkbox"> Welding Hood/Face Shield</label>
+              <label><input type="checkbox"> Respirator/SCBA</label>
+              <label><input type="checkbox"> Heat Resistant Gloves</label>
+            </span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- COMPLEMENTARY CERTIFICATES -->
+  <div class="section">
+    <div class="section-header">2. COMPLEMENTARY CERTIFICATES & CROSS REFERENCES</div>
+    <div class="section-body">
+      <table class="form-grid" id="cert-table">
+        <tr>
+          <th>CERTIFICATE TYPE</th>
+          <th style="width:15%;">CERT. NO.</th>
+          <th style="width:20%;">ISSUED BY (NAME/ID)</th>
+          <th style="width:15%;">VALID UNTIL</th>
+          <th style="width:18%;">STATUS</th>
+          <th style="width:12%;">SIGN / STAMP</th>
+        </tr>
+        <tr data-cert="confined-space">
+          <td><input type="text" value="Confined Space Entry" readonly style="background:#eee;"></td>
+          <td><input type="text" class="cert-no" placeholder="CSE-XXX"></td>
+          <td><input type="text" class="cert-issuer" placeholder="Name / Badge ID"></td>
+          <td><input type="datetime-local" class="cert-valid"></td>
+          <td>
+            <span class="check-group">
+              <label><input type="checkbox" class="status-valid" onchange="handleCertStatus(this)"> Valid</label>
+              <label><input type="checkbox" class="status-nr" onchange="handleCertStatus(this)"> Not Req.</label>
+            </span>
+          </td>
+          <td><input type="text" class="cert-sig" placeholder="Signature"></td>
+        </tr>
+        <tr data-cert="electrical-iso">
+          <td><input type="text" value="Electrical Isolation" readonly style="background:#eee;"></td>
+          <td><input type="text" class="cert-no" placeholder="ELC-XXX"></td>
+          <td><input type="text" class="cert-issuer" placeholder="Name / Badge ID"></td>
+          <td><input type="datetime-local" class="cert-valid"></td>
+          <td>
+            <span class="check-group">
+              <label><input type="checkbox" class="status-valid" onchange="handleCertStatus(this)"> Valid</label>
+              <label><input type="checkbox" class="status-nr" onchange="handleCertStatus(this)"> Not Req.</label>
+            </span>
+          </td>
+          <td><input type="text" class="cert-sig" placeholder="Signature"></td>
+        </tr>
+        <tr data-cert="mechanical-iso">
+          <td><input type="text" value="Mechanical Isolation" readonly style="background:#eee;"></td>
+          <td><input type="text" class="cert-no" placeholder="MEC-XXX"></td>
+          <td><input type="text" class="cert-issuer" placeholder="Name / Badge ID"></td>
+          <td><input type="datetime-local" class="cert-valid"></td>
+          <td>
+            <span class="check-group">
+              <label><input type="checkbox" class="status-valid" onchange="handleCertStatus(this)"> Valid</label>
+              <label><input type="checkbox" class="status-nr" onchange="handleCertStatus(this)"> Not Req.</label>
+            </span>
+          </td>
+          <td><input type="text" class="cert-sig" placeholder="Signature"></td>
+        </tr>
+        <tr data-cert="hot-tapping">
+          <td><input type="text" value="Hot Tapping Certificate" readonly style="background:#eee;"></td>
+          <td><input type="text" class="cert-no" placeholder="HTP-XXX"></td>
+          <td><input type="text" class="cert-issuer" placeholder="Name / Badge ID"></td>
+          <td><input type="datetime-local" class="cert-valid"></td>
+          <td>
+            <span class="check-group">
+              <label><input type="checkbox" class="status-valid" onchange="handleCertStatus(this)"> Valid</label>
+              <label><input type="checkbox" class="status-nr" onchange="handleCertStatus(this)"> Not Req.</label>
+            </span>
+          </td>
+          <td><input type="text" class="cert-sig" placeholder="Signature"></td>
+        </tr>
+        <tr data-cert="excavation">
+          <td><input type="text" value="Excavation Certificate" readonly style="background:#eee;"></td>
+          <td><input type="text" class="cert-no" placeholder="EXC-XXX"></td>
+          <td><input type="text" class="cert-issuer" placeholder="Name / Badge ID"></td>
+          <td><input type="datetime-local" class="cert-valid"></td>
+          <td>
+            <span class="check-group">
+              <label><input type="checkbox" class="status-valid" onchange="handleCertStatus(this)"> Valid</label>
+              <label><input type="checkbox" class="status-nr" onchange="handleCertStatus(this)"> Not Req.</label>
+            </span>
+          </td>
+          <td><input type="text" class="cert-sig" placeholder="Signature"></td>
+        </tr>
+        <tr data-cert="lifting">
+          <td><input type="text" value="Lifting Plan Certificate" readonly style="background:#eee;"></td>
+          <td><input type="text" class="cert-no" placeholder="LFT-XXX"></td>
+          <td><input type="text" class="cert-issuer" placeholder="Name / Badge ID"></td>
+          <td><input type="datetime-local" class="cert-valid"></td>
+          <td>
+            <span class="check-group">
+              <label><input type="checkbox" class="status-valid" onchange="handleCertStatus(this)"> Valid</label>
+              <label><input type="checkbox" class="status-nr" onchange="handleCertStatus(this)"> Not Req.</label>
+            </span>
+          </td>
+          <td><input type="text" class="cert-sig" placeholder="Signature"></td>
+        </tr>
+        <tr data-cert="radiography">
+          <td><input type="text" value="Radiography Certificate" readonly style="background:#eee;"></td>
+          <td><input type="text" class="cert-no" placeholder="RAD-XXX"></td>
+          <td><input type="text" class="cert-issuer" placeholder="Name / Badge ID"></td>
+          <td><input type="datetime-local" class="cert-valid"></td>
+          <td>
+            <span class="check-group">
+              <label><input type="checkbox" class="status-valid" onchange="handleCertStatus(this)"> Valid</label>
+              <label><input type="checkbox" class="status-nr" onchange="handleCertStatus(this)"> Not Req.</label>
+            </span>
+          </td>
+          <td><input type="text" class="cert-sig" placeholder="Signature"></td>
+        </tr>
+        <tr data-cert="scaffold">
+          <td><input type="text" value="Scaffold Certificate" readonly style="background:#eee;"></td>
+          <td><input type="text" class="cert-no" placeholder="SCF-XXX"></td>
+          <td><input type="text" class="cert-issuer" placeholder="Name / Badge ID"></td>
+          <td><input type="datetime-local" class="cert-valid"></td>
+          <td>
+            <span class="check-group">
+              <label><input type="checkbox" class="status-valid" onchange="handleCertStatus(this)"> Valid</label>
+              <label><input type="checkbox" class="status-nr" onchange="handleCertStatus(this)"> Not Req.</label>
+            </span>
+          </td>
+          <td><input type="text" class="cert-sig" placeholder="Signature"></td>
+        </tr>
+        <tr data-cert="custom">
+          <td><input type="text" id="f-custom-cert-name" value="Other (Specify)"></td>
+          <td><input type="text" class="cert-no" placeholder="OTH-XXX"></td>
+          <td><input type="text" class="cert-issuer" placeholder="Name / Badge ID"></td>
+          <td><input type="datetime-local" class="cert-valid"></td>
+          <td>
+            <span class="check-group">
+              <label><input type="checkbox" class="status-valid" onchange="handleCertStatus(this)"> Valid</label>
+              <label><input type="checkbox" class="status-nr" onchange="handleCertStatus(this)"> Not Req.</label>
+            </span>
+          </td>
+          <td><input type="text" class="cert-sig" placeholder="Signature"></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- GAS TEST LOG -->
+  <div class="section">
+    <div class="section-header">3. ATMOSPHERIC TESTING LOG (CONTINUOUS / PRE-WORK)</div>
+    <div class="section-body">
+      <table class="form-grid" id="gas-log-table">
+        <tr>
+          <th style="width:15%;">TIME</th>
+          <th style="width:12%;">O₂ (%)</th>
+          <th style="width:12%;">LEL (%)</th>
+          <th style="width:12%;">H₂S (ppm)</th>
+          <th style="width:12%;">CO (ppm)</th>
+          <th style="width:18%;">TESTER NAME / ID</th>
+          <th style="width:19%;">SIGNATURE</th>
+        </tr>
+        <tbody id="gas-rows">
+          <!-- Rows generated by JS or static -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SIGNATURES & APPROVALS -->
+  <div class="section">
+    <div class="section-header">4. AUTHORIZATION & HANDOVER</div>
+    <div class="section-body sig-grid" id="sig-grid">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+
+  <div class="permit-footer">
+    <div>© Global Petrochemicals Inc. | HSE Dept. | Controlled Document</div>
+    <div>Printed: <span id="print-ts">N/A</span> | Page 1 of 1</div>
+  </div>
+</main>
+
+<script>
+  // --- INIT & CONFIG ---
+  const STORAGE_KEY = 'hwp_permit_data_v1';
+  let currentStatus = 'DRAFT';
+  const statusFlow = ['DRAFT', 'APPROVED', 'ACTIVE', 'SUSPENDED', 'CLOSED'];
+  const signatories = [
+    { role: 'ISSUING AUTHORITY (HSE)', id: 'sig-issuing' },
+    { role: 'AREA AUTHORITY (OPS)', id: 'sig-area' },
+    { role: 'PERFORMING AUTHORITY (SUP)', id: 'sig-perform' },
+    { role: 'GAS TESTER', id: 'sig-gastest' },
+    { role: 'FIRE WATCH', id: 'sig-firewatch' },
+    { role: 'AREA OPERATOR / RECEIVING', id: 'sig-receiver' }
+  ];
+
+  // --- DOM ELEMENTS ---
+  const permitNoEl = document.getElementById('disp-permit-no');
+  const statusTracker = document.getElementById('status-tracker');
+  const sysStatusEl = document.getElementById('sys-status');
+  const stampEl = document.getElementById('approval-stamp');
+
+  // --- INIT FUNCTIONS ---
+  function init() {
+    generatePermitNo();
+    setupGasLog();
+    setupSignatures();
+    loadForm();
+    autoSetDates();
+    setupAutoSave();
+    setupTimestamp();
+  }
+
+  function generatePermitNo() {
+    const year = new Date().getFullYear();
+    let seq = localStorage.getItem('hwp_seq_counter') || 0;
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      seq = parseInt(seq) + 1;
+      localStorage.setItem('hwp_seq_counter', seq);
+    }
+    permitNoEl.textContent = `HWP-${year}-${String(seq).padStart(4, '0')}`;
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('f-issue-date').value = today;
+  }
+
+  function setupGasLog() {
+    const tbody = document.getElementById('gas-rows');
+    for(let i=0; i<8; i++) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="time" class="gas-time" ${i===0 ? 'onfocus="this.type=\'time\'"' : ''}></td>
+        <td><input type="number" step="0.1" class="gas-o2" placeholder="19.5-23.0"></td>
+        <td><input type="number" step="0.1" class="gas-lel" placeholder="< 10%"></td>
+        <td><input type="number" step="1" class="gas-h2s" placeholder="0"></td>
+        <td><input type="number" step="1" class="gas-co" placeholder="0"></td>
+        <td><input type="text" class="gas-name" placeholder="Name / ID"></td>
+        <td><input type="text" class="gas-sig" placeholder="Initial"></td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  function setupSignatures() {
+    const grid = document.getElementById('sig-grid');
+    signatories.forEach(s => {
+      const div = document.createElement('div');
+      div.className = 'sig-block';
+      div.id = s.id;
+      div.innerHTML = `
+        <div style="font-weight:700; margin-bottom:6px; font-size:10px; text-transform:uppercase; color:var(--header-bg);">${s.role}</div>
+        <div class="sig-line"><input type="text" class="sig-name" placeholder="Full Name" onfocus="handleSigFocus(this)"></div>
+        <div style="font-size:10px; margin-bottom:2px;">Signature: <input type="text" class="sig-val" placeholder="Sign" onfocus="handleSigFocus(this)"></div>
+        <div class="sig-meta">
+          <span>Date: <input type="date" class="sig-date" style="width:100px;"></span>
+          <span>Time: <input type="time" class="sig-time" style="width:80px;"></span>
+        </div>
+      `;
+      grid.appendChild(div);
+    });
+  }
+
+  function handleSigFocus(input) {
+    const block = input.closest('.sig-block');
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    const timeStr = now.toTimeString().slice(0,5);
+    const dateInput = block.querySelector('.sig-date');
+    const timeInput = block.querySelector('.sig-time');
+    if(!dateInput.value) dateInput.value = dateStr;
+    if(!timeInput.value) timeInput.value = timeStr;
+  }
+
+  function autoSetDates() {
+    const now = new Date();
+    const expiry = new Date(now.getTime() + 8*60*60*1000); // 8h validity
+    const toLocalISO = d => {
+      const off = d.getTimezoneOffset() * 60000;
+      return new Date(d - off).toISOString().slice(0,16);
+    };
+    document.getElementById('f-expiry').value = toLocalISO(expiry);
+  }
+
+  // --- CERTIFICATE STATUS LOGIC ---
+  window.handleCertStatus = function(checkbox) {
+    const row = checkbox.closest('tr');
+    const validChk = row.querySelector('.status-valid');
+    const nrChk = row.querySelector('.status-nr');
+    
+    if (checkbox === validChk && checkbox.checked) {
+      nrChk.checked = false;
+      row.querySelectorAll('.cert-no, .cert-issuer, .cert-valid, .cert-sig').forEach(el => el.disabled = false);
+      row.classList.remove('disabled-field');
+    } else if (checkbox === nrChk && checkbox.checked) {
+      validChk.checked = false;
+      row.querySelectorAll('.cert-no, .cert-issuer, .cert-valid, .cert-sig').forEach(el => el.disabled = true);
+      row.classList.add('disabled-field');
+    } else {
+      // Unchecked both
+      row.querySelectorAll('.cert-no, .cert-issuer, .cert-valid, .cert-sig').forEach(el => el.disabled = false);
+      row.classList.remove('disabled-field');
+    }
+  }
+
+  // --- LOCAL STORAGE & VALIDATION ---
+  function collectFormData() {
+    const data = {
+      permitNo: permitNoEl.textContent,
+      status: currentStatus,
+      fields: {},
+      tables: { certs: [], gas: [] },
+      sigs: {}
+    };
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+      if(el.id) data.fields[el.id] = el.value;
+      if(el.classList.contains('status-valid') || el.classList.contains('status-nr')) data.fields[el.name || el.id] = el.checked;
+    });
+
+    // Certs
+    document.querySelectorAll('#cert-table tr[data-cert]').forEach(row => {
+      data.tables.certs.push({
+        type: row.dataset.cert,
+        no: row.querySelector('.cert-no').value,
+        issuer: row.querySelector('.cert-issuer').value,
+        valid: row.querySelector('.cert-valid').value,
+        validChk: row.querySelector('.status-valid').checked,
+        nrChk: row.querySelector('.status-nr').checked,
+        sig: row.querySelector('.cert-sig').value
+      });
+    });
+
+    // Gas
+    document.querySelectorAll('#gas-rows tr').forEach(row => {
+      data.tables.gas.push({
+        time: row.querySelector('.gas-time').value,
+        o2: row.querySelector('.gas-o2').value,
+        lel: row.querySelector('.gas-lel').value,
+        h2s: row.querySelector('.gas-h2s').value,
+        co: row.querySelector('.gas-co').value,
+        name: row.querySelector('.gas-name').value,
+        sig: row.querySelector('.gas-sig').value
+      });
+    });
+
+    // Sigs
+    document.querySelectorAll('.sig-block').forEach(blk => {
+      data.sigs[blk.id] = {
+        name: blk.querySelector('.sig-name').value,
+        val: blk.querySelector('.sig-val').value,
+        date: blk.querySelector('.sig-date').value,
+        time: blk.querySelector('.sig-time').value
+      };
+    });
+
+    return data;
+  }
+
+  function populateFormData(data) {
+    if(!data) return;
+    currentStatus = data.status || 'DRAFT';
+    permitNoEl.textContent = data.permitNo;
+
+    for(const [id, val] of Object.entries(data.fields || {})) {
+      const el = document.getElementById(id);
+      if(el) el.value = val;
+      if(el && (el.classList.contains('status-valid') || el.classList.contains('status-nr'))) el.checked = val;
+    }
+
+    if(data.tables?.certs) {
+      data.tables.certs.forEach((c, i) => {
+        const rows = document.querySelectorAll('#cert-table tr[data-cert]');
+        if(rows[i]) {
+          const row = rows[i];
+          row.querySelector('.cert-no').value = c.no || '';
+          row.querySelector('.cert-issuer').value = c.issuer || '';
+          row.querySelector('.cert-valid').value = c.valid || '';
+          row.querySelector('.cert-sig').value = c.sig || '';
+          row.querySelector('.status-valid').checked = c.validChk || false;
+          row.querySelector('.status-nr').checked = c.nrChk || false;
+          handleCertStatus(row.querySelector(c.validChk ? '.status-valid' : '.status-nr'));
+        }
+      });
+    }
+
+    if(data.tables?.gas) {
+      const rows = document.querySelectorAll('#gas-rows tr');
+      data.tables.gas.forEach((g, i) => {
+        if(rows[i]) {
+          rows[i].querySelector('.gas-time').value = g.time || '';
+          rows[i].querySelector('.gas-o2').value = g.o2 || '';
+          rows[i].querySelector('.gas-lel').value = g.lel || '';
+          rows[i].querySelector('.gas-h2s').value = g.h2s || '';
+          rows[i].querySelector('.gas-co').value = g.co || '';
+          rows[i].querySelector('.gas-name').value = g.name || '';
+          rows[i].querySelector('.gas-sig').value = g.sig || '';
+        }
+      });
+    }
+
+    if(data.sigs) {
+      for(const [id, s] of Object.entries(data.sigs)) {
+        const blk = document.getElementById(id);
+        if(blk) {
+          blk.querySelector('.sig-name').value = s.name || '';
+          blk.querySelector('.sig-val').value = s.val || '';
+          blk.querySelector('.sig-date').value = s.date || '';
+          blk.querySelector('.sig-time').value = s.time || '';
+        }
+      }
+    }
+    updateStatusUI();
+  }
+
+  window.saveForm = function() {
+    const data = collectFormData();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    alert('Permit saved locally.');
+  }
+
+  function loadForm() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if(saved) {
+      try {
+        populateFormData(JSON.parse(saved));
+      } catch(e) { console.error('Load failed', e); }
+    }
+  }
+
+  window.validateAndPrint = function() {
+    if(currentStatus === 'DRAFT') {
+      alert('Cannot print. Permit must be APPROVED or ACTIVE.');
+      return;
+    }
+    const requiredFields = ['f-work-desc', 'f-location', 'f-equip-id', 'f-contractor'];
+    let missing = false;
+    requiredFields.forEach(id => {
+      const el = document.getElementById(id);
+      if(!el.value.trim()) {
+        el.style.borderColor = 'red';
+        missing = true;
+      } else { el.style.borderColor = 'transparent'; }
+    });
+
+    // Check at least one gas test filled
+    const gasRows = document.querySelectorAll('#gas-rows tr');
+    let gasFilled = false;
+    gasRows.forEach(r => {
+      if(r.querySelector('.gas-time').value && r.querySelector('.gas-o2').value) gasFilled = true;
+    });
+
+    if(missing) { alert('Required fields missing. Please complete all red-highlighted areas.'); return; }
+    if(!gasFilled) { alert('Initial gas test record is required before printing.'); return; }
+    
+    document.getElementById('print-ts').textContent = new Date().toLocaleString();
+    window.print();
+  }
+
+  // --- STATUS WORKFLOW ---
+  window.advanceStatus = function() {
+    const idx = statusFlow.indexOf(currentStatus);
+    if(idx < statusFlow.length - 1) {
+      currentStatus = statusFlow[idx + 1];
+      updateStatusUI();
+      saveForm();
+    }
+  }
+
+  function updateStatusUI() {
+    const idx = statusFlow.indexOf(currentStatus);
+    statusFlow.forEach((s, i) => {
+      const el = document.querySelector(`.status-step[data-status="${s}"]`);
+      el.className = 'status-step';
+      if(i < idx) el.classList.add('active');
+      else if(i === idx) { el.classList.add('active'); el.style.boxShadow = '0 0 0 2px #000'; }
+      else el.classList.add('disabled');
+    });
+    sysStatusEl.textContent = `Status: ${currentStatus}`;
+    
+    if(currentStatus === 'APPROVED' || currentStatus === 'ACTIVE') {
+      stampEl.classList.add('visible');
+    } else {
+      stampEl.classList.remove('visible');
+    }
+  }
+
+  // Add workflow buttons dynamically
+  const controlPanel = document.getElementById('control-panel');
+  const flowBtns = document.createElement('div');
+  flowBtns.style.display = 'flex';
+  flowBtns.style.gap = '5px';
+  ['Approve', 'Activate', 'Suspend', 'Close'].forEach(txt => {
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.textContent = txt.toUpperCase();
+    btn.onclick = () => advanceStatus();
+    flowBtns.appendChild(btn);
+  });
+  controlPanel.appendChild(flowBtns);
+
+  // --- AUTO SAVE & UTILS ---
+  function setupAutoSave() {
+    let timeout;
+    document.addEventListener('input', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => saveForm(), 2000);
+    });
+  }
+
+  function setupTimestamp() {
+    const now = new Date().toLocaleString();
+    document.getElementById('print-ts').textContent = now;
+  }
+
+  // Boot
+  document.addEventListener('DOMContentLoaded', init);
+  window.addEventListener('beforeprint', () => {
+    const data = collectFormData();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HWP-2026 INDUSTRIAL HOT WORK PERMIT SYSTEM</title>
+<style>
+:root {
+    --unit: 4px;
+    --color-ink: #000000;
+    --color-paper: #ffffff;
+    --color-border: #1a1a1a;
+    --color-header-bg: #e6e6e6;
+    --color-warning-hatch: repeating-linear-gradient(-45deg, #ffcc00, #ffcc00 calc(var(--unit) * 1), #000000 calc(var(--unit) * 1), #000000 calc(var(--unit) * 3));
+    --color-risk-green: #4caf50;
+    --color-risk-yellow: #ffeb3b;
+    --color-risk-orange: #ff9800;
+    --color-risk-red: #f44336;
+    --color-risk-black: #000000;
+    --color-alert: #b00020;
+    --color-active: #003366;
+    --font-label: system-ui, -apple-system, 'Inter', 'Segoe UI', Roboto, sans-serif;
+    --font-data: 'Courier New', 'Consolas', 'Lucida Console', monospace;
+    --grid-gap: var(--unit);
+    --pad: calc(var(--unit) * 2);
+    --border-width: calc(var(--unit) * 0.25);
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transition: none !important;
+    text-shadow: none !important;
+}
+
+html, body {
+    background: #d9d9d9;
+    font-family: var(--font-label);
+    font-size: 10px;
+    line-height: calc(var(--unit) * 3.5);
+    color: var(--color-ink);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: var(--pad);
+}
+
+/* A4 CONTAINER */
+.hwp-a4-sheet {
+    background: var(--color-paper);
+    width: 210mm;
+    min-height: 297mm;
+    padding: 8mm 12mm 12mm 12mm;
+    border: 4px solid var(--color-border);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--pad);
+    position: relative;
+    overflow: hidden;
+}
+
+/* TYPOGRAPHY & UTILITIES */
+.hwp-label {
+    font-family: var(--font-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+    line-height: var(--unit);
+    padding-bottom: var(--unit);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: var(--pad);
+    display: flex;
+    justify-content: space-between;
+}
+
+.hwp-value {
+    font-family: var(--font-data);
+    font-size: 0.85rem;
+    padding: var(--unit);
+    background: #f4f4f4;
+    border: var(--border-width) solid var(--color-border);
+    width: 100%;
+    min-height: calc(var(--unit) * 6);
+    appearance: none;
+}
+
+.hwp-input, .hwp-select, .hwp-textarea {
+    font-family: var(--font-data);
+    font-size: 0.85rem;
+    padding: var(--unit) calc(var(--unit) * 2);
+    border: var(--border-width) solid var(--color-border);
+    background: #ffffff;
+    color: var(--color-ink);
+    width: 100%;
+    height: calc(var(--unit) * 8);
+    line-height: 1.4;
+    vertical-align: middle;
+}
+
+.hwp-input:focus, .hwp-select:focus, .hwp-textarea:focus {
+    outline: none;
+    border-color: var(--color-active);
+    background: #e8f0fe;
+}
+
+.hwp-textarea { height: calc(var(--unit) * 16); resize: vertical; }
+.hwp-select { cursor: pointer; }
+.hwp-checkbox { width: 16px; height: 16px; margin-right: var(--unit); vertical-align: middle; cursor: pointer; }
+
+.hwp-table-wrapper { width: 100%; overflow-x: auto; border: var(--border-width) solid var(--color-border); margin-bottom: var(--pad); }
+.hwp-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+.hwp-table th, .hwp-table td {
+    padding: var(--unit);
+    border: var(--border-width) solid var(--color-border);
+    text-align: left;
+    vertical-align: top;
+    line-height: calc(var(--unit) * 3.5);
+}
+.hwp-table th { background: var(--color-header-bg); font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; text-align: center; }
+.hwp-table td { background: #ffffff; }
+.hwp-table input, .hwp-table select { border: none; background: transparent; padding: 0; height: auto; width: 100%; font-family: var(--font-data); }
+
+/* WARNINGS & PATTERNS */
+.hwp-warning-banner {
+    background: var(--color-warning-hatch);
+    padding: var(--pad);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-align: center;
+    border: 2px solid var(--color-ink);
+    margin-bottom: var(--pad);
+    font-size: 0.8rem;
+    color: #000;
+    mix-blend-mode: multiply;
+}
+
+.hwp-stamp {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 3px double var(--color-active);
+    padding: var(--pad);
+    margin: var(--pad) 0;
+    color: var(--color-active);
+    font-weight: bold;
+    transform: rotate(-2deg);
+    opacity: 0.8;
+    background: rgba(0,51,102,0.05);
+}
+.hwp-stamp::before {
+    content: "APPROVED";
+    font-size: 1.2rem;
+    letter-spacing: 0.2em;
+    border-bottom: 1px solid var(--color-active);
+    margin-bottom: 4px;
+}
+.hwp-stamp::after {
+    content: "VALIDATED HSE SYSTEM";
+    font-size: 0.6rem;
+    text-transform: uppercase;
+}
+
+/* GRID SYSTEMS */
+.hwp-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--pad); }
+.hwp-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--pad); }
+.hwp-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--pad); }
+.hwp-grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--pad); }
+.hwp-grid-5-risk { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--unit); }
+
+/* RISK MATRIX */
+.hwp-matrix-cell {
+    border: var(--border-width) solid var(--color-border);
+    padding: var(--pad);
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.7rem;
+    color: #000;
+}
+.hwp-matrix-active { background: var(--color-active); color: #fff; transform: scale(1.05); box-shadow: 0 0 0 2px #fff inset; }
+.risk-low { background: var(--color-risk-green); color: #000; }
+.risk-med { background: var(--color-risk-yellow); color: #000; }
+.risk-high { background: var(--color-risk-orange); color: #000; }
+.risk-extreme { background: var(--color-risk-red); color: #fff; }
+.risk-intolerable { background: var(--color-risk-black); color: #fff; }
+
+/* CERT MODULES */
+.hwp-cert-module { border: var(--border-width) solid var(--color-border); padding: var(--pad); margin-bottom: var(--pad); background: #fafafa; }
+.hwp-cert-header { background: #e0e0e0; padding: var(--unit) var(--pad); font-weight: 800; text-transform: uppercase; margin: calc(var(--pad) * -1) calc(var(--pad) * -1) var(--pad) calc(var(--pad) * -1); border-bottom: 2px solid var(--color-border); }
+
+/* PPE GRID */
+.hwp-ppe-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--unit); font-size: 0.75rem; }
+.hwp-ppe-item { display: flex; align-items: center; gap: var(--unit); padding: var(--unit); border: var(--border-width) solid #ccc; background: #fff; }
+.hwp-ppe-item.checked { background: #e8f5e9; border-color: var(--color-risk-green); }
+
+/* STATUS INDICATOR */
+.hwp-status-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 0.65rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    border: 1px solid var(--color-border);
+    background: #eee;
+}
+.status-draft { background: #e0e0e0; color: #333; }
+.status-review { background: #fff3e0; color: #e65100; border-color: #e65100; }
+.status-auth { background: #e8f5e9; color: #1b5e20; border-color: #1b5e20; }
+.status-active { background: #003366; color: #fff; animation: hwp-pulse 2s infinite; }
+.status-suspended { background: #ffebee; color: #c62828; border-color: #c62828; text-decoration: line-through; }
+.status-closed { background: #212121; color: #fff; }
+
+@keyframes hwp-pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+/* COUNTDOWN */
+.hwp-countdown { font-family: var(--font-data); font-size: 1.1rem; font-weight: 900; color: var(--color-alert); letter-spacing: 1px; text-align: right; }
+
+/* SIGNATURE ZONE */
+.hwp-sig-block { border: 2px solid var(--color-border); padding: var(--pad); position: relative; background: #fff; margin-bottom: var(--pad); }
+.hwp-sig-label { font-weight: 800; text-transform: uppercase; font-size: 0.7rem; margin-bottom: var(--pad); border-bottom: 1px dashed #999; padding-bottom: 4px; }
+.hwp-sig-line { border-bottom: 1px solid #000; height: 32px; margin-top: var(--pad); font-family: var(--font-data); display: flex; align-items: flex-end; justify-content: flex-end; }
+.hwp-stamp-placeholder { width: 64px; height: 64px; border: 2px dashed #999; position: absolute; bottom: var(--pad); right: var(--pad); display: flex; align-items: center; justify-content: center; font-size: 0.5rem; text-align: center; color: #666; }
+
+/* CONTROLS */
+.hwp-controls { position: fixed; bottom: 20px; right: 20px; display: flex; gap: var(--pad); z-index: 999; background: #000; padding: var(--pad); border: 2px solid #fff; }
+.hwp-btn {
+    background: #fff;
+    border: none;
+    padding: var(--unit) var(--pad);
+    font-family: var(--font-data);
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    min-width: 100px;
+    text-align: center;
+}
+.hwp-btn:hover { background: #ccc; }
+.hwp-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.hwp-btn-primary { background: #003366; color: #fff; }
+.hwp-btn-primary:hover { background: #004c99; }
+.hwp-btn-danger { background: #c62828; color: #fff; }
+
+/* LOGO & QR */
+.hwp-logo-qr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--pad); }
+.hwp-logo-box { width: 120px; height: 48px; border: 2px solid var(--color-border); background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 900; color: #333; }
+.hwp-qr-box { width: 64px; height: 64px; border: 2px solid var(--color-border); background: repeating-conic-gradient(#000 0% 25%, #fff 0% 50%) 50% / 8px 8px; position: relative; }
+.hwp-qr-box::after { content: "SCAN VERIF"; position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: 0.5rem; font-weight: bold; background: #fff; border: 1px solid #000; padding: 1px; }
+
+/* ALERTS */
+.hwp-alert-box { padding: var(--pad); border-left: 4px solid var(--color-alert); background: #ffebee; margin-bottom: var(--pad); font-size: 0.75rem; display: none; }
+.hwp-alert-box.visible { display: block; }
+.hwp-alert-title { font-weight: 900; color: var(--color-alert); margin-bottom: 4px; }
+
+/* PRINT STYLES */
+@media print {
+    @page { margin: 0; size: A4 portrait; }
+    body { background: #fff; padding: 0; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .hwp-a4-sheet { width: 100%; min-height: auto; border: none; margin: 0; padding: 10mm; page-break-inside: avoid; box-shadow: none !important; }
+    .hwp-controls { display: none !important; }
+    .hwp-input, .hwp-select, .hwp-textarea { border: 1px solid #000; background: #fff !important; padding-left: 2px; }
+    .hwp-warning-banner { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .hwp-status-pill { border: 1px solid #000; }
+    .hwp-ppe-item.checked { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .hwp-sig-block { break-inside: avoid; }
+    .hwp-alert-box { border: 1px solid #c62828; }
+    h1, h2, h3 { page-break-after: avoid; }
+    .hwp-table-wrapper { overflow: visible; }
+    .hwp-table th, .hwp-table td { font-size: 7pt; padding: 2px; }
+}
+</style>
+</head>
+<body>
+
+<div id="hwp-app" class="hwp-a4-sheet">
+    <div class="hwp-warning-banner">⚠️ CONTROL OF HAZARDOUS ENERGY & HOT WORK OPERATIONS - STRICT COMPLIANCE REQUIRED ⚠️</div>
+    
+    <div class="hwp-logo-qr">
+        <div class="hwp-logo-box">[CORPORATE LOGO PLACEHOLDER]</div>
+        <div style="text-align: center; flex: 1;">
+            <h2 style="font-size: 1.2rem; margin-bottom: 4px; text-transform: uppercase;">HOT WORK PERMIT SYSTEM</h2>
+            <div style="display: flex; gap: var(--pad); justify-content: center;">
+                <span>Ref ID: <strong id="hwp-ref-id">HWP-2026-0000</strong></span>
+                <span>Shift: <strong id="hwp-shift-display">N/A</strong></span>
+                <span>Valid Until: <strong id="hwp-expiry-display">--:--</strong></span>
+            </div>
+            <div class="hwp-countdown" id="hwp-validity-countdown">00:00:00</div>
+        </div>
+        <div class="hwp-qr-box"></div>
+    </div>
+
+    <div class="hwp-grid-3">
+        <div class="hwp-label">Facility / Unit <input type="text" class="hwp-input" id="inp-facility" placeholder="e.g. NGL-4 Train A"></div>
+        <div class="hwp-label">GPS Coordinates <input type="text" class="hwp-input" id="inp-gps" placeholder="LAT: 26.XXXXX LON: 49.XXXXX"></div>
+        <div class="hwp-label">Work Location Description <input type="text" class="hwp-input" id="inp-location" placeholder="Grid Sector, Elevation, Tag"></div>
+    </div>
+
+    <div class="hwp-grid-4">
+        <div class="hwp-label">Applicant Name <input type="text" class="hwp-input" id="inp-applicant-name"></div>
+        <div class="hwp-label">Contact Badge ID <input type="text" class="hwp-input" id="inp-badge-id" pattern="[0-9]{5,8}"></div>
+        <div class="hwp-label">Work Type <select class="hwp-select" id="inp-work-type"><option value="">-- SELECT --</option><option value="grinding">Grinding / Surface Prep</option><option value="welding">Welding / Hot Tapping</option><option value="torching">Flame Cutting</option><option value="sparking">Non-Sparking Impact</option></select></div>
+        <div class="hwp-label">Status <div id="hwp-status-pill" class="hwp-status-pill status-draft">DRAFT</div></div>
+    </div>
+
+    <div class="hwp-label">JSA & RISK ASSESSMENT MATRIX (5x5) <span>Risk Threshold: EXTREME REQUIRES MGMT APPROVAL</span></div>
+    <div class="hwp-grid-2">
+        <div>
+            <div class="hwp-table-wrapper">
+                <table class="hwp-table">
+                    <thead><tr><th>L \ C</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead>
+                    <tbody id="hwp-risk-matrix-body"></tbody>
+                </table>
+            </div>
+            <div class="hwp-grid-3" style="margin-top: 8px;">
+                <div class="hwp-label">Likelihood <select class="hwp-select" id="sel-likelihood"><option value="1">1: Improbable</option><option value="2">2: Unlikely</option><option value="3">3: Possible</option><option value="4">4: Likely</option><option value="5">5: Certain</option></select></div>
+                <div class="hwp-label">Consequence <select class="hwp-select" id="sel-consequence"><option value="1">1: Negligible</option><option value="2">2: Minor</option><option value="3">3: Moderate</option><option value="4">4: Major</option><option value="5">5: Catastrophic</option></select></div>
+                <div class="hwp-label">Calculated Score <div id="hwp-risk-score" class="hwp-input" style="background: #eee; display:flex; align-items:center; justify-content:center; font-weight:900;">1</div></div>
+            </div>
+        </div>
+        <div>
+            <div class="hwp-label">Identified Hazards & Control Measures</div>
+            <textarea class="hwp-textarea" id="txt-hazards" placeholder="e.g. 1. Hydrocarbon vapor accumulation. Control: Continuous gas monitoring & forced ventilation..."></textarea>
+            <div class="hwp-label" style="margin-top: 8px;">Emergency Response Plan</div>
+            <textarea class="hwp-textarea" id="txt-erp" placeholder="e.g. Muster Point Alpha, Alarm Code: 3-2-1, Fire Extinguisher Dry Chem 10kg within 10m..."></textarea>
+        </div>
+    </div>
+
+    <div class="hwp-label">MASTER LINK CERTIFICATES (VERIFICATION REQUIRED)</div>
+    <div id="hwp-certificates-container" class="hwp-grid-2"></div>
+
+    <div class="hwp-warning-banner">GAS TESTING LOG - CONTINUOUS MONITORING PROTOCOL</div>
+    <div class="hwp-alert-box" id="gas-alert-box"><div class="hwp-alert-title">⚠️ GAS LIMIT BREACH</div><div id="gas-alert-msg">LEL threshold exceeded. Work must cease immediately.</div></div>
+    <div class="hwp-table-wrapper">
+        <table class="hwp-table">
+            <thead><tr><th>Time</th><th>Location</th><th>O2 (%)</th><th>LEL (%)</th><th>H2S (ppm)</th><th>CO (ppm)</th><th>Tester ID</th><th>Remarks</th></tr></thead>
+            <tbody id="hwp-gas-log-body"></tbody>
+        </table>
+    </div>
+
+    <div class="hwp-label">PPE & SAFETY EQUIPMENT CHECKLIST (VERIFIED BY ISSUER)</div>
+    <div class="hwp-ppe-grid" id="hwp-ppe-grid"></div>
+
+    <div class="hwp-grid-3" style="margin-top: var(--pad);">
+        <div class="hwp-sig-block">
+            <div class="hwp-sig-label">A. PERMIT APPLICANT (PA)</div>
+            <div class="hwp-label">Full Name <input type="text" class="hwp-input" id="sig-pa-name"></div>
+            <div class="hwp-label">Signature / Timestamp</div>
+            <div class="hwp-sig-line" id="sig-pa-stamp">--</div>
+            <div class="hwp-stamp-placeholder">PA STAMP</div>
+        </div>
+        <div class="hwp-sig-block">
+            <div class="hwp-sig-label">B. AREA AUTHORITY (AA)</div>
+            <div class="hwp-label">Full Name <input type="text" class="hwp-input" id="sig-aa-name"></div>
+            <div class="hwp-label">Signature / Timestamp</div>
+            <div class="hwp-sig-line" id="sig-aa-stamp">--</div>
+            <div class="hwp-stamp-placeholder">AA STAMP</div>
+        </div>
+        <div class="hwp-sig-block">
+            <div class="hwp-sig-label">C. ISSUING AUTHORITY (IA) / HSE</div>
+            <div class="hwp-label">Full Name <input type="text" class="hwp-input" id="sig-ia-name"></div>
+            <div class="hwp-label">Signature / Timestamp</div>
+            <div class="hwp-sig-line" id="sig-ia-stamp">--</div>
+            <div class="hwp-stamp-placeholder">IA STAMP</div>
+        </div>
+    </div>
+
+    <div class="hwp-label" style="margin-top: var(--pad);">PERMIT HANDOVER & CLOSEOUT</div>
+    <div class="hwp-grid-2">
+        <div class="hwp-label">Closeout Conditions Met? <select class="hwp-select" id="sel-closeout-cond"><option value="no">NO - Pending</option><option value="yes">YES - Verified</option></select></div>
+        <div class="hwp-label">Area Restored to Normal? <select class="hwp-select" id="sel-area-restored"><option value="no">NO</option><option value="yes">YES - Cleared</option></select></div>
+    </div>
+    <div class="hwp-label" style="margin-top: var(--pad);">Auditor / Final Validator</div>
+    <textarea class="hwp-textarea" id="txt-final-notes" placeholder="e.g. Permit successfully closed. All hot work ceased. Area handed back to Production. Fire watch released at 14:00."></textarea>
+</div>
+
+<div class="hwp-controls">
+    <button class="hwp-btn" onclick="HWP_SYS.draftSave()">💾 SAVE DRAFT</button>
+    <button class="hwp-btn" onclick="HWP_SYS.validateAndSubmit()">✅ VALIDATE & SUBMIT</button>
+    <button class="hwp-btn hwp-btn-primary" onclick="HWP_SYS.printPermit()" id="btn-print" disabled>🖨️ PRINT / PDF</button>
+    <button class="hwp-btn hwp-btn-danger" onclick="HWP_SYS.resetSystem()" id="btn-reset">🗑️ RESET</button>
+</div>
+
+<script>
+"use strict";
+
+const HWP_SYS_CONFIG = {
+    storageDraftKey: "HWP_DRAFT_V26_001",
+    storageAuditKey: "HWP_AUDIT_LOG_26",
+    sessionActivePermit: "HWP_ACTIVE_SESSION",
+    shiftHours: [8, 12],
+    riskMatrixColors: {1:"risk-low",2:"risk-low",3:"risk-low",4:"risk-med",6:"risk-med",8:"risk-med",9:"risk-med",5:"risk-high",10:"risk-high",12:"risk-high",15:"risk-high",16:"risk-extreme",20:"risk-extreme",18:"risk-extreme",25:"risk-intolerable"},
+    thresholds: { LEL_MAX: 5, O2_MIN: 19.5, O2_MAX: 23.5, H2S_MAX: 10, CO_MAX: 25 },
+    states: ["DRAFT", "UNDER REVIEW", "AUTHORIZED", "ACTIVE", "SUSPENDED", "CLOSED"]
+};
+
+const HWP_CERTS_DATA = [
+    { id: "LOTO", name: "LOCK-OUT / TAG-OUT", fields: ["Cert ID", "Energy Source Isolated", "Verifier", "Status"] },
+    { id: "CSE", name: "CONFINED SPACE ENTRY", fields: ["Permit No.", "Atmosphere Verified", "Attendant Name", "Status"] },
+    { id: "EXC", name: "EXCAVATION / TRENCHING", fields: ["Shoring Cert", "Soil Classification", "Underground Scan", "Status"] },
+    { id: "LFT", name: "LIFTING PLAN / CRITICAL", fields: ["SWL Verified", "Rigger Grade", "Ground Bearing", "Status"] },
+    { id: "SCF", name: "SCAFFOLD INSPECTION", fields: ["Scaffold Tag Color", "Inspector Name", "Max Load kg", "Status"] },
+    { id: "RAD", name: "RADIOGRAPHY / NDT", fields: ["Source Type", "Exclusion Zone", "Badge Dosimetry", "Status"] }
+];
+
+const HWP_PPE_LIST = [
+    "FR Coveralls (NFPA 2112)", "Safety Helmet (ANSI Z89.1)", "Impact Goggles", "Face Shield (Clear/Smoke)", 
+    "Chemical Splash Goggles", "Leather Welding Gloves", "Nitrile Chemical Gloves", "Safety Boots (Steel Toe/Met)",
+    "Fall Arrest Harness (EN 361)", "Double Lanyard + SRL", "Welding Apron/Spats", "Fire Blanket (Woollen/Fiberglass)",
+    "Spark Containment Drop Cloths", "Portable Fire Extinguisher (DCP)", "Gas Detector (Multi-gas)", "SCBA / EEBD",
+    "Intrinsically Safe Radio", "Hearing Protection (NRR 25+)", "Hard Hat Winter Liner", "Welding Helmet (Shade 10-13)",
+    "Respirator (P100 / Organic Vapor)", "Insulated Rubber Mats", "Barrier Tapes / Warning Signs", "First Aid Kit (Trauma)",
+    "Emergency Eye Wash Station", "Thermal Imaging Camera", "Hot Work Spark Resistant Tools", "Grounding Cable & Clamps",
+    "Ventilation Blower (Ex-proof)", "Hydrocarbon Vapour Detector", "Static Earth Bond Verification", "Toolbox Talk Attendance"
+];
+
+class HWP_SYSTEM {
+    constructor() {
+        this.state = "DRAFT";
+        this.auditLog = [];
+        this.initDOM();
+        this.renderModules();
+        this.loadDraft();
+        this.startTimers();
+        this.attachListeners();
+        this.logEvent("SYSTEM_INIT", "HWP System Initialized. Version 2.6.0");
+    }
+
+    initDOM() {
+        this.dom = {
+            statusPill: document.getElementById("hwp-status-pill"),
+            countdown: document.getElementById("hwp-validity-countdown"),
+            refId: document.getElementById("hwp-ref-id"),
+            expiryDisplay: document.getElementById("hwp-expiry-display"),
+            shiftDisplay: document.getElementById("hwp-shift-display"),
+            riskScore: document.getElementById("hwp-risk-score"),
+            matrixBody: document.getElementById("hwp-risk-matrix-body"),
+            certContainer: document.getElementById("hwp-certificates-container"),
+            gasLogBody: document.getElementById("hwp-gas-log-body"),
+            ppeGrid: document.getElementById("hwp-ppe-grid"),
+            alertBox: document.getElementById("gas-alert-box"),
+            alertMsg: document.getElementById("gas-alert-msg")
+        };
+        this.dom.refId.textContent = this.generateSerial();
+    }
+
+    generateSerial() {
+        const y = new Date().getFullYear();
+        const seq = Math.floor(Math.random() * 9000) + 1000;
+        return `HWP-${y}-${seq}`;
+    }
+
+    renderModules() {
+        // Risk Matrix 5x5
+        let matrixHTML = "";
+        for(let l=1; l<=5; l++) {
+            matrixHTML += `<tr><td style="font-weight:900; background:#ddd;">${l}</td>`;
+            for(let c=1; c<=5; c++) {
+                const score = l * c;
+                const colorClass = HWP_SYS_CONFIG.riskMatrixColors[score] || "risk-low";
+                matrixHTML += `<td class="hwp-matrix-cell ${colorClass}" id="mat-${l}-${c}">${score}</td>`;
+            }
+            matrixHTML += `</tr>`;
+        }
+        this.dom.matrixBody.innerHTML = matrixHTML;
+
+        // Certificates
+        let certHTML = "";
+        HWP_CERTS_DATA.forEach(cert => {
+            certHTML += `<div class="hwp-cert-module">
+                <div class="hwp-cert-header">${cert.name}</div>
+                <table class="hwp-table">
+                    <thead><tr>${cert.fields.map(f => `<th>${f}</th>`).join("")}<th>Verify</th></tr></thead>
+                    <tbody id="cert-${cert.id}-rows"></tbody>
+                </table>
+                <button class="hwp-btn" style="margin-top:4px; width:100%" onclick="HWP_SYS.addCertRow('${cert.id}')">+ ADD LINE</button>
+            </div>`;
+        });
+        this.dom.certContainer.innerHTML = certHTML;
+
+        // PPE Grid
+        let ppeHTML = "";
+        HWP_PPE_LIST.forEach((item, i) => {
+            ppeHTML += `<label class="hwp-ppe-item"><input type="checkbox" class="hwp-checkbox" id="ppe-${i}"><span>${item}</span></label>`;
+        });
+        this.dom.ppeGrid.innerHTML = ppeHTML;
+
+        // Gas Log (24 hrs template)
+        this.renderGasLogRows(8); // Initial 8 rows
+    }
+
+    addCertRow(certId) {
+        const tbody = document.getElementById(`cert-${certId}-rows`);
+        const row = document.createElement("tr");
+        const fields = HWP_CERTS_DATA.find(c => c.id === certId).fields;
+        fields.forEach(f => {
+            row.innerHTML += `<td><input type="text" placeholder="Enter ${f}"></td>`;
+        });
+        row.innerHTML += `<td><input type="checkbox" class="hwp-checkbox" data-cert-verify="${certId}"></td>`;
+        tbody.appendChild(row);
+    }
+
+    renderGasLogRows(count) {
+        let html = "";
+        const now = new Date();
+        for(let i=0; i<count; i++) {
+            const t = new Date(now.getTime() - (i * 3600000));
+            html += `<tr>
+                <td><input type="time" class="hwp-input" data-gas-time></td>
+                <td><input type="text" placeholder="Zone/Grid" data-gas-loc></td>
+                <td><input type="number" step="0.1" placeholder="20.9" data-gas-o2></td>
+                <td><input type="number" step="0.1" placeholder="0.0" data-gas-lel></td>
+                <td><input type="number" step="1" placeholder="0" data-gas-h2s></td>
+                <td><input type="number" step="1" placeholder="0" data-gas-co></td>
+                <td><input type="text" data-gas-tester></td>
+                <td><input type="text" placeholder="OK/Abnormal" data-gas-rem></td>
+            </tr>`;
+        }
+        this.dom.gasLogBody.innerHTML += html;
+    }
+
+    attachListeners() {
+        document.getElementById("sel-likelihood").addEventListener("change", () => this.calcRisk());
+        document.getElementById("sel-consequence").addEventListener("change", () => this.calcRisk());
+        this.dom.gasLogBody.addEventListener("input", (e) => this.validateGasLive(e.target));
+        this.dom.ppeGrid.addEventListener("change", (e) => {
+            if(e.target.checked) e.target.parentElement.classList.add("checked");
+            else e.target.parentElement.classList.remove("checked");
+        });
+    }
+
+    calcRisk() {
+        const l = parseInt(document.getElementById("sel-likelihood").value);
+        const c = parseInt(document.getElementById("sel-consequence").value);
+        const score = l * c;
+        this.dom.riskScore.textContent = score;
+        
+        document.querySelectorAll(".hwp-matrix-cell").forEach(el => el.classList.remove("hwp-matrix-active"));
+        const activeCell = document.getElementById(`mat-${l}-${c}`);
+        if(activeCell) activeCell.classList.add("hwp-matrix-active");
+        
+        if(score >= 16) {
+            document.getElementById("inp-work-type").disabled = true;
+            alert("HIGH RISK SCORE DETECTED. MANAGEMENT AUTHORIZATION MANDATORY BEFORE PROCEEDING.");
+        } else {
+            document.getElementById("inp-work-type").disabled = false;
+        }
+    }
+
+    validateGasLive(target) {
+        if(!target.matches("[data-gas-lel], [data-gas-o2], [data-gas-h2s], [data-gas-co]")) return;
+        const row = target.closest("tr");
+        const lel = parseFloat(row.querySelector("[data-gas-lel]").value) || 0;
+        const o2 = parseFloat(row.querySelector("[data-gas-o2]").value) || 20.9;
+        const h2s = parseFloat(row.querySelector("[data-gas-h2s]").value) || 0;
+        const co = parseFloat(row.querySelector("[data-gas-co]").value) || 0;
+
+        const breach = (lel > HWP_SYS_CONFIG.thresholds.LEL_MAX) || 
+                       (o2 < HWP_SYS_CONFIG.thresholds.O2_MIN || o2 > HWP_SYS_CONFIG.thresholds.O2_MAX) || 
+                       (h2s > HWP_SYS_CONFIG.thresholds.H2S_MAX) || 
+                       (co > HWP_SYS_CONFIG.thresholds.CO_MAX);
+
+        if(breach) {
+            this.dom.alertBox.classList.add("visible");
+            row.style.background = "#ffcdd2";
+            this.logEvent("GAS_BREACH", `Limit exceeded. LEL:${lel} O2:${o2} H2S:${h2s} CO:${co}`);
+        } else {
+            this.dom.alertBox.classList.remove("visible");
+            row.style.background = "#e8f5e9";
+        }
+    }
+
+    validatePermitData() {
+        const errors = [];
+        const requiredIds = ["inp-facility", "inp-gps", "inp-location", "inp-applicant-name", "inp-badge-id", "txt-hazards", "txt-erp", "sig-pa-name", "sig-aa-name", "sig-ia-name"];
+        requiredIds.forEach(id => {
+            if(!document.getElementById(id).value.trim()) errors.push(`Field ${id} is mandatory.`);
+        });
+
+        const ppeChecked = document.querySelectorAll(".hwp-ppe-item.checked input:checked").length;
+        if(ppeChecked < 15) errors.push(`Minimum 15 PPE items must be verified. Current: ${ppeChecked}`);
+
+        const certRows = document.querySelectorAll("tbody[id^='cert-'] tr");
+        let certsVerified = 0;
+        certRows.forEach(r => { if(r.querySelector("input[type='checkbox']").checked) certsVerified++; });
+        if(certsVerified < 2) errors.push("At least 2 Master Link certificates must be verified for applicable work.");
+
+        const gasRows = document.querySelectorAll("#hwp-gas-log-body tr");
+        if(gasRows.length === 0) errors.push("Initial gas testing log is required.");
+
+        return errors;
+    }
+
+    async validateAndSubmit() {
+        if(this.state !== "DRAFT" && this.state !== "UNDER REVIEW") {
+            alert("PERMIT ALREADY AUTHORIZED OR CLOSED.");
+            return;
+        }
+        const errors = this.validatePermitData();
+        if(errors.length > 0) {
+            alert(`VALIDATION FAILED:\n- ${errors.join("\n- ")}`);
+            this.state = "UNDER REVIEW";
+            this.updateStateUI();
+            return;
+        }
+
+        // Simulate processing delay
+        this.state = "AUTHORIZED";
+        this.updateStateUI();
+        this.stampSignatures();
+        this.logEvent("STATE_TRANSITION", "DRAFT -> AUTHORIZED");
+        this.calculateExpiry();
+        this.startCountdown();
+        alert("PERMIT AUTHORIZED. PROCEED TO PRINT & EXECUTE.");
+        this.state = "ACTIVE";
+        this.updateStateUI();
+        document.getElementById("btn-print").disabled = false;
+        this.saveDraft();
+    }
+
+    stampSignatures() {
+        const now = new Date().toLocaleString('en-GB');
+        ["sig-pa-stamp", "sig-aa-stamp", "sig-ia-stamp"].forEach(id => {
+            document.getElementById(id).innerHTML = `<span style="font-weight:bold; color:var(--color-active);">DIGITALLY SIGNED ${now}</span>`;
+        });
+    }
+
+    calculateExpiry() {
+        const shiftHrs = document.getElementById("inp-shift-hours")?.value || "8";
+        const hrs = parseInt(shiftHrs);
+        const now = new Date();
+        const exp = new Date(now.getTime() + hrs * 3600000);
+        this.dom.expiryDisplay.textContent = exp.toLocaleString();
+        sessionStorage.setItem(HWP_SYS_CONFIG.sessionActivePermit, JSON.stringify({ start: now, end: exp }));
+    }
+
+    startCountdown() {
+        const stored = JSON.parse(sessionStorage.getItem(HWP_SYS_CONFIG.sessionActivePermit));
+        if(!stored) return;
+        const end = new Date(stored.end).getTime();
+        
+        const tick = () => {
+            const now = Date.now();
+            const diff = end - now;
+            if(diff <= 0) {
+                this.dom.countdown.textContent = "EXPIRED";
+                this.state = "CLOSED";
+                this.updateStateUI();
+                clearInterval(this.timerInterval);
+                return;
+            }
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            this.dom.countdown.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        };
+        this.timerInterval = setInterval(tick, 1000);
+    }
+
+    startTimers() { this.startCountdown(); }
+
+    updateStateUI() {
+        this.dom.statusPill.textContent = this.state;
+        this.dom.statusPill.className = `hwp-status-pill status-${this.state.toLowerCase().replace(' ', '-')}`;
+        const inputs = document.querySelectorAll(".hwp-input, .hwp-select, .hwp-textarea");
+        const locked = this.state !== "DRAFT";
+        inputs.forEach(i => i.disabled = locked);
+    }
+
+    logEvent(action, detail) {
+        const entry = { ts: new Date().toISOString(), state: this.state, action, detail };
+        this.auditLog.push(entry);
+        let logs = JSON.parse(sessionStorage.getItem(HWP_SYS_CONFIG.storageAuditKey) || "[]");
+        logs.push(entry);
+        sessionStorage.setItem(HWP_SYS_CONFIG.storageAuditKey, JSON.stringify(logs));
+    }
+
+    draftSave() {
+        const data = {};
+        document.querySelectorAll(".hwp-input, .hwp-select, .hwp-textarea, .hwp-checkbox").forEach(el => {
+            data[el.id || el.closest("label")?.querySelector(".hwp-checkbox")?.id || `manual-${Math.random()}`] = el.type === 'checkbox' ? el.checked : el.value;
+        });
+        localStorage.setItem(HWP_SYS_CONFIG.storageDraftKey, JSON.stringify({ data, state: this.state, log: this.auditLog, ts: new Date() }));
+        alert("WORK IN PROGRESS SAVED LOCALLY.");
+    }
+
+    loadDraft() {
+        const saved = localStorage.getItem(HWP_SYS_CONFIG.storageDraftKey);
+        if(!saved) return;
+        const parsed = JSON.parse(saved);
+        if(!parsed.data) return;
+        
+        Object.keys(parsed.data).forEach(key => {
+            const el = document.getElementById(key) || document.querySelector(`input[id*="${key}"]`) || document.querySelector(`[id="${key}"]`);
+            if(el) {
+                if(el.type === 'checkbox') el.checked = parsed.data[key];
+                else el.value = parsed.data[key];
+                if(el.type === 'checkbox' && el.checked) el.parentElement.classList.add("checked");
+            }
+        });
+        
+        this.state = parsed.state || "DRAFT";
+        this.updateStateUI();
+        this.logEvent("DRAFT_LOADED", "Restored from local persistence.");
+    }
+
+    printPermit() {
+        window.print();
+        this.logEvent("PRINT_EXEC", "Document rendered to PDF/Print queue.");
+    }
+
+    resetSystem() {
+        if(!confirm("CLEAR ALL DATA? THIS ACTION IS IRREVERSIBLE.")) return;
+        localStorage.removeItem(HWP_SYS_CONFIG.storageDraftKey);
+        sessionStorage.removeItem(HWP_SYS_CONFIG.sessionActivePermit);
+        location.reload();
+    }
+}
+
+// Initialize System
+let HWP_SYS;
+document.addEventListener("DOMContentLoaded", () => {
+    HWP_SYS = new HWP_SYSTEM();
+    HWP_SYS.shiftDisplay.textContent = "Standard 12H Shift";
+    // Pre-fill one gas row
+    const firstRow = document.querySelector("#hwp-gas-log-body tr");
+    if(firstRow) firstRow.querySelector("[data-gas-time]").value = new Date().toTimeString().slice(0,5);
+});
+</script>
+</body>
+</html>
